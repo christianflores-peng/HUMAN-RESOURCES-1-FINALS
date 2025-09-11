@@ -1,0 +1,17 @@
+# Protect uploaded files from direct access
+# Only allow specific file types to be downloaded
+
+<Files "*">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Allow only PDF, DOC, DOCX files
+<FilesMatch "\.(pdf|doc|docx)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Prevent execution of scripts
+Options -ExecCGI
+AddHandler cgi-script .php .pl .py .jsp .asp .sh .cgi

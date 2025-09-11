@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Management System</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Scoped Login UI styles (from login.html) */
+        #loginScreen * { box-sizing: border-box; }
+        #loginScreen {
+            color: white;
+            line-height: 1.6;
+        }
+        /* Branding and theme */
+        .app-brand { display: flex; align-items: center; gap: 0.5rem; }
+        .app-logo { width: 40px; height: 40px; object-fit: contain; }
+        .dept-name { font-weight: 700; letter-spacing: 0.5px; }
+        .theme-toggle { margin-left: 0.5rem; padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: inherit; cursor: pointer; }
+        body.theme-light { --bg-color: #f7f9fc; --text-color: #0f172a; --header-bg: #ffffff; }
+        body.theme-dark { --bg-color: #0f172a; --text-color: #e5e7eb; --header-bg: #111827; }
+        body.theme-light, body.theme-dark { background-color: var(--bg-color); color: var(--text-color); }
+        body.theme-light .top-header, body.theme-dark .top-header { background: var(--header-bg); }
+        .role-badge { background: rgba(0, 114, 255, 0.15); color: #0072ff; }
+        .logout-btn { padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: inherit; cursor: pointer; }
+        .logout-btn:hover { background: rgba(0,0,0,0.08); }
+        #loginScreen .main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        #loginScreen .login-container {
+            width: 100%;
+            max-width: 75rem;
+            display: flex;
+            background: rgba(31, 42, 56, 0.8);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.3);
+        }
+        #loginScreen .welcome-panel {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, rgba(0, 114, 255, 0.2), rgba(0, 198, 255, 0.2));
+        }
+        #loginScreen .welcome-panel h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0.125rem 0.125rem 0.5rem rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+        #loginScreen .login-panel {
+            width: 25rem;
+            padding: 3.75rem 2.5rem;
+            background: rgba(22, 33, 49, 0.95);
+        }
+        #loginScreen .login-box { width: 100%; text-align: center; }
+        #loginScreen .login-box img { width: 6.25rem; height: auto; margin-bottom: 1.25rem; }
+        #loginScreen .login-box h2 { margin-bottom: 1.5625rem; color: #ffffff; font-size: 1.75rem; }
+        #loginScreen .login-box form { display: flex; flex-direction: column; gap: 1.25rem; }
+        #loginScreen .login-box input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.375rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        #loginScreen .login-box input:focus {
+            outline: none;
+            border-color: #00c6ff;
+            box-shadow: 0 0 0 0.125rem rgba(0, 198, 255, 0.2);
+        }
+        #loginScreen .login-box input::placeholder { color: rgba(160, 160, 160, 0.8); }
+        #loginScreen .login-box button {
+            padding: 0.75rem;
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        #loginScreen .login-box button:hover {
+            background: linear-gradient(to right, #0052cc, #009ee3);
+            transform: translateY(-0.125rem);
+            box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.2);
+        }
+        @media (max-width: 48rem) {
+            #loginScreen .login-container { flex-direction: column; }
+            #loginScreen .welcome-panel, #loginScreen .login-panel { width: 100%; }
+            #loginScreen .welcome-panel { padding: 1.875rem 1.25rem; }
+            #loginScreen .welcome-panel h1 { font-size: 1.75rem; }
+            #loginScreen .login-panel { padding: 2.5rem 1.25rem; }
+        }
+        @media (max-width: 30rem) {
+            #loginScreen .main-container { padding: 1rem; }
+            #loginScreen .welcome-panel h1 { font-size: 1.5rem; }
+            #loginScreen .login-box h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="main-container">
+            <div class="login-container">
+                <div class="welcome-panel">
+                    <h1>FREIGHT MANAGEMENT SYSTEM</h1>
+                </div>
+                <div class="login-panel">
+                    <div class="login-box">
+                        <img src="assets/images/slate.png" alt="SLATE Logo">
+                        <h2>Login</h2>
+                        <form action="login.php" method="POST" novalidate>
+                            <input type="text" id="username" name="username" placeholder="Username" required>
+                            <div style="position: relative;">
+                                <input type="password" id="password" name="password" placeholder="Password" style="padding-right:2rem;" required>
+                            </div>
+                            <button type="submit">Log In</button>
+                            <div style="margin-top: 1rem; text-align: center;">
+                                <small style="color: #888; font-size: 0.8rem;">
+                                    Demo: admin/admin123 | hr_manager/hr123
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="main-app" style="display: none;">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="app-brand">
+                    <img src="assets/images/slate.png" alt="SLATE Logo" class="app-logo">
+                    <h2 class="dept-name">HR1</h2>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <h3>Main</h3>
+                    <ul>
+                        <li><a href="pages/dashboard.php" class="menu-item">
+                            <span class="icon">🏠︎</span>Dashboard
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <h3>HR Modules</h3>
+                    <ul>
+                        <li><a href="pages/recruitment.php" class="menu-item">
+                            <span class="icon">📋</span>Recruitment
+                        </a></li>
+                        <li><a href="pages/applicant-management.php" class="menu-item">
+                            <span class="icon">👥</span>Applicant Management
+                        </a></li>
+                        <li><a href="pages/onboarding.php" class="menu-item">
+                            <span class="icon">🎯</span>Onboarding
+                        </a></li>
+                        <li><a href="pages/performance.php" class="menu-item">
+                            <span class="icon">📈</span>Performance Management
+                        </a></li>
+                        <li><a href="pages/recognition.php" class="menu-item">
+                            <span class="icon">🏆</span>Social Recognition
+                        </a></li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <h3>Public Access</h3>
+                    <ul>
+                        <li><a href="careers.php" class="menu-item" target="_blank">
+                            <span class="icon">🌐</span>Careers Page
+                        </a></li>
+                        <li><a href="logout.php" class="menu-item">
+                            <span class="icon">🚪</span>Logout
+                        </a></li>
+                    </ul>
+                </div>
+                
+                
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <span id="userInfo">Welcome, <span id="currentUser">User</span></span>
+                    <span id="currentRole" class="role-badge">Role</span>
+                    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
+                    <button id="logoutBtn" class="logout-btn">Logout</button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" id="contentArea">
+                <!-- Dashboard Module -->
+                <div id="dashboard-module" class="module active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <h3>Total Employees</h3>
+                                <p class="stat-number">1,247</p>
+                                <span class="stat-change positive">+12 this month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-info">
+                                <h3>Active Recruitments</h3>
+                                <p class="stat-number">34</p>
+                                <span class="stat-change positive">+5 this week</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-info">
+                                <h3>Performance Score</h3>
+                                <p class="stat-number">4.2/5</p>
+                                <span class="stat-change positive">+0.3 this quarter</span>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-info">
+                                <h3>Recognition Awards</h3>
+                                <p class="stat-number">156</p>
+                                <span class="stat-change positive">+23 this month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-container">
+                            <h3>Recruitment Pipeline</h3>
+                            <div class="progress-chart">
+                                <div class="progress-item">
+                                    <span>Applications</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 85%"></div>
+                                    </div>
+                                    <span>340</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Screening</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%"></div>
+                                    </div>
+                                    <span>156</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Interviews</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 45%"></div>
+                                    </div>
+                                    <span>89</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>Offers</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 25%"></div>
+                                    </div>
+                                    <span>23</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>Recent Activities</h3>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <span class="activity-icon">📋</span>
+                                    <div class="activity-content">
+                                        <p>New job requisition created</p>
+                                        <small>2 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <span class="activity-icon">👤</span>
+                                    <div class="activity-content">
+                                        <p>Interview scheduled with John Doe</p>
+                                        <small>4 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <span class="activity-icon">🏆</span>
+                                    <div class="activity-content">
+                                        <p>Employee recognition awarded</p>
+                                        <small>1 day ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <span class="activity-icon">📈</span>
+                                    <div class="activity-content">
+                                        <p>Performance review completed</p>
+                                        <small>2 days ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recruitment Module -->
+                <div id="recruitment-module" class="module">
+                    <div class="module-header">
+                        <h2>Recruitment Management</h2>
+                        <button class="btn btn-primary" onclick="showSubModule('job-requisition')">New Job Requisition</button>
+                    </div>
+
+                    <div class="submodule-nav">
+                        <button class="submodule-btn active" data-submodule="job-requisition">Job Requisition</button>
+                        <button class="submodule-btn" data-submodule="sourcing">Sourcing</button>
+                        <button class="submodule-btn" data-submodule="screening">Screening</button>
+                        <button class="submodule-btn" data-submodule="interview">Interview Process</button>
+                    </div>
+
+                    <!-- Job Requisition Submodule -->
+                    <div id="job-requisition" class="submodule active">
+                        <div class="form-container">
+                            <h3>Create Job Requisition</h3>
+                            <form class="job-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Job Title</label>
+                                        <input type="text" placeholder="e.g., Senior Software Engineer">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Department</label>
+                                        <select>
+                                            <option>Engineering</option>
+                                            <option>Marketing</option>
+                                            <option>Sales</option>
+                                            <option>HR</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Location</label>
+                                        <input type="text" placeholder="e.g., San Francisco, CA">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Employment Type</label>
+                                        <select>
+                                            <option>Full-time</option>
+                                            <option>Part-time</option>
+                                            <option>Contract</option>
+                                            <option>Internship</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Job Description</label>
+                                    <textarea rows="4" placeholder="Describe the role and responsibilities..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Requirements</label>
+                                    <textarea rows="3" placeholder="List required skills and qualifications..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create Requisition</button>
+                            </form>
+                        </div>
+
+                        <div class="table-container">
+                            <h3>Active Job Requisitions</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Job Title</th>
+                                        <th>Department</th>
+                                        <th>Status</th>
+                                        <th>Applications</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Senior Software Engineer</td>
+                                        <td>Engineering</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>45</td>
+                                        <td>
+                                            <button class="btn btn-sm">View</button>
+                                            <button class="btn btn-sm">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Marketing Manager</td>
+                                        <td>Marketing</td>
+                                        <td><span class="status-badge active">Active</span></td>
+                                        <td>32</td>
+                                        <td>
+                                            <button class="btn btn-sm">View</button>
+                                            <button class="btn btn-sm">Edit</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Sourcing Submodule -->
+                    <div id="sourcing" class="submodule">
+                        <div class="sourcing-tools">
+                            <h3>Candidate Sourcing</h3>
+                            <div class="sourcing-grid">
+                                <div class="sourcing-card">
+                                    <h4>Job Boards</h4>
+                                    <p>Post to LinkedIn, Indeed, Glassdoor</p>
+                                    <button class="btn btn-primary">Post Jobs</button>
+                                </div>
+                                <div class="sourcing-card">
+                                    <h4>Social Media</h4>
+                                    <p>Share on company social channels</p>
+                                    <button class="btn btn-primary">Share</button>
+                                </div>
+                                <div class="sourcing-card">
+                                    <h4>Employee Referrals</h4>
+                                    <p>Internal referral program</p>
+                                    <button class="btn btn-primary">Send Referral</button>
+                                </div>
+                                <div class="sourcing-card">
+                                    <h4>Talent Pool</h4>
+                                    <p>Search existing candidate database</p>
+                                    <button class="btn btn-primary">Search</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Screening Submodule -->
+                    <div id="screening" class="submodule">
+                        <div class="screening-container">
+                            <h3>Application Screening</h3>
+                            <div class="filter-bar">
+                                <input type="text" placeholder="Search candidates..." class="search-input">
+                                <select class="filter-select">
+                                    <option>All Positions</option>
+                                    <option>Software Engineer</option>
+                                    <option>Marketing Manager</option>
+                                </select>
+                                <select class="filter-select">
+                                    <option>All Status</option>
+                                    <option>New</option>
+                                    <option>Reviewed</option>
+                                    <option>Shortlisted</option>
+                                </select>
+                            </div>
+                            
+                            <div class="candidates-grid">
+                                <div class="candidate-card">
+                                    <div class="candidate-header">
+                                        <h4>John Smith</h4>
+                                        <span class="status-badge new">New</span>
+                                    </div>
+                                    <p>Senior Software Engineer</p>
+                                    <p>5 years experience • San Francisco</p>
+                                    <div class="candidate-actions">
+                                        <button class="btn btn-sm btn-success">Shortlist</button>
+                                        <button class="btn btn-sm">View Resume</button>
+                                        <button class="btn btn-sm btn-danger">Reject</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="candidate-card">
+                                    <div class="candidate-header">
+                                        <h4>Sarah Johnson</h4>
+                                        <span class="status-badge reviewed">Reviewed</span>
+                                    </div>
+                                    <p>Marketing Manager</p>
+                                    <p>7 years experience • New York</p>
+                                    <div class="candidate-actions">
+                                        <button class="btn btn-sm btn-success">Shortlist</button>
+                                        <button class="btn btn-sm">View Resume</button>
+                                        <button class="btn btn-sm btn-danger">Reject</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interview Process Submodule -->
+                    <div id="interview" class="submodule">
+                        <div class="interview-container">
+                            <h3>Interview Management</h3>
+                            <div class="interview-calendar">
+                                <h4>Upcoming Interviews</h4>
+                                <div class="interview-list">
+                                    <div class="interview-item">
+                                        <div class="interview-time">
+                                            <span class="date">Jan 20</span>
+                                            <span class="time">2:00 PM</span>
+                                        </div>
+                                        <div class="interview-details">
+                                            <h5>John Smith - Software Engineer</h5>
+                                            <p>Technical Interview with Engineering Team</p>
+                                        </div>
+                                        <div class="interview-actions">
+                                            <button class="btn btn-sm">Reschedule</button>
+                                            <button class="btn btn-sm btn-primary">Join</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="interview-item">
+                                        <div class="interview-time">
+                                            <span class="date">Jan 21</span>
+                                            <span class="time">10:00 AM</span>
+                                        </div>
+                                        <div class="interview-details">
+                                            <h5>Sarah Johnson - Marketing Manager</h5>
+                                            <p>Final Interview with VP Marketing</p>
+                                        </div>
+                                        <div class="interview-actions">
+                                            <button class="btn btn-sm">Reschedule</button>
+                                            <button class="btn btn-sm btn-primary">Join</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Applicant Management Module -->
+                <div id="applicant-management-module" class="module">
+                    <div class="module-header">
+                        <h2>Applicant Management</h2>
+                        <button class="btn btn-primary" onclick="showSubModule('tracking')">View Pipeline</button>
+                    </div>
+
+                    <div class="submodule-nav">
+                        <button class="submodule-btn active" data-submodule="tracking">Tracking</button>
+                        <button class="submodule-btn" data-submodule="documents">Document Management</button>
+                        <button class="submodule-btn" data-submodule="collaboration">Collaboration</button>
+                    </div>
+
+                    <!-- Tracking Submodule -->
+                    <div id="tracking" class="submodule active">
+                        <div class="kanban-board">
+                            <div class="kanban-column">
+                                <h4>Applied <span class="count">12</span></h4>
+                                <div class="kanban-cards">
+                                    <div class="kanban-card">
+                                        <h5>Mike Davis</h5>
+                                        <p>Software Engineer</p>
+                                        <small>Applied 2 days ago</small>
+                                    </div>
+                                    <div class="kanban-card">
+                                        <h5>Lisa Wilson</h5>
+                                        <p>UX Designer</p>
+                                        <small>Applied 1 day ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="kanban-column">
+                                <h4>Screening <span class="count">8</span></h4>
+                                <div class="kanban-cards">
+                                    <div class="kanban-card">
+                                        <h5>John Smith</h5>
+                                        <p>Senior Developer</p>
+                                        <small>In screening</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="kanban-column">
+                                <h4>Interview <span class="count">5</span></h4>
+                                <div class="kanban-cards">
+                                    <div class="kanban-card">
+                                        <h5>Sarah Johnson</h5>
+                                        <p>Marketing Manager</p>
+                                        <small>Interview scheduled</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="kanban-column">
+                                <h4>Offer <span class="count">2</span></h4>
+                                <div class="kanban-cards">
+                                    <div class="kanban-card">
+                                        <h5>David Brown</h5>
+                                        <p>Product Manager</p>
+                                        <small>Offer pending</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Document Management Submodule -->
+                    <div id="documents" class="submodule">
+                        <div class="document-manager">
+                            <h3>Document Management</h3>
+                            <div class="document-grid">
+                                <div class="document-card">
+                                    <div class="document-icon">📄</div>
+                                    <h4>Resumes</h4>
+                                    <p>156 files</p>
+                                    <button class="btn btn-sm">Manage</button>
+                                </div>
+                                <div class="document-card">
+                                    <div class="document-icon">📋</div>
+                                    <h4>Cover Letters</h4>
+                                    <p>89 files</p>
+                                    <button class="btn btn-sm">Manage</button>
+                                </div>
+                                <div class="document-card">
+                                    <div class="document-icon">🎓</div>
+                                    <h4>Certificates</h4>
+                                    <p>67 files</p>
+                                    <button class="btn btn-sm">Manage</button>
+                                </div>
+                                <div class="document-card">
+                                    <div class="document-icon">✅</div>
+                                    <h4>Background Checks</h4>
+                                    <p>23 files</p>
+                                    <button class="btn btn-sm">Manage</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Collaboration Submodule -->
+                    <div id="collaboration" class="submodule">
+                        <div class="collaboration-tools">
+                            <h3>Team Collaboration</h3>
+                            <div class="collaboration-grid">
+                                <div class="collab-card">
+                                    <h4>Interview Feedback</h4>
+                                    <p>Collect and review feedback from interview panels</p>
+                                    <button class="btn btn-primary">View Feedback</button>
+                                </div>
+                                <div class="collab-card">
+                                    <h4>Hiring Committee</h4>
+                                    <p>Coordinate with hiring committee members</p>
+                                    <button class="btn btn-primary">Committee Notes</button>
+                                </div>
+                                <div class="collab-card">
+                                    <h4>Reference Checks</h4>
+                                    <p>Manage reference check process</p>
+                                    <button class="btn btn-primary">Check References</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Onboarding Module -->
+                <div id="onboarding-module" class="module">
+                    <div class="module-header">
+                        <h2>Employee Onboarding</h2>
+                        <button class="btn btn-primary" onclick="showSubModule('pre-boarding')">New Hire</button>
+                    </div>
+
+                    <div class="submodule-nav">
+                        <button class="submodule-btn active" data-submodule="pre-boarding">Pre-boarding</button>
+                        <button class="submodule-btn" data-submodule="orientation">Orientation</button>
+                        <button class="submodule-btn" data-submodule="integration">Role Integration</button>
+                    </div>
+
+                    <!-- Pre-boarding Submodule -->
+                    <div id="pre-boarding" class="submodule active">
+                        <div class="onboarding-checklist">
+                            <h3>Pre-boarding Checklist</h3>
+                            <div class="checklist-container">
+                                <div class="checklist-item completed">
+                                    <input type="checkbox" checked disabled>
+                                    <span>Send welcome email</span>
+                                    <small>Completed 2 days ago</small>
+                                </div>
+                                <div class="checklist-item completed">
+                                    <input type="checkbox" checked disabled>
+                                    <span>Prepare workspace</span>
+                                    <small>Completed 1 day ago</small>
+                                </div>
+                                <div class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>Setup IT equipment</span>
+                                    <small>Due today</small>
+                                </div>
+                                <div class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>Create system accounts</span>
+                                    <small>Due tomorrow</small>
+                                </div>
+                                <div class="checklist-item">
+                                    <input type="checkbox">
+                                    <span>Schedule first day meeting</span>
+                                    <small>Due in 2 days</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="new-hires-list">
+                            <h3>Upcoming New Hires</h3>
+                            <div class="hire-cards">
+                                <div class="hire-card">
+                                    <div class="hire-info">
+                                        <h4>Alex Thompson</h4>
+                                        <p>Software Engineer</p>
+                                        <p>Start Date: Jan 25, 2024</p>
+                                    </div>
+                                    <div class="hire-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 60%"></div>
+                                        </div>
+                                        <span>60% Complete</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="hire-card">
+                                    <div class="hire-info">
+                                        <h4>Maria Garcia</h4>
+                                        <p>Marketing Specialist</p>
+                                        <p>Start Date: Feb 1, 2024</p>
+                                    </div>
+                                    <div class="hire-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 30%"></div>
+                                        </div>
+                                        <span>30% Complete</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Orientation Submodule -->
+                    <div id="orientation" class="submodule">
+                        <div class="orientation-program">
+                            <h3>Orientation Program</h3>
+                            <div class="orientation-schedule">
+                                <div class="schedule-item">
+                                    <div class="schedule-time">9:00 AM</div>
+                                    <div class="schedule-content">
+                                        <h4>Welcome & Company Overview</h4>
+                                        <p>Introduction to company culture and values</p>
+                                    </div>
+                                </div>
+                                <div class="schedule-item">
+                                    <div class="schedule-time">10:30 AM</div>
+                                    <div class="schedule-content">
+                                        <h4>HR Policies & Benefits</h4>
+                                        <p>Review of employee handbook and benefits</p>
+                                    </div>
+                                </div>
+                                <div class="schedule-item">
+                                    <div class="schedule-time">1:00 PM</div>
+                                    <div class="schedule-content">
+                                        <h4>Department Introduction</h4>
+                                        <p>Meet the team and understand department goals</p>
+                                    </div>
+                                </div>
+                                <div class="schedule-item">
+                                    <div class="schedule-time">3:00 PM</div>
+                                    <div class="schedule-content">
+                                        <h4>IT Setup & Training</h4>
+                                        <p>System access and tool training</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role Integration Submodule -->
+                    <div id="integration" class="submodule">
+                        <div class="integration-plan">
+                            <h3>30-60-90 Day Plan</h3>
+                            <div class="plan-tabs">
+                                <button class="plan-tab active" data-period="30">30 Days</button>
+                                <button class="plan-tab" data-period="60">60 Days</button>
+                                <button class="plan-tab" data-period="90">90 Days</button>
+                            </div>
+                            
+                            <div class="plan-content">
+                                <div id="plan-30" class="plan-period active">
+                                    <h4>First 30 Days - Learning & Adaptation</h4>
+                                    <ul class="plan-goals">
+                                        <li>Complete all required training modules</li>
+                                        <li>Shadow team members and understand workflows</li>
+                                        <li>Set up development environment</li>
+                                        <li>Complete first small project</li>
+                                        <li>Weekly check-ins with manager</li>
+                                    </ul>
+                                </div>
+                                
+                                <div id="plan-60" class="plan-period">
+                                    <h4>60 Days - Contributing & Growing</h4>
+                                    <ul class="plan-goals">
+                                        <li>Take ownership of medium-sized projects</li>
+                                        <li>Participate in team meetings and planning</li>
+                                        <li>Provide feedback on processes</li>
+                                        <li>Build relationships across departments</li>
+                                        <li>Complete performance review</li>
+                                    </ul>
+                                </div>
+                                
+                                <div id="plan-90" class="plan-period">
+                                    <h4>90 Days - Full Integration</h4>
+                                    <ul class="plan-goals">
+                                        <li>Lead projects independently</li>
+                                        <li>Mentor newer team members</li>
+                                        <li>Contribute to strategic planning</li>
+                                        <li>Set long-term career goals</li>
+                                        <li>Complete comprehensive review</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Management Module -->
+                <div id="performance-module" class="module">
+                    <div class="module-header">
+                        <h2>Performance Management</h2>
+                        <button class="btn btn-primary" onclick="showSubModule('goal-setting')">Set Goals</button>
+                    </div>
+
+                    <div class="submodule-nav">
+                        <button class="submodule-btn active" data-submodule="goal-setting">Goal Setting</button>
+                        <button class="submodule-btn" data-submodule="reviews">Reviews</button>
+                        <button class="submodule-btn" data-submodule="feedback">Feedback</button>
+                    </div>
+
+                    <!-- Goal Setting Submodule -->
+                    <div id="goal-setting" class="submodule active">
+                        <div class="goals-container">
+                            <h3>Goal Management</h3>
+                            <div class="goal-form">
+                                <h4>Create New Goal</h4>
+                                <form class="goal-creation-form">
+                                    <div class="form-group">
+                                        <label>Goal Title</label>
+                                        <input type="text" placeholder="e.g., Increase team productivity by 20%">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Category</label>
+                                            <select>
+                                                <option>Performance</option>
+                                                <option>Development</option>
+                                                <option>Leadership</option>
+                                                <option>Innovation</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Priority</label>
+                                            <select>
+                                                <option>High</option>
+                                                <option>Medium</option>
+                                                <option>Low</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <textarea rows="3" placeholder="Describe the goal and success criteria..."></textarea>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Start Date</label>
+                                            <input type="date">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Target Date</label>
+                                            <input type="date">
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Create Goal</button>
+                                </form>
+                            </div>
+
+                            <div class="goals-list">
+                                <h4>Active Goals</h4>
+                                <div class="goal-cards">
+                                    <div class="goal-card">
+                                        <div class="goal-header">
+                                            <h5>Improve Code Quality</h5>
+                                            <span class="priority-badge high">High Priority</span>
+                                        </div>
+                                        <p>Reduce bug reports by 30% through better testing</p>
+                                        <div class="goal-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 75%"></div>
+                                            </div>
+                                            <span>75% Complete</span>
+                                        </div>
+                                        <div class="goal-dates">
+                                            <small>Due: March 31, 2024</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="goal-card">
+                                        <div class="goal-header">
+                                            <h5>Team Leadership</h5>
+                                            <span class="priority-badge medium">Medium Priority</span>
+                                        </div>
+                                        <p>Mentor 2 junior developers and improve team collaboration</p>
+                                        <div class="goal-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 45%"></div>
+                                            </div>
+                                            <span>45% Complete</span>
+                                        </div>
+                                        <div class="goal-dates">
+                                            <small>Due: June 30, 2024</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Submodule -->
+                    <div id="reviews" class="submodule">
+                        <div class="reviews-container">
+                            <h3>Performance Reviews</h3>
+                            <div class="review-schedule">
+                                <h4>Upcoming Reviews</h4>
+                                <div class="review-list">
+                                    <div class="review-item">
+                                        <div class="review-employee">
+                                            <h5>John Smith</h5>
+                                            <p>Software Engineer</p>
+                                        </div>
+                                        <div class="review-details">
+                                            <span class="review-type">Annual Review</span>
+                                            <span class="review-date">Due: Jan 30, 2024</span>
+                                        </div>
+                                        <div class="review-actions">
+                                            <button class="btn btn-sm btn-primary">Start Review</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="review-item">
+                                        <div class="review-employee">
+                                            <h5>Sarah Johnson</h5>
+                                            <p>Marketing Manager</p>
+                                        </div>
+                                        <div class="review-details">
+                                            <span class="review-type">Mid-Year Review</span>
+                                            <span class="review-date">Due: Feb 15, 2024</span>
+                                        </div>
+                                        <div class="review-actions">
+                                            <button class="btn btn-sm btn-primary">Start Review</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="review-templates">
+                                <h4>Review Templates</h4>
+                                <div class="template-grid">
+                                    <div class="template-card">
+                                        <h5>Annual Performance Review</h5>
+                                        <p>Comprehensive yearly evaluation</p>
+                                        <button class="btn btn-sm">Use Template</button>
+                                    </div>
+                                    <div class="template-card">
+                                        <h5>90-Day Review</h5>
+                                        <p>New employee evaluation</p>
+                                        <button class="btn btn-sm">Use Template</button>
+                                    </div>
+                                    <div class="template-card">
+                                        <h5>Project Review</h5>
+                                        <p>Project-specific performance</p>
+                                        <button class="btn btn-sm">Use Template</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Submodule -->
+                    <div id="feedback" class="submodule">
+                        <div class="feedback-container">
+                            <h3>Continuous Feedback</h3>
+                            <div class="feedback-tools">
+                                <div class="feedback-card">
+                                    <h4>360-Degree Feedback</h4>
+                                    <p>Collect feedback from peers, managers, and direct reports</p>
+                                    <button class="btn btn-primary">Start 360 Review</button>
+                                </div>
+                                
+                                <div class="feedback-card">
+                                    <h4>Peer Feedback</h4>
+                                    <p>Request feedback from team members</p>
+                                    <button class="btn btn-primary">Request Feedback</button>
+                                </div>
+                                
+                                <div class="feedback-card">
+                                    <h4>Self Assessment</h4>
+                                    <p>Employee self-evaluation tools</p>
+                                    <button class="btn btn-primary">Self Assess</button>
+                                </div>
+                            </div>
+
+                            <div class="recent-feedback">
+                                <h4>Recent Feedback</h4>
+                                <div class="feedback-list">
+                                    <div class="feedback-item">
+                                        <div class="feedback-header">
+                                            <strong>From: Manager</strong>
+                                            <span class="feedback-date">2 days ago</span>
+                                        </div>
+                                        <p>"Excellent work on the recent project. Great attention to detail and team collaboration."</p>
+                                        <div class="feedback-rating">
+                                            <span>Rating: ⭐⭐⭐⭐⭐</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="feedback-item">
+                                        <div class="feedback-header">
+                                            <strong>From: Peer</strong>
+                                            <span class="feedback-date">1 week ago</span>
+                                        </div>
+                                        <p>"Always willing to help and share knowledge. A valuable team member."</p>
+                                        <div class="feedback-rating">
+                                            <span>Rating: ⭐⭐⭐⭐⭐</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Recognition Module -->
+                <div id="recognition-module" class="module">
+                    <div class="module-header">
+                        <h2>Social Recognition</h2>
+                        <button class="btn btn-primary" onclick="showSubModule('peer-recognition')">Give Recognition</button>
+                    </div>
+
+                    <div class="submodule-nav">
+                        <button class="submodule-btn active" data-submodule="peer-recognition">Peer Recognition</button>
+                        <button class="submodule-btn" data-submodule="rewards">Rewards</button>
+                        <button class="submodule-btn" data-submodule="analytics">Engagement Analytics</button>
+                    </div>
+
+                    <!-- Peer Recognition Submodule -->
+                    <div id="peer-recognition" class="submodule active">
+                        <div class="recognition-container">
+                            <h3>Give Recognition</h3>
+                            <div class="recognition-form">
+                                <form class="recognition-creation-form">
+                                    <div class="form-group">
+                                        <label>Recognize Employee</label>
+                                        <select>
+                                            <option>Select Employee</option>
+                                            <option>John Smith</option>
+                                            <option>Sarah Johnson</option>
+                                            <option>Mike Davis</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Recognition Type</label>
+                                        <div class="recognition-types">
+                                            <button type="button" class="recognition-type-btn" data-type="teamwork">
+                                                🤝 Teamwork
+                                            </button>
+                                            <button type="button" class="recognition-type-btn" data-type="innovation">
+                                                💡 Innovation
+                                            </button>
+                                            <button type="button" class="recognition-type-btn" data-type="leadership">
+                                                👑 Leadership
+                                            </button>
+                                            <button type="button" class="recognition-type-btn" data-type="excellence">
+                                                ⭐ Excellence
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Message</label>
+                                        <textarea rows="3" placeholder="Share why this person deserves recognition..."></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox"> Make this recognition public
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Send Recognition</button>
+                                </form>
+                            </div>
+
+                            <div class="recognition-feed">
+                                <h4>Recent Recognition</h4>
+                                <div class="recognition-list">
+                                    <div class="recognition-item">
+                                        <div class="recognition-header">
+                                            <div class="recognition-avatar">👤</div>
+                                            <div class="recognition-info">
+                                                <strong>Sarah Johnson</strong> recognized <strong>John Smith</strong>
+                                                <small>2 hours ago</small>
+                                            </div>
+                                            <div class="recognition-badge">🤝 Teamwork</div>
+                                        </div>
+                                        <p>"John went above and beyond to help our team meet the deadline. His collaboration and support made all the difference!"</p>
+                                        <div class="recognition-actions">
+                                            <button class="btn btn-sm">👍 12</button>
+                                            <button class="btn btn-sm">💬 Comment</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="recognition-item">
+                                        <div class="recognition-header">
+                                            <div class="recognition-avatar">👤</div>
+                                            <div class="recognition-info">
+                                                <strong>Mike Davis</strong> recognized <strong>Lisa Wilson</strong>
+                                                <small>1 day ago</small>
+                                            </div>
+                                            <div class="recognition-badge">💡 Innovation</div>
+                                        </div>
+                                        <p>"Lisa's creative solution saved us weeks of development time. Brilliant thinking!"</p>
+                                        <div class="recognition-actions">
+                                            <button class="btn btn-sm">👍 8</button>
+                                            <button class="btn btn-sm">💬 Comment</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rewards Submodule -->
+                    <div id="rewards" class="submodule">
+                        <div class="rewards-container">
+                            <h3>Rewards Program</h3>
+                            <div class="rewards-overview">
+                                <div class="reward-stat">
+                                    <h4>Total Points Awarded</h4>
+                                    <p class="stat-number">12,450</p>
+                                </div>
+                                <div class="reward-stat">
+                                    <h4>Active Participants</h4>
+                                    <p class="stat-number">89%</p>
+                                </div>
+                                <div class="reward-stat">
+                                    <h4>Rewards Redeemed</h4>
+                                    <p class="stat-number">156</p>
+                                </div>
+                            </div>
+
+                            <div class="rewards-catalog">
+                                <h4>Rewards Catalog</h4>
+                                <div class="rewards-grid">
+                                    <div class="reward-item">
+                                        <div class="reward-icon">🎁</div>
+                                        <h5>Gift Card</h5>
+                                        <p>$50 Amazon Gift Card</p>
+                                        <span class="reward-points">500 points</span>
+                                        <button class="btn btn-sm">Redeem</button>
+                                    </div>
+                                    
+                                    <div class="reward-item">
+                                        <div class="reward-icon">🏖️</div>
+                                        <h5>Extra PTO Day</h5>
+                                        <p>Additional paid time off</p>
+                                        <span class="reward-points">1000 points</span>
+                                        <button class="btn btn-sm">Redeem</button>
+                                    </div>
+                                    
+                                    <div class="reward-item">
+                                        <div class="reward-icon">🍕</div>
+                                        <h5>Team Lunch</h5>
+                                        <p>Lunch for your team</p>
+                                        <span class="reward-points">750 points</span>
+                                        <button class="btn btn-sm">Redeem</button>
+                                    </div>
+                                    
+                                    <div class="reward-item">
+                                        <div class="reward-icon">🎓</div>
+                                        <h5>Training Course</h5>
+                                        <p>Professional development</p>
+                                        <span class="reward-points">1500 points</span>
+                                        <button class="btn btn-sm">Redeem</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Submodule -->
+                    <div id="analytics" class="submodule">
+                        <div class="analytics-container">
+                            <h3>Engagement Analytics</h3>
+                            <div class="analytics-grid">
+                                <div class="analytics-card">
+                                    <h4>Recognition Trends</h4>
+                                    <div class="chart-placeholder">
+                                        <div class="trend-chart">
+                                            <div class="chart-bar" style="height: 60%"></div>
+                                            <div class="chart-bar" style="height: 80%"></div>
+                                            <div class="chart-bar" style="height: 45%"></div>
+                                            <div class="chart-bar" style="height: 90%"></div>
+                                            <div class="chart-bar" style="height: 70%"></div>
+                                        </div>
+                                    </div>
+                                    <p>Recognition activity over the last 5 months</p>
+                                </div>
+                                
+                                <div class="analytics-card">
+                                    <h4>Top Recognizers</h4>
+                                    <div class="leaderboard">
+                                        <div class="leaderboard-item">
+                                            <span class="rank">1</span>
+                                            <span class="name">Sarah Johnson</span>
+                                            <span class="count">23</span>
+                                        </div>
+                                        <div class="leaderboard-item">
+                                            <span class="rank">2</span>
+                                            <span class="name">Mike Davis</span>
+                                            <span class="count">19</span>
+                                        </div>
+                                        <div class="leaderboard-item">
+                                            <span class="rank">3</span>
+                                            <span class="name">John Smith</span>
+                                            <span class="count">15</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="analytics-card">
+                                    <h4>Recognition Categories</h4>
+                                    <div class="category-stats">
+                                        <div class="category-item">
+                                            <span class="category-name">🤝 Teamwork</span>
+                                            <div class="category-bar">
+                                                <div class="category-fill" style="width: 35%"></div>
+                                            </div>
+                                            <span class="category-percent">35%</span>
+                                        </div>
+                                        <div class="category-item">
+                                            <span class="category-name">💡 Innovation</span>
+                                            <div class="category-bar">
+                                                <div class="category-fill" style="width: 28%"></div>
+                                            </div>
+                                            <span class="category-percent">28%</span>
+                                        </div>
+                                        <div class="category-item">
+                                            <span class="category-name">⭐ Excellence</span>
+                                            <div class="category-bar">
+                                                <div class="category-fill" style="width: 22%"></div>
+                                            </div>
+                                            <span class="category-percent">22%</span>
+                                        </div>
+                                        <div class="category-item">
+                                            <span class="category-name">👑 Leadership</span>
+                                            <div class="category-bar">
+                                                <div class="category-fill" style="width: 15%"></div>
+                                            </div>
+                                            <span class="category-percent">15%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
