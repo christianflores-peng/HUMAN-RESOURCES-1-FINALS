@@ -21,6 +21,20 @@ CREATE TABLE IF NOT EXISTS `departments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
+-- Table structure for table `users`
+-- --------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('Applicant Management','Recruitment Management','New Hire Onboarding','Performance Management (Initial)','Social Recognition','Competency Management','admin_Human Resource 1','Learning Management','Training Management','Succession Planning','Employee Self-Service (ESS)','admin_Human Resource 2','Time and Attendance System','Shift and Schedule Management','Timesheet Management','Leave Management','Claims and Reimbursement','admin_Human Resource 3','Core Human Capital Management (HCM)','Payroll Management','Compensation Planning','HR Analytics Dashboard','HMO & Benefits Administration','admin_Human Resource 4','Shipment Booking & Routing System','Consolidation & Deconsolidation Management','House & Master Bill of Lading Generator','Shipment File & Tracking System','Purchase Order Integration System','Service Provider Management','admin_Core Transaction 1','Service Network & Route Planner','Rate & Tariff Management System','Standard Operating Procedure (SOP) Manager','Scheduler & Transit Timetable Management','admin_Core Transaction 2','Customer Relationship Management (CRM)','Contract & SLA Monitoring','E-Documentation & Compliance Manager','Business Intelligence & Freight Analytics','Customer Portal & Notification Hub','admin_Core Transaction 3','Smart Warehousing System (SWS)','Procurement & Sourcing Management (PSM)','Project Logistics Tracker (PLT)','Asset Lifecycle & Maintenance (ALMS)','Document Tracking & Logistics Records (DTRS)','admin_Logistics 1','Fleet & Vehicle Management (FVM)','Vehicle Reservation & Dispatch System (VRDS)','Driver and Trip Performance Monitoring','Transport Cost Analysis & Optimization (TCAO)','Mobile Fleet Command App (optional)','admin_Logistics 2','Disbursement','Budget Management','Collection','General Ledger','Accounts Payable / Accounts Receivables','admin_Financials') NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 -- Table structure for table `employees`
 -- --------------------------------------------------------
 
@@ -246,6 +260,15 @@ CREATE TABLE IF NOT EXISTS `reward_redemptions` (
   FOREIGN KEY (`reward_id`) REFERENCES `rewards_catalog`(`id`) ON DELETE CASCADE,
   FOREIGN KEY (`approved_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+-- Insert sample users
+-- --------------------------------------------------------
+
+INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`) VALUES
+(1, 'admin', '$2y$12$.j.7vsnJ5mPvDUUNkQS6puP9Jm/xtib8q5t99aOp.JWMAKSI2rFx.', 'admin_Human Resource 1', '2025-09-09 08:54:34'),
+(2, 'hr_manager', '$2y$12$DknfgcIeCp8jV97DK3dfCuIVeGgDG5Bfj1Vx0loulO1tbkNop6CTG', 'Recruitment Management', '2025-09-08 17:03:20'),
+(3, 'performance_mgr', '$2y$12$9py/Bu0YTGWQenvNPSYOWOFlPvGdHS67coP2oLWg5KTzRId2naqRq', 'Performance Management (Initial)', '2025-09-08 17:03:36');
 
 -- --------------------------------------------------------
 -- Insert sample departments

@@ -16,8 +16,14 @@ $active_page = $active_page ?? 'dashboard';
         <div class="menu-section">
             <h3>Main</h3>
             <ul>
+                <li><a href="../index.php" class="menu-item">
+                    <span class="icon">🏠</span>Home
+                </a></li>
                 <li><a href="dashboard.php" class="menu-item <?php echo $active_page === 'dashboard' ? 'active' : ''; ?>">
-                    <span class="icon">🏠︎</span>Dashboard
+                    <span class="icon">📊</span>Dashboard
+                </a></li>
+                <li><a href="../applicant-portal.php" class="menu-item <?php echo $active_page === 'applicant-portal' ? 'active' : ''; ?>">
+                    <span class="icon">📋</span>Applicant Portal
                 </a></li>
             </ul>
         </div>

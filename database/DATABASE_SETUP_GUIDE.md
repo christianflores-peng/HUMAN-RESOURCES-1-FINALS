@@ -4,7 +4,7 @@
 
 ### 1. Access phpMyAdmin
 - Open your web browser
-- Go to: `http://localhost/phpmyadmin` (Laragon)
+- Go to: `http://localhost/phpmyadmin` (XAMPP)
 - Login with your credentials (usually `root` with no password for local development)
 
 ### 2. Check Existing Database

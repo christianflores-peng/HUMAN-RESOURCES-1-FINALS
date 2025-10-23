@@ -391,6 +391,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     Demo: admin/admin123 | hr_manager/hr123
                                 </small>
                             </div>
+                            
+                            <div style="margin-top: 1.5rem; text-align: center;">
+                                <p style="color: #cbd5e1; font-size: 0.9rem;">
+                                    Don't have an account? <a href="register.php" style="color: #3b82f6; text-decoration: none; font-weight: 500;">Create Account</a>
+                                </p>
+                            </div>
                         </form>
 
                         <!-- Demo Credentials -->
