@@ -46,7 +46,7 @@ $success_message = '';
 
 // Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: pages/dashboard.php');
+    header('Location: index.php');
     exit();
 }
 
@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['role'] = $user_data['role'];
                 $_SESSION['login_time'] = time();
                 
-                // Redirect to dashboard
-                header('Location: pages/dashboard.php');
+                // Redirect to landing page
+                header('Location: index.php');
                 exit();
             } else {
                 $error_message = "Invalid password. Please try again.";
