@@ -206,7 +206,7 @@ Edit `database/config.php`:
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'hr1_hr1data');
 define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_PASS', 'password');
 ```
 
 ### File Permissions

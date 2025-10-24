@@ -362,7 +362,6 @@ $current_role = $_SESSION['role'] ?? 'Guest';
                 <a href="#"><i class="fab fa-linkedin"></i></a>
             </div>
         </div>
-        </div>
         
     <!-- Main Navigation -->
     <nav class="main-nav">

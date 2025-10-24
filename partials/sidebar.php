@@ -6,7 +6,7 @@ $active_page = $active_page ?? 'dashboard';
 <nav class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <div class="app-brand">
-            <img src="../assets/images/slate.png" alt="SLATE Logo" class="app-logo">
+            <img src="../assets/images/slate.png" alt="HR1 Logo" class="app-logo">
             <h2 class="dept-name">HR1</h2>
         </div>
         <button class="sidebar-toggle" id="sidebarToggle">☰</button>

@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - SLATE Freight Management System</title>
+    <title>Register - HR1 Management System</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         /* Registration page specific styles */
@@ -359,8 +359,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="warehouse-illustration">
                         <div style="font-size: 4rem;">🏢</div>
                     </div>
-                    <h2 class="illustration-title">Join Our Network</h2>
-                    <p class="illustration-subtitle">Connect with freight management professionals and grow your business</p>
+                    <h2 class="illustration-title">Join Our Team</h2>
+                    <p class="illustration-subtitle">Connect with HR professionals and advance your career</p>
                 </div>
             </div>
             
@@ -368,8 +368,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="register-form-section">
                 <div class="register-header">
                     <div class="slate-logo">
-                        <div class="truck-icon">S</div>
-                        <h1>SLATE</h1>
+                        <div class="truck-icon">H</div>
+                        <h1>HR1</h1>
                     </div>
                     <h2 class="register-title">Register</h2>
                     <p class="register-subtitle">Create your account to get started</p>
@@ -450,7 +450,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         
         <div class="footer">
-            © 2025 SLATE Freight Management System. All rights reserved. | 
+            © 2025 HR1 Management System. All rights reserved. | 
             <a href="#">Terms & Conditions</a> | 
             <a href="#">Privacy Policy</a>
         </div>
