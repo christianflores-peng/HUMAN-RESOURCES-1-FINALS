@@ -1,5 +1,5 @@
--- HR Management System Database Schema
--- Based on existing hr1_hr1data database
+-- HR Management System Database Schema (Clean Version)
+-- Optimized for easy export/import
 -- Run this in phpMyAdmin to create all necessary tables
 
 -- Use existing database
@@ -273,7 +273,10 @@ CREATE TABLE IF NOT EXISTS `reward_redemptions` (
 INSERT INTO `users` (`id`, `username`, `password`, `role`, `full_name`, `email`, `company`, `phone`, `created_at`) VALUES
 (1, 'admin', '$2y$12$.j.7vsnJ5mPvDUUNkQS6puP9Jm/xtib8q5t99aOp.JWMAKSI2rFx.', 'Administrator', 'System Administrator', 'admin@slate.com', 'SLATE Freight Management', '555-0001', '2025-09-09 08:54:34'),
 (2, 'hr_manager', '$2y$12$DknfgcIeCp8jV97DK3dfCuIVeGgDG5Bfj1Vx0loulO1tbkNop6CTG', 'HR Manager', 'HR Manager', 'hr@slate.com', 'SLATE Freight Management', '555-0002', '2025-09-08 17:03:20'),
-(3, 'performance_mgr', '$2y$12$9py/Bu0YTGWQenvNPSYOWOFlPvGdHS67coP2oLWg5KTzRId2naqRq', 'Manager', 'Performance Manager', 'performance@slate.com', 'SLATE Freight Management', '555-0003', '2025-09-08 17:03:36');
+(3, 'recruiter', '$2y$12$9py/Bu0YTGWQenvNPSYOWOFlPvGdHS67coP2oLWg5KTzRId2naqRq', 'Recruiter', 'Senior Recruiter', 'recruiter@slate.com', 'SLATE Freight Management', '555-0003', '2025-09-08 17:03:36'),
+(4, 'employee', '$2y$12$example.hash.for.employee', 'Employee', 'Employee User', 'employee@slate.com', 'SLATE Freight Management', '555-0004', '2025-09-08 17:03:50'),
+(5, 'john_doe', '$2y$12$example.hash.for.john', 'Employee', 'John Doe', 'john@slate.com', 'SLATE Freight Management', '555-0005', '2025-09-08 17:04:00'),
+(6, 'jane_smith', '$2y$12$example.hash.for.jane', 'HR Manager', 'Jane Smith', 'jane@slate.com', 'SLATE Freight Management', '555-0006', '2025-09-08 17:04:10');
 
 -- --------------------------------------------------------
 -- Insert sample departments

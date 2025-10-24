@@ -53,44 +53,6 @@ try {
 } catch (Exception $e) {
     $upcomingReviews = [];
 }
-// Database
-require_once '../database/config.php';
-
-function h($v){ return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
-
-// Load active goals (limit 8)
-try {
-    $activeGoals = fetchAll(
-        "SELECT pg.id, pg.title, pg.description, pg.priority, pg.target_date,
-                COALESCE(pg.progress_percentage, 0) AS progress_percentage,
-                CONCAT(e.first_name, ' ', e.last_name) AS employee_name
-         FROM performance_goals pg
-         JOIN employees e ON e.id = pg.employee_id
-         WHERE pg.status = 'active'
-         ORDER BY pg.priority DESC, pg.target_date ASC
-         LIMIT 8"
-    );
-} catch (Exception $e) {
-    $activeGoals = [];
-}
-
-// Load upcoming reviews (next 6)
-try {
-    $upcomingReviews = fetchAll(
-        "SELECT pr.id,
-                CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
-                e.position,
-                pr.review_type,
-                pr.due_date
-         FROM performance_reviews pr
-         JOIN employees e ON e.id = pr.employee_id
-         WHERE pr.status IN ('draft','submitted','approved') AND pr.due_date IS NOT NULL AND pr.due_date >= CURDATE()
-         ORDER BY pr.due_date ASC
-         LIMIT 6"
-    );
-} catch (Exception $e) {
-    $upcomingReviews = [];
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
