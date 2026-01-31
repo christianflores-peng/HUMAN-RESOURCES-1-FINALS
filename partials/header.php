@@ -13,7 +13,7 @@ $current_role = $current_role ?? ($_SESSION['role'] ?? 'Employee');
         <div class="header-right">
             <span id="userInfo">Welcome, <span id="currentUser"><?php echo htmlspecialchars($current_user); ?></span></span>
             <span id="currentRole" class="role-badge"><?php echo htmlspecialchars($current_role); ?></span>
-            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="material-symbols-outlined">dark_mode</span></button>
             <a href="../index.php" class="home-btn">Home</a>
             <a href="../logout.php" class="logout-btn">Logout</a>
         </div>

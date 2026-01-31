@@ -1,11 +1,11 @@
 <?php
-session_start();
+require_once 'includes/session_helper.php';
 
-// Destroy all session data
-session_destroy();
+// Start secure session
+startSecureSession();
 
-// Clear all session variables
-$_SESSION = array();
+// Securely destroy session
+destroySecureSession();
 
 // Redirect to the landing page
 header("Location: index.php");

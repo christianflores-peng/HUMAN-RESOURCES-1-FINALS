@@ -7,6 +7,13 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// Check if user has admin access (block Applicants from admin panel)
+$admin_roles = ['Administrator', 'HR Manager', 'Recruiter', 'Manager', 'Supervisor', 'Employee'];
+if (!in_array($_SESSION['role'] ?? '', $admin_roles)) {
+    header('Location: ../careers.php');
+    exit();
+}
+
 // Get current user info
 $current_user = $_SESSION['username'] ?? 'User';
 $current_role = $_SESSION['role'] ?? 'Employee';
@@ -14,6 +21,78 @@ $current_role = $_SESSION['role'] ?? 'Employee';
 require_once '../database/config.php';
 
 function h($v){ return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
+
+$success_message = '';
+$error_message = '';
+
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    
+    // Add new performance goal
+    if ($action === 'add_goal') {
+        $employee_id = (int)($_POST['employeeId'] ?? 0);
+        $title = trim($_POST['goalTitle'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $category = $_POST['category'] ?? 'performance';
+        $priority = $_POST['priority'] ?? 'medium';
+        $start_date = $_POST['startDate'] ?? null;
+        $target_date = $_POST['targetDate'] ?? null;
+        
+        if ($employee_id && $title && $description) {
+            try {
+                insertRecord(
+                    "INSERT INTO performance_goals (employee_id, title, description, category, priority, start_date, target_date, status, progress_percentage, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', 0, NOW())",
+                    [$employee_id, $title, $description, $category, $priority, $start_date, $target_date]
+                );
+                $success_message = "Performance goal created successfully!";
+            } catch (Exception $e) {
+                $error_message = "Error creating goal: " . $e->getMessage();
+            }
+        } else {
+            $error_message = "Please fill in all required fields.";
+        }
+    }
+    
+    // Schedule performance review
+    if ($action === 'schedule_review') {
+        $employee_id = (int)($_POST['employeeId'] ?? 0);
+        $review_type = $_POST['reviewType'] ?? 'annual';
+        $due_date = $_POST['dueDate'] ?? null;
+        
+        if ($employee_id && $due_date) {
+            try {
+                insertRecord(
+                    "INSERT INTO performance_reviews (employee_id, review_type, status, due_date, created_at) VALUES (?, ?, 'draft', ?, NOW())",
+                    [$employee_id, $review_type, $due_date]
+                );
+                $success_message = "Performance review scheduled successfully!";
+            } catch (Exception $e) {
+                $error_message = "Error scheduling review: " . $e->getMessage();
+            }
+        } else {
+            $error_message = "Please fill in all required fields.";
+        }
+    }
+    
+    // Redirect to avoid form resubmission
+    if ($success_message || $error_message) {
+        $_SESSION['success_message'] = $success_message;
+        $_SESSION['error_message'] = $error_message;
+        header('Location: performance.php');
+        exit();
+    }
+}
+
+// Get messages from session
+if (isset($_SESSION['success_message'])) {
+    $success_message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
 
 // Load employees for selectors (limit to active)
 try {
@@ -76,6 +155,13 @@ include '../partials/header.php';
                     <button class="btn btn-primary" onclick="showSubModule('goal-setting')">Set Goals</button>
                 </div>
 
+                <?php if ($success_message): ?>
+                    <div class="alert alert-success"><?php echo h($success_message); ?></div>
+                <?php endif; ?>
+                <?php if ($error_message): ?>
+                    <div class="alert alert-error"><?php echo h($error_message); ?></div>
+                <?php endif; ?>
+
                 <div class="submodule-nav">
                     <button class="submodule-btn active" data-submodule="goal-setting">Goal Setting</button>
                     <button class="submodule-btn" data-submodule="reviews">Reviews</button>
@@ -88,7 +174,8 @@ include '../partials/header.php';
                         <h3>Goal Management</h3>
                         <div class="goal-form">
                             <h4>Create New Goal</h4>
-                            <form class="goal-creation-form">
+                            <form method="POST" action="performance.php" class="goal-creation-form">
+                                <input type="hidden" name="action" value="add_goal">
                                 <div class="form-group">
                                     <label>Goal Title</label>
                                     <input type="text" name="goalTitle" placeholder="e.g., Increase team productivity by 20%" required>
@@ -188,7 +275,8 @@ include '../partials/header.php';
                         <h3>Performance Reviews</h3>
                         <div class="goal-form" style="margin-bottom:1rem;">
                             <h4>Schedule Review</h4>
-                            <form class="review-scheduling-form">
+                            <form method="POST" action="performance.php" class="review-scheduling-form">
+                                <input type="hidden" name="action" value="schedule_review">
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label>Employee</label>
@@ -321,4 +409,25 @@ include '../partials/header.php';
                     </div>
                 </div>
             </div>
+
+<style>
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+</style>
+
 <?php include '../partials/footer.php'; ?>

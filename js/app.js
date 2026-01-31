@@ -76,10 +76,6 @@ class HRSystem {
 
         // Form submissions
         document.addEventListener('submit', async (e) => {
-            if (e.target.classList.contains('job-form')) {
-                e.preventDefault();
-                this.handleJobSubmission(e.target);
-            }
             if (e.target.classList.contains('goal-creation-form')) {
                 e.preventDefault();
                 await this.handleGoalCreation(e.target);
@@ -96,8 +92,27 @@ class HRSystem {
 
         // Responsive sidebar
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                document.getElementById('sidebar').classList.remove('open');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (window.innerWidth > 1024) {
+                // Desktop: show sidebar by default, remove mobile classes
+                sidebar.classList.remove('active');
+                if (mainContent) {
+                    mainContent.classList.remove('sidebar-active');
+                }
+            } else if (window.innerWidth > 768) {
+                // Tablet: hide sidebar by default
+                sidebar.classList.remove('active');
+                if (mainContent) {
+                    mainContent.classList.remove('sidebar-active');
+                }
+            } else {
+                // Mobile: hide sidebar by default
+                sidebar.classList.remove('active');
+                if (mainContent) {
+                    mainContent.classList.remove('sidebar-active');
+                }
             }
         });
 
@@ -122,6 +137,13 @@ class HRSystem {
         const storedTheme = localStorage.getItem('hrTheme') || 'theme-dark';
         document.body.classList.remove('theme-light', 'theme-dark');
         document.body.classList.add(storedTheme);
+        
+        // Set initial icon
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.textContent = storedTheme === 'theme-light' ? '🌙' : '☀️';
+            themeToggle.setAttribute('aria-label', storedTheme === 'theme-light' ? 'Switch to dark mode' : 'Switch to light mode');
+        }
     }
 
     toggleTheme() {
@@ -129,6 +151,13 @@ class HRSystem {
         document.body.classList.remove('theme-light', 'theme-dark');
         document.body.classList.add(next);
         localStorage.setItem('hrTheme', next);
+        
+        // Update button icon
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.textContent = next === 'theme-light' ? '🌙' : '☀️';
+            themeToggle.setAttribute('aria-label', next === 'theme-light' ? 'Switch to dark mode' : 'Switch to light mode');
+        }
     }
 
     showLoginScreen() {
@@ -198,8 +227,45 @@ class HRSystem {
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         
-        sidebar.classList.toggle('open');
-        mainContent.classList.toggle('expanded');
+        // Toggle active class for responsive design
+        sidebar.classList.toggle('active');
+        
+        // Handle main content margin for desktop
+        if (window.innerWidth > 1024) {
+            if (mainContent) {
+                mainContent.classList.toggle('expanded');
+            }
+        } else {
+            // For mobile/tablet, toggle sidebar-active class on main content
+            if (mainContent) {
+                mainContent.classList.toggle('sidebar-active');
+            }
+        }
+        
+        // Close sidebar when clicking outside on mobile
+        if (window.innerWidth <= 1024) {
+            if (sidebar.classList.contains('active')) {
+                setTimeout(() => {
+                    document.addEventListener('click', this.handleOutsideClick);
+                }, 100);
+            } else {
+                document.removeEventListener('click', this.handleOutsideClick);
+            }
+        }
+    }
+    
+    handleOutsideClick(e) {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        
+        if (sidebar && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+            sidebar.classList.remove('active');
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) {
+                mainContent.classList.remove('sidebar-active');
+            }
+            document.removeEventListener('click', this.handleOutsideClick);
+        }
     }
 
     switchModule(moduleName) {
@@ -557,30 +623,6 @@ class HRSystem {
         }
     }
 
-    handleJobSubmission(form) {
-        const formData = new FormData(form);
-        const jobData = {
-            title: formData.get('jobTitle'),
-            department: formData.get('department'),
-            location: formData.get('location'),
-            type: formData.get('jobType'),
-            description: formData.get('jobDescription'),
-            requirements: formData.get('requirements')
-        };
-
-        // Simulate job creation
-        console.log('Creating job:', jobData);
-        
-        // Show success message
-        this.showNotification('Job requisition created successfully!', 'success');
-        
-        // Reset form
-        form.reset();
-        
-        // Add to job listings (simulate)
-        this.addJobToTable(jobData);
-    }
-
     async handleGoalCreation(form) {
         const formData = new FormData(form);
         try {
@@ -642,24 +684,6 @@ class HRSystem {
         
         // Add to recognition feed (simulate)
         this.addRecognitionToFeed(recognitionData);
-    }
-
-    addJobToTable(jobData) {
-        const tableBody = document.querySelector('#job-requisition .data-table tbody');
-        if (tableBody) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${jobData.title}</td>
-                <td>${jobData.department}</td>
-                <td><span class="status-badge active">Active</span></td>
-                <td>0</td>
-                <td>
-                    <button class="btn btn-sm">View</button>
-                    <button class="btn btn-sm">Edit</button>
-                </td>
-            `;
-            tableBody.appendChild(row);
-        }
     }
 
     addGoalToList(goalData) {

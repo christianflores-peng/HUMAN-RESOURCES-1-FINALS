@@ -1,0 +1,15 @@
+# Deny direct access to files for security
+# Only allow specific file types
+<FilesMatch "\.(pdf|jpg|jpeg|png)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Deny all other file types
+<FilesMatch "^(?!.*\.(pdf|jpg|jpeg|png)$)">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Disable directory listing
+Options -Indexes

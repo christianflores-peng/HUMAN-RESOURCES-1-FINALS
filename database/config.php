@@ -104,10 +104,15 @@ function fetchAll($sql, $params = []) {
  * @return string Last inserted ID
  */
 function insertRecord($sql, $params = []) {
-    $pdo = getDBConnection();
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    return $pdo->lastInsertId();
+    try {
+        $pdo = getDBConnection();
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $pdo->lastInsertId();
+    } catch (PDOException $e) {
+        error_log("insertRecord failed: " . $e->getMessage());
+        throw new PDOException("Insert failed.");
+    }
 }
 
 /**
