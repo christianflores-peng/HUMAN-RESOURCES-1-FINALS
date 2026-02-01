@@ -1,34 +1,57 @@
 <?php
+/**
+ * Role-Based Portal Router
+ * Routes users to their appropriate dashboard based on role_type
+ * 
+ * Directory Structure:
+ * - Admin → admin/dashboard.php
+ * - HR_Staff → pages/hr-recruitment-dashboard.php
+ * - Manager → pages/manager-dashboard.php
+ * - Applicant → modals/applicant/dashboard.php
+ * - Employee → modals/employee/dashboard.php
+ */
+
 require_once 'includes/session_helper.php';
 startSecureSession();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: partials/login.php');
     exit();
 }
 
 // Route based on role
 $role = $_SESSION['role_type'] ?? '';
 
-// Applicants go to their own dashboard
-if ($role === 'Applicant') {
-    header('Location: modals/applicant/dashboard.php');
-    exit();
+switch ($role) {
+    case 'Admin':
+        // Admin portal - admin/ directory
+        header('Location: admin/dashboard.php');
+        break;
+        
+    case 'HR_Staff':
+        // HR Staff - recruitment dashboard
+        header('Location: pages/hr-recruitment-dashboard.php');
+        break;
+        
+    case 'Manager':
+        // Manager - manager dashboard
+        header('Location: pages/manager-dashboard.php');
+        break;
+        
+    case 'Applicant':
+        // Applicant portal - modals/applicant/
+        header('Location: modals/applicant/dashboard.php');
+        break;
+        
+    case 'Employee':
+        // Employee portal - modals/employee/
+        header('Location: modals/employee/dashboard.php');
+        break;
+        
+    default:
+        // Fallback to general dashboard
+        header('Location: pages/dashboard.php');
+        break;
 }
-
-// Managers/HR/Admin go to recruitment dashboard
-if (in_array($role, ['Manager', 'HR_Staff', 'Admin'])) {
-    header('Location: modals/manager/recruitment-dashboard.php');
-    exit();
-}
-
-// Employees go to employee dashboard
-if ($role === 'Employee') {
-    header('Location: modals/employee/dashboard.php');
-    exit();
-}
-
-// Fallback - redirect to login
-header('Location: login.php');
 exit();

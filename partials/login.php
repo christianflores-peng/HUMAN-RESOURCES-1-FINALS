@@ -82,19 +82,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
                         logAuditAction($user['id'], 'LOGIN', 'user_accounts', $user['id'], null, null, 'User logged in with OTP verification');
                     } catch (Exception $e) {}
                     
-                    // Redirect based on role type
+                    // Redirect based on role type (matches directory structure)
                     $roleType = $user['role_type'] ?? 'Employee';
                     
-                    if ($roleType === 'Admin') {
-                        header('Location: ../pages/admin-dashboard.php');
-                    } elseif ($roleType === 'HR_Staff') {
-                        header('Location: ../pages/hr-recruitment-dashboard.php');
-                    } elseif ($roleType === 'Manager') {
-                        header('Location: ../pages/manager-dashboard.php');
-                    } elseif ($roleType === 'Applicant') {
-                        header('Location: ../modals/applicant/dashboard.php');
-                    } else {
-                        header('Location: ../pages/dashboard.php');
+                    switch ($roleType) {
+                        case 'Admin':
+                            header('Location: ../admin/dashboard.php');
+                            break;
+                        case 'HR_Staff':
+                            header('Location: ../pages/hr-recruitment-dashboard.php');
+                            break;
+                        case 'Manager':
+                            header('Location: ../pages/manager-dashboard.php');
+                            break;
+                        case 'Applicant':
+                            header('Location: ../modals/applicant/dashboard.php');
+                            break;
+                        case 'Employee':
+                            header('Location: ../modals/employee/dashboard.php');
+                            break;
+                        default:
+                            header('Location: ../pages/dashboard.php');
+                            break;
                     }
                     exit();
                 }
