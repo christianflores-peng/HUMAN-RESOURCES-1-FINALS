@@ -28,36 +28,36 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
             align-items: center;
             justify-content: center;
             color: #f8fafc;
-            padding: 2rem;
+            padding: 1rem;
         }
 
         .terms-container {
             width: 100%;
-            max-width: 700px;
+            max-width: 520px;
             background: #1e2936;
-            border-radius: 16px;
-            padding: 2.5rem;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .terms-header {
-            text-align: center;
-            margin-bottom: 2rem;
+            text-align: left;
+            margin-bottom: 1rem;
         }
 
         .terms-header h1 {
-            font-size: 2rem;
+            font-size: 1.4rem;
             color: #ffffff;
-            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
         .terms-content {
             background: #2a3544;
-            border-radius: 12px;
-            padding: 2rem;
-            max-height: 400px;
+            border-radius: 8px;
+            padding: 1.25rem;
+            max-height: 320px;
             overflow-y: auto;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .terms-content::-webkit-scrollbar {
@@ -76,35 +76,35 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
 
         .terms-title {
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .terms-title h2 {
             color: #0ea5e9;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
         }
 
         .terms-title p {
             color: #94a3b8;
-            font-size: 0.95rem;
+            font-size: 0.8rem;
         }
 
         .terms-section {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .terms-section h3 {
             color: #60a5fa;
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
 
         .terms-section p {
             color: #cbd5e1;
-            line-height: 1.6;
-            margin-bottom: 0.75rem;
-            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
         }
 
         .terms-section ul {
@@ -114,26 +114,27 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
 
         .terms-section ul li {
             color: #cbd5e1;
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-            padding-left: 1.5rem;
+            line-height: 1.5;
+            margin-bottom: 0.35rem;
+            padding-left: 1.25rem;
             position: relative;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .terms-section ul li::before {
             content: "•";
             position: absolute;
-            left: 0.5rem;
+            left: 0.4rem;
             color: #0ea5e9;
         }
 
         .legal-basis {
             background: rgba(14, 165, 233, 0.1);
             border-left: 3px solid #0ea5e9;
-            padding: 1rem;
-            margin-top: 1rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
             border-radius: 4px;
+            font-size: 0.8rem;
         }
 
         .legal-basis strong {
@@ -147,67 +148,55 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
         .agreement-section {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            gap: 0.75rem;
+            padding: 0;
+            margin-bottom: 1rem;
             cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(14, 165, 233, 0.1);
-            border-radius: 8px;
-            border: 2px solid transparent;
-        }
-
-        .agreement-section:hover {
-            background: rgba(14, 165, 233, 0.15);
-            border-color: rgba(14, 165, 233, 0.3);
         }
 
         .agreement-section input[type="checkbox"] {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             accent-color: #0ea5e9;
             flex-shrink: 0;
-            pointer-events: none;
         }
 
         .agreement-section label {
-            color: #e2e8f0;
-            font-size: 1rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
             cursor: pointer;
             user-select: none;
-            flex: 1;
-            line-height: 1.5;
         }
 
         .button-group {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             justify-content: center;
-            margin-top: 2rem;
         }
 
         .btn {
-            padding: 0.875rem 2.5rem;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            padding: 0.625rem 1.5rem;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
             text-decoration: none;
             display: inline-block;
+            min-width: 120px;
         }
 
         .btn-secondary {
-            background: transparent;
+            background: #475569;
             color: #ffffff;
             border-color: #475569;
         }
 
         .btn-secondary:hover {
-            background: #475569;
-            border-color: #475569;
+            background: #64748b;
+            border-color: #64748b;
         }
 
         .btn-primary {
@@ -219,35 +208,26 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
         .btn-primary:hover {
             background: #0284c7;
             border-color: #0284c7;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
         }
 
         .btn-primary:disabled {
             background: #475569;
             border-color: #475569;
             cursor: not-allowed;
-            opacity: 0.5;
-            transform: none;
+            opacity: 0.6;
         }
 
         .btn-primary:disabled:hover {
-            transform: none;
-            box-shadow: none;
+            background: #475569;
         }
 
         @media (max-width: 768px) {
             .terms-container {
-                padding: 1.5rem;
-            }
-
-            .terms-header h1 {
-                font-size: 1.5rem;
+                padding: 1.25rem;
             }
 
             .terms-content {
-                padding: 1.5rem;
-                max-height: 300px;
+                max-height: 280px;
             }
 
             .button-group {

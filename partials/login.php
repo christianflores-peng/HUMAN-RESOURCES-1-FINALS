@@ -205,97 +205,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%);
+            background: #0a1929;
             min-height: 100vh;
-            height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            overflow: hidden;
+            flex-direction: column;
+            overflow-x: hidden;
         }
 
         .login-screen {
-            width: 100%;
-            height: 100vh;
+            flex: 1;
             display: flex;
-            align-items: center;
-            justify-content: center;
             background: #0a1929;
         }
 
-        .main-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            width: 100%;
-        }
-
         .login-container {
-            background: #1e2936;
-            border-radius: 20px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            width: 100%;
-            max-width: 1000px;
-            max-height: calc(100vh - 2rem);
             display: flex;
+            width: 100%;
+            min-height: calc(100vh - 50px);
         }
 
         .welcome-panel {
-            flex: 1;
+            flex: 1.4;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
-            padding: 3rem;
-            background: linear-gradient(135deg, #2d5f7f 0%, #3a7a9e 50%, #4a9fd8 100%);
+            padding: 2rem 3rem;
+            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 50%, #3a7a9e 100%);
             position: relative;
+            overflow: hidden;
         }
 
         .welcome-panel .system-label {
             position: absolute;
-            top: 2rem;
-            left: 2rem;
+            top: 1.5rem;
+            left: 1.5rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             color: #ffffff;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 500;
         }
 
-        .welcome-panel .system-label::before {
-            content: '🏢';
-            font-size: 1.2rem;
+        .welcome-panel .system-label img {
+            width: 28px;
+            height: 28px;
         }
 
         .welcome-panel .illustration {
             width: 100%;
-            max-width: 450px;
-            height: auto;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+        }
+
+        .welcome-panel .illustration img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
         }
 
         .welcome-panel .illustration-placeholder {
             width: 100%;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
+            max-width: 500px;
+            height: 350px;
+            background: url('../assets/images/warehouse-illustration.png') center/contain no-repeat;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
-            color: rgba(255, 255, 255, 0.3);
         }
 
         .login-panel {
-            width: 400px;
-            padding: 3rem 2.5rem;
+            width: 320px;
+            min-width: 320px;
+            padding: 2rem 2rem;
             background: #1a2332;
             display: flex;
             flex-direction: column;
@@ -308,33 +293,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .login-box img {
-            width: 6.25rem;
+            width: 80px;
             height: auto;
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.75rem;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         .login-box h2 {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             color: #ffffff;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 600;
         }
 
         .login-box form {
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 0.875rem;
         }
 
         .login-box input {
             width: 100%;
-            padding: 0.875rem 1rem;
+            padding: 0.75rem 1rem;
             background: #2a3544;
             border: 1px solid #3a4554;
             border-radius: 6px;
             color: #e2e8f0;
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             transition: all 0.3s ease;
         }
 
@@ -353,50 +338,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .password-field input {
-            padding-right: 3rem;
+            padding-right: 2.5rem;
         }
 
         .password-icon {
             position: absolute;
-            right: 1rem;
+            right: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #0ea5e9;
-            font-size: 20px;
+            color: #64748b;
+            font-size: 18px;
             cursor: pointer;
             user-select: none;
             transition: color 0.3s ease;
         }
 
         .password-icon:hover {
-            color: #0284c7;
+            color: #0ea5e9;
         }
 
         .login-box button {
-            padding: 0.875rem;
+            padding: 0.75rem;
             background: #0ea5e9;
             border: none;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-transform: capitalize;
         }
 
         .login-box button:hover {
             background: #0284c7;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
         }
 
         .error-message {
             background: rgba(239, 68, 68, 0.15);
             color: #ff6b6b;
-            padding: 0.75rem;
+            padding: 0.625rem;
             border-radius: 0.375rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             border: 1px solid rgba(239, 68, 68, 0.3);
             text-align: center;
             font-size: 0.9rem;
@@ -416,10 +398,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .signup-link {
-            margin-top: 1.5rem;
+            margin-top: 1.25rem;
             text-align: center;
             color: #cbd5e1;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .signup-link a {
@@ -434,16 +416,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
             text-align: center;
-            padding: 1rem;
+            padding: 0.875rem;
             color: #64748b;
-            font-size: 0.85rem;
-            background: rgba(10, 25, 41, 0.8);
-            backdrop-filter: blur(10px);
+            font-size: 0.8rem;
+            background: #0a1929;
+            border-top: 1px solid rgba(100, 116, 139, 0.2);
         }
 
         .footer a {
@@ -457,40 +435,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             color: #94a3b8;
         }
 
-        @media (max-width: 48rem) {
+        @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
-                height: auto;
-            }
-            
-            .welcome-panel, .login-panel {
-                width: 100%;
             }
             
             .welcome-panel {
-                padding: 2rem 1.5rem;
-            }
-            
-            .welcome-panel h1 {
-                font-size: 1.75rem;
+                min-height: 250px;
+                padding: 1.5rem;
             }
             
             .login-panel {
-                padding: 2.5rem 1.5rem;
-            }
-        }
-
-        @media (max-width: 30rem) {
-            .main-container {
-                padding: 1rem;
-            }
-            
-            .welcome-panel h1 {
-                font-size: 1.5rem;
-            }
-            
-            .login-box h2 {
-                font-size: 1.5rem;
+                width: 100%;
+                min-width: unset;
+                padding: 2rem 1.5rem;
             }
         }
     </style>
@@ -499,18 +457,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <?php include '../includes/loading-screen.php'; ?>
     
     <div class="login-screen">
-        <div class="main-container">
-            <div class="login-container">
-                <div class="welcome-panel">
-                    <div class="system-label">Freight Management System</div>
-                    <div class="illustration">
-                        <div class="illustration-placeholder">🏭</div>
-                    </div>
+        <div class="login-container">
+            <div class="welcome-panel">
+                <div class="system-label">
+                    <img src="../assets/images/slate.png" alt="Logo">
+                    Freight Management System
                 </div>
-                <div class="login-panel">
-                    <div class="login-box">
-                        <img src="../assets/images/slate.png" alt="SLATE Logo">
-                        <h2>Login</h2>
+                <div class="illustration">
+                    <img src="../assets/images/warehouse-illustration.png" alt="Warehouse" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="illustration-placeholder" style="display:none;">🏭</div>
+                </div>
+            </div>
+            <div class="login-panel">
+                <div class="login-box">
+                    <img src="../assets/images/slate.png" alt="SLATE Logo">
+                    <h2>Login</h2>
                         
                         <?php if (!empty($error_message)): ?>
                             <div class="error-message">
@@ -543,6 +504,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div class="footer">
+        © 2025 SLATE Freight Management System. All rights reserved. &nbsp;|&nbsp;
+        <a href="terms.php">Terms & Conditions</a> &nbsp;|&nbsp;
+        <a href="#">Privacy Policy</a>
     </div>
 
     <!-- OTP Verification Modal -->

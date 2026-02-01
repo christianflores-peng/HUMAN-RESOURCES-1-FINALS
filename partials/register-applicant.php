@@ -138,60 +138,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%);
+            background: #0a1929;
             min-height: 100vh;
-            height: 100vh;
-            padding: 1rem;
+            display: flex;
+            flex-direction: column;
             color: #f8fafc;
-            overflow: hidden;
         }
 
         .registration-wrapper {
-            max-width: 1000px;
+            flex: 1;
+            max-width: 900px;
+            width: 100%;
             margin: 0 auto;
+            padding: 0.75rem 1rem;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
         }
 
         .header {
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-            flex-shrink: 0;
-            position: relative;
-        }
-
-        .logo-section {
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 0.5rem;
-            position: absolute;
-            left: 0;
-        }
-
-        .logo-section img {
-            width: 65px;
-            height: auto;
+            margin-bottom: 0.5rem;
         }
 
         .progress-steps {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .step {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.2rem;
         }
 
         .step-number {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             background: #10b981;
             color: #ffffff;
@@ -199,7 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.7rem;
         }
 
         .step.active .step-number {
@@ -207,34 +193,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         }
 
         .step-label {
-            font-size: 0.75rem;
-            color: #0ea5e9;
+            font-size: 0.65rem;
+            color: #94a3b8;
             font-weight: 500;
         }
 
+        .step.active .step-label {
+            color: #0ea5e9;
+        }
+
         .step-connector {
-            width: 60px;
+            width: 40px;
             height: 2px;
             background: #10b981;
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-section img {
+            width: 50px;
+            height: auto;
         }
 
         .content-container {
-            background: rgba(30, 41, 54, 0.6);
-            border-radius: 12px;
-            padding: 1rem 0.75rem 0.75rem 0.75rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
-            backdrop-filter: blur(10px);
+            flex: 1;
+            background: transparent;
+            padding: 0;
         }
 
         .page-title {
             text-align: center;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.25rem;
         }
 
         .page-title h2 {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #ffffff;
             font-weight: 600;
         }
@@ -268,28 +266,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.6rem;
+            gap: 0.75rem;
         }
 
         .form-section {
-            background: rgba(42, 53, 68, 0.5);
-            border: 1px solid rgba(58, 69, 84, 0.5);
-            border-radius: 6px;
-            padding: 0.65rem;
+            background: #1e2936;
+            border-radius: 8px;
+            padding: 0.75rem;
         }
 
         .section-header {
             display: flex;
             align-items: center;
             gap: 0.35rem;
-            margin-bottom: 0.65rem;
-            padding-bottom: 0;
-            border-bottom: none;
+            margin-bottom: 0.5rem;
         }
 
         .section-icon {
             color: #0ea5e9;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
 
         .section-title {
@@ -301,12 +296,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.6rem;
-            margin-bottom: 0.6rem;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .form-group {
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.5rem;
         }
 
         .form-group.full-width {
@@ -315,22 +310,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         .form-label {
             display: block;
-            color: #e2e8f0;
+            color: #94a3b8;
             font-weight: 400;
-            margin-bottom: 0.3rem;
-            font-size: 0.75rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.7rem;
         }
 
         .form-input,
         .form-textarea,
         .form-select {
             width: 100%;
-            padding: 0.5rem 0.75rem;
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(58, 69, 84, 0.6);
+            padding: 0.5rem 0.65rem;
+            background: #2a3544;
+            border: 1px solid #3a4554;
             border-radius: 4px;
             color: #e2e8f0;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             transition: all 0.3s;
         }
 
@@ -339,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         .form-select:focus {
             outline: none;
             border-color: #0ea5e9;
-            background: #1a2332;
+            background: #2f3a4a;
         }
 
         .form-input::placeholder,
@@ -349,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         .form-textarea {
             resize: vertical;
-            min-height: 55px;
+            min-height: 50px;
         }
 
         .password-field {
@@ -357,32 +352,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         }
 
         .password-field input {
-            padding-right: 3rem;
+            padding-right: 2.5rem;
         }
 
         .password-icon {
             position: absolute;
-            right: 1rem;
+            right: 0.65rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #0ea5e9;
-            font-size: 20px;
+            color: #64748b;
+            font-size: 18px;
             pointer-events: none;
         }
 
         .file-upload {
-            border: 2px dashed rgba(58, 69, 84, 0.6);
-            border-radius: 4px;
-            padding: 1rem;
+            border: 2px dashed #3a4554;
+            border-radius: 6px;
+            padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: rgba(15, 23, 42, 0.3);
+            background: #2a3544;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .file-upload:hover {
             border-color: #0ea5e9;
-            background: #1e2936;
+            background: #2f3a4a;
         }
 
         .file-upload input[type="file"] {
@@ -396,40 +396,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         }
 
         .file-info {
-            color: #94a3b8;
-            font-size: 0.7rem;
-            margin-top: 0.35rem;
+            color: #64748b;
+            font-size: 0.65rem;
+            margin-top: 0.25rem;
         }
 
         .button-group {
             display: flex;
-            gap: 0.6rem;
-            margin-top: 1rem;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
             justify-content: center;
         }
 
         .btn {
-            padding: 0.55rem 1.3rem;
+            padding: 0.5rem 1.25rem;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 0.35rem;
+            min-width: 100px;
+            justify-content: center;
         }
 
         .btn-secondary {
-            background: rgba(71, 85, 105, 0.8);
+            background: #475569;
             color: #ffffff;
-            border: 1px solid rgba(100, 116, 139, 0.5);
         }
 
         .btn-secondary:hover {
-            background: rgba(51, 65, 85, 0.9);
-            transform: translateY(-1px);
+            background: #64748b;
         }
 
         .btn-primary {
@@ -439,21 +439,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         .btn-primary:hover {
             background: #0284c7;
-            transform: translateY(-1px);
         }
 
         .footer {
             text-align: center;
-            color: #94a3b8;
-            font-size: 0.75rem;
+            color: #64748b;
+            font-size: 0.7rem;
             padding: 0.5rem;
+            border-top: 1px solid rgba(100, 116, 139, 0.2);
+            margin-top: auto;
         }
 
         .login-link {
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: #94a3b8;
-            margin-top: 0.75rem;
+            margin-top: 0.5rem;
         }
 
         .login-link a {
@@ -462,13 +463,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
             font-weight: 500;
         }
 
-        @media (max-width: 968px) {
+        @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
             }
 
             .form-row {
                 grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 0.5rem;
             }
         }
     </style>
@@ -479,9 +485,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     <div class="registration-wrapper">
         <!-- Header -->
         <div class="header">
-            <div class="logo-section">
-                <img src="../assets/images/slate.png" alt="SLATE Logo">
-            </div>
             <div class="progress-steps">
                 <div class="step">
                     <div class="step-number">✓</div>
@@ -492,11 +495,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                     <div class="step-number">2</div>
                     <div class="step-label">Registration Details</div>
                 </div>
-                <div class="step-connector"></div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-label">Documents</div>
-                </div>
+            </div>
+            <div class="logo-section">
+                <img src="../assets/images/slate.png" alt="SLATE Logo">
             </div>
         </div>
 
