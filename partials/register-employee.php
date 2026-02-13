@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Registration - HR1</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -575,7 +575,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
                     <!-- Personal Information -->
                     <div class="form-section">
                         <div class="section-header">
-                            <span class="material-symbols-outlined section-icon">person</span>
+                            <i data-lucide="user" class="section-icon"></i>
                             <h3 class="section-title">Personal Information</h3>
                         </div>
 
@@ -605,7 +605,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
                             <label class="form-label">Password *</label>
                             <div class="password-field">
                                 <input type="password" name="password" class="form-input" placeholder="Enter password" required>
-                                <span class="material-symbols-outlined password-icon">visibility</span>
+                                <i data-lucide="eye" class="password-icon"></i>
                             </div>
                         </div>
 
@@ -618,7 +618,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
                     <!-- Employment Details -->
                     <div class="form-section">
                         <div class="section-header">
-                            <span class="material-symbols-outlined section-icon">badge</span>
+                            <i data-lucide="badge-check" class="section-icon"></i>
                             <h3 class="section-title">Employment Details</h3>
                         </div>
 
@@ -656,7 +656,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
                         <!-- Verification Document (inside Employment Details border) -->
                         <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(58, 69, 84, 0.5);">
                             <div class="section-header" style="margin-bottom: 0.4rem;">
-                                <span class="material-symbols-outlined section-icon">description</span>
+                                <i data-lucide="file-text" class="section-icon"></i>
                                 <h3 class="section-title">Verification Document</h3>
                             </div>
 
@@ -665,7 +665,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
                                 <div class="file-upload" onclick="document.getElementById('verification_doc').click()" style="padding: 0.5rem;">
                                     <input type="file" id="verification_doc" name="verification_doc" accept=".pdf,.jpg,.jpeg,.png" onchange="updateFileName(this)">
                                     <div class="file-upload-label" id="file-label">
-                                        <span class="material-symbols-outlined" style="font-size: 1.2rem; color: #0ea5e9;">upload_file</span>
+                                        <i data-lucide="upload" style="width: 1.2rem; height: 1.2rem; color: #0ea5e9;"></i>
                                         <p style="margin-top: 0.2rem; margin-bottom: 0.1rem; font-size: 0.7rem;">Choose File</p>
                                         <p style="font-size: 0.6rem; color: #64748b; margin: 0;">No file chosen</p>
                                     </div>
@@ -678,11 +678,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
 
                 <div class="button-group">
                     <button type="button" class="btn btn-secondary" onclick="window.location.href='register-portal.php?terms_accepted=true'">
-                        <span class="material-symbols-outlined">arrow_back</span>
+                        <i data-lucide="arrow-left"></i>
                         Previous
                     </button>
                     <button type="submit" class="btn btn-primary">
-                        <span class="material-symbols-outlined">check_circle</span>
+                        <i data-lucide="check-circle"></i>
                         Register
                     </button>
                 </div>
@@ -704,7 +704,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
             const label = document.getElementById('file-label');
             if (input.files && input.files[0]) {
                 label.innerHTML = `
-                    <span class="material-symbols-outlined" style="font-size: 2rem; color: #10b981;">check_circle</span>
+                    <i data-lucide="check-circle" style="width: 2rem; height: 2rem; color: #10b981;"></i>
                     <p style="margin-top: 0.5rem; color: #10b981;">File Selected</p>
                     <p style="font-size: 0.85rem; color: #cbd5e1;">${input.files[0].name}</p>
                 `;
@@ -718,7 +718,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
             <div class="otp-header">
                 <img src="../assets/images/slate.png" alt="SLATE Logo" class="otp-logo">
                 <h2>Verify Your Account</h2>
-                <p>Enter the 6-digit code sent to your email<?php echo !empty($pending_phone) ? ' and phone' : ''; ?></p>
+                <p>Enter the 6-digit code sent to <strong style="color:#0ea5e9;"><?php echo htmlspecialchars(maskEmail($pending_email)); ?></strong></p>
             </div>
 
             <?php if (!empty($error_message) && $show_otp_modal): ?>
@@ -759,7 +759,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
             </div>
 
             <div class="otp-timer">
-                <span class="material-symbols-outlined">timer</span>
+                <i data-lucide="timer"></i>
                 <span id="otpTimer">Code expires in 5:00</span>
             </div>
         </div>
@@ -835,7 +835,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             color: #f59e0b; font-size: 0.85rem;
         }
-        .otp-timer .material-symbols-outlined { font-size: 1.1rem; }
+        .otp-timer i { width: 1.1rem; height: 1.1rem; }
     </style>
 
     <script>
@@ -902,6 +902,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
 
         document.querySelector('.otp-digit[data-index="0"]')?.focus();
         <?php endif; ?>
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

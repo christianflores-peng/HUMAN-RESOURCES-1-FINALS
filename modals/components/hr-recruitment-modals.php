@@ -2,7 +2,7 @@
 <div class="modal" id="hireModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2><span class="material-symbols-outlined">how_to_reg</span> Confirm Hiring</h2>
+            <h2><i data-lucide="user-check"></i> Confirm Hiring</h2>
             <button class="modal-close" onclick="closeModal('hireModal')">&times;</button>
         </div>
         <div class="modal-body">
@@ -43,7 +43,7 @@
 
                 <div style="background: #2a3544; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                     <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.5rem;">
-                        <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">info</span>
+                        <i data-lucide="info" style="width: 16px; height: 16px; vertical-align: middle;"></i>
                         Auto-Fill Action:
                     </p>
                     <p style="color: #0ea5e9; font-size: 0.9rem;">
@@ -52,7 +52,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center;" id="hireSubmitBtn">
-                    <span class="material-symbols-outlined">check_circle</span>
+                    <i data-lucide="check-circle"></i>
                     Confirm Hire & Generate Email
                 </button>
             </form>

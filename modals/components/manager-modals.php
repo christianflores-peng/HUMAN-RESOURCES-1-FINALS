@@ -2,43 +2,43 @@
 <div class="modal" id="documentsModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2><span class="material-symbols-outlined">folder_open</span> Employee Documents - <span id="docEmployeeName"></span></h2>
+            <h2><i data-lucide="folder-open"></i> Employee Documents - <span id="docEmployeeName"></span></h2>
             <button class="modal-close" onclick="closeModal('documentsModal')">&times;</button>
         </div>
         <div class="modal-body">
             <div class="doc-section">
-                <h3><span class="material-symbols-outlined">badge</span> Licenses & Certifications (Critical for Freight)</h3>
+                <h3><i data-lucide="id-card"></i> Licenses & Certifications (Critical for Freight)</h3>
                 <div id="licenseDocs">
                     <div class="doc-item">
                         <div class="doc-info">
-                            <h4><span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle;">description</span> Commercial Driver's License (CDL)</h4>
+                            <h4><i data-lucide="file-text" style="width: 1.2rem; height: 1.2rem; vertical-align: middle;"></i> Commercial Driver's License (CDL)</h4>
                             <p>Status: <span class="status-badge valid">Valid</span> | Expiry: Dec 2025</p>
                         </div>
                         <button class="btn btn-view" title="View Only - No Delete">
-                            <span class="material-symbols-outlined">visibility</span>
+                            <i data-lucide="eye"></i>
                         </button>
                     </div>
                     <div class="doc-item">
                         <div class="doc-info">
-                            <h4><span class="material-symbols-outlined" style="font-size: 1.2rem; vertical-align: middle;">description</span> Medical Certificate</h4>
-                            <p>Status: <span class="status-badge expiring"><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">warning</span> Expiring Soon</span> | Expiry: Next Week</p>
+                            <h4><i data-lucide="file-text" style="width: 1.2rem; height: 1.2rem; vertical-align: middle;"></i> Medical Certificate</h4>
+                            <p>Status: <span class="status-badge expiring"><i data-lucide="alert-triangle" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> Expiring Soon</span> | Expiry: Next Week</p>
                         </div>
                         <button class="btn btn-view" title="View Only - No Delete">
-                            <span class="material-symbols-outlined">visibility</span>
+                            <i data-lucide="eye"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
             <div class="doc-section">
-                <h3><span class="material-symbols-outlined">description</span> HR Files (Filtered)</h3>
+                <h3><i data-lucide="file-text"></i> HR Files (Filtered)</h3>
                 <div class="doc-item">
                     <div class="doc-info">
                         <h4>📄 201 File (Bio-data)</h4>
                         <p>Viewable</p>
                     </div>
                     <button class="btn btn-view">
-                        <span class="material-symbols-outlined">visibility</span>
+                        <i data-lucide="eye"></i>
                     </button>
                 </div>
                 <div class="doc-item">
@@ -47,15 +47,15 @@
                         <p>Viewable</p>
                     </div>
                     <button class="btn btn-view">
-                        <span class="material-symbols-outlined">visibility</span>
+                        <i data-lucide="eye"></i>
                     </button>
                 </div>
             </div>
 
             <div class="doc-section">
-                <h3><span class="material-symbols-outlined">lock</span> Restricted Files</h3>
+                <h3><i data-lucide="lock"></i> Restricted Files</h3>
                 <div class="locked-section">
-                    <span class="material-symbols-outlined">lock</span>
+                    <i data-lucide="lock"></i>
                     <p>🚫 Salary / Payslips - HIDDEN / LOCKED</p>
                     <small>Only HR Staff and Admin have access to Payroll Management</small>
                 </div>
@@ -68,7 +68,7 @@
 <div class="modal" id="reviewModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2><span class="material-symbols-outlined">rate_review</span> Probation Evaluation - <span id="reviewEmployeeName"></span></h2>
+            <h2><i data-lucide="clipboard-check"></i> Probation Evaluation - <span id="reviewEmployeeName"></span></h2>
             <button class="modal-close" onclick="closeModal('reviewModal')">&times;</button>
         </div>
         <div class="modal-body">
@@ -140,7 +140,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                    <span class="material-symbols-outlined">send</span>
+                    <i data-lucide="send"></i>
                     Submit Evaluation to HR
                 </button>
             </form>

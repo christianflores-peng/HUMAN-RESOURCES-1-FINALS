@@ -16,7 +16,7 @@ $from_terms = isset($_GET['terms_accepted']) && $_GET['terms_accepted'] === 'tru
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration - HR1 Management System</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -454,12 +454,12 @@ $from_terms = isset($_GET['terms_accepted']) && $_GET['terms_accepted'] === 'tru
             <!-- Buttons -->
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="window.location.href='terms.php'">
-                    <span class="material-symbols-outlined">arrow_back</span>
+                    <i data-lucide="arrow-left"></i>
                     Previous
                 </button>
                 <button class="btn btn-primary" id="next-btn" disabled onclick="proceedToRegistration()">
                     Next
-                    <span class="material-symbols-outlined">arrow_forward</span>
+                    <i data-lucide="arrow-right"></i>
                 </button>
             </div>
 
@@ -499,6 +499,11 @@ $from_terms = isset($_GET['terms_accepted']) && $_GET['terms_accepted'] === 'tru
             } else if (selectedCategory === 'employee') {
                 window.location.href = 'register-employee.php?terms_accepted=true';
             }
+        }
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
     </script>
 </body>

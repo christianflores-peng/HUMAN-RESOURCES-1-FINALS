@@ -1,9 +1,17 @@
 <?php
 require_once '../../includes/session_helper.php';
+require_once '../../includes/spa_helper.php';
 startSecureSession();
+$is_ajax = is_spa_ajax();
 
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role_type'], ['Manager', 'HR_Staff', 'Admin'])) {
     header('Location: ../../index.php');
+    exit();
+}
+
+if (!$is_ajax) {
+    $id = isset($_GET['id']) ? '&id=' . urlencode($_GET['id']) : '';
+    header('Location: index.php?page=applicant-details' . $id);
     exit();
 }
 
@@ -67,16 +75,8 @@ $departments = fetchAll("SELECT id, department_name FROM departments ORDER BY de
 $success_messages = ['moved_screening' => 'Applicant moved to screening stage', 'interview_scheduled' => 'Interview scheduled successfully', 'road_test_scheduled' => 'Road test scheduled successfully', 'offer_sent' => 'Job offer sent successfully', 'hired' => 'Applicant hired successfully!', 'rejected' => 'Applicant rejected'];
 $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']] ?? '') : '';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applicant Details - <?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?></title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%); min-height: 100vh; color: #f8fafc; padding: 2rem; }
+<div data-page-title="Applicant Details - <?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?>">
+<style>
         .container { max-width: 1400px; margin: 0 auto; }
         .header { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 1.5rem; color: #e2e8f0; }
@@ -92,7 +92,7 @@ $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']
         .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
         .card { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(58, 69, 84, 0.5); margin-bottom: 1.5rem; }
         .card h2 { font-size: 1.2rem; color: #e2e8f0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .card h2 .material-symbols-outlined { color: #0ea5e9; }
+        .card h2 i[data-lucide] { color: #0ea5e9; width: 1.2rem; height: 1.2rem; }
         .status-badge { display: inline-block; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
         .status-badge.new { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
         .status-badge.screening { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
@@ -127,22 +127,23 @@ $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']
         .timeline-content { color: #e2e8f0; font-size: 0.9rem; }
         @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } }
     </style>
-</head>
-<body>
     <div class="container">
         <div class="header">
             <h1>Applicant Details</h1>
-            <a href="recruitment-dashboard.php" class="btn btn-secondary"><span class="material-symbols-outlined">arrow_back</span>Back to Pipeline</a>
+            <div class="header-actions">
+                <?php include '../../includes/header-notifications.php'; ?>
+                <a href="recruitment-dashboard.php" class="btn btn-secondary"><i data-lucide="arrow-left"></i>Back to Pipeline</a>
+            </div>
         </div>
 
         <?php if ($success_message): ?>
-        <div class="alert alert-success"><span class="material-symbols-outlined">check_circle</span><span><?php echo htmlspecialchars($success_message); ?></span></div>
+        <div class="alert alert-success"><i data-lucide="check-circle"></i><span><?php echo htmlspecialchars($success_message); ?></span></div>
         <?php endif; ?>
 
         <div class="content-grid">
             <div class="main-content">
                 <div class="card">
-                    <h2><span class="material-symbols-outlined">person</span>Applicant Information</h2>
+                    <h2><i data-lucide="user"></i>Applicant Information</h2>
                     <span class="status-badge <?php echo strtolower($application['status']); ?>"><?php echo ucfirst(str_replace('_', ' ', $application['status'])); ?></span>
                     <div class="info-row"><span class="info-label">Full Name</span><span class="info-value"><?php echo htmlspecialchars($application['first_name'] . ' ' . $application['last_name']); ?></span></div>
                     <div class="info-row"><span class="info-label">Email</span><span class="info-value"><?php echo htmlspecialchars($application['email']); ?></span></div>
@@ -156,32 +157,32 @@ $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']
                 </div>
 
                 <div class="card">
-                    <h2><span class="material-symbols-outlined">settings</span>Actions</h2>
+                    <h2><i data-lucide="settings"></i>Actions</h2>
                     <div class="action-buttons">
                         <?php if ($application['status'] === 'new'): ?>
-                        <form method="POST" style="display: inline;"><input type="hidden" name="action" value="move_to_screening"><button type="submit" class="btn btn-primary"><span class="material-symbols-outlined">arrow_forward</span>Move to Screening</button></form>
+                        <form method="POST" style="display: inline;"><input type="hidden" name="action" value="move_to_screening"><button type="submit" class="btn btn-primary"><i data-lucide="arrow-right"></i>Move to Screening</button></form>
                         <?php endif; ?>
                         <?php if ($application['status'] === 'screening'): ?>
-                        <button onclick="openModal('interviewModal')" class="btn btn-primary"><span class="material-symbols-outlined">event</span>Schedule Interview</button>
+                        <button onclick="openModal('interviewModal')" class="btn btn-primary"><i data-lucide="calendar"></i>Schedule Interview</button>
                         <?php endif; ?>
                         <?php if ($application['status'] === 'interview'): ?>
-                        <button onclick="openModal('roadTestModal')" class="btn btn-primary"><span class="material-symbols-outlined">directions_car</span>Schedule Road Test</button>
+                        <button onclick="openModal('roadTestModal')" class="btn btn-primary"><i data-lucide="car"></i>Schedule Road Test</button>
                         <?php endif; ?>
                         <?php if ($application['status'] === 'road_test'): ?>
-                        <button onclick="openModal('offerModal')" class="btn btn-success"><span class="material-symbols-outlined">mail</span>Send Job Offer</button>
+                        <button onclick="openModal('offerModal')" class="btn btn-success"><i data-lucide="mail"></i>Send Job Offer</button>
                         <?php endif; ?>
                         <?php if ($application['status'] === 'offer_sent'): ?>
-                        <form method="POST" style="display: inline;"><input type="hidden" name="action" value="hire_applicant"><button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to hire this applicant?')"><span class="material-symbols-outlined">check_circle</span>Hire Applicant</button></form>
+                        <form method="POST" style="display: inline;"><input type="hidden" name="action" value="hire_applicant"><button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to hire this applicant?')"><i data-lucide="check-circle"></i>Hire Applicant</button></form>
                         <?php endif; ?>
                         <?php if (!in_array($application['status'], ['hired', 'rejected'])): ?>
-                        <button onclick="openModal('rejectModal')" class="btn btn-danger"><span class="material-symbols-outlined">cancel</span>Reject</button>
+                        <button onclick="openModal('rejectModal')" class="btn btn-danger"><i data-lucide="x-circle"></i>Reject</button>
                         <?php endif; ?>
                     </div>
                 </div>
 
                 <?php if (!empty($status_history)): ?>
                 <div class="card">
-                    <h2><span class="material-symbols-outlined">history</span>Status History</h2>
+                    <h2><i data-lucide="history"></i>Status History</h2>
                     <div class="timeline">
                         <?php foreach ($status_history as $history): ?>
                         <div class="timeline-item">
@@ -198,7 +199,7 @@ $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']
 
             <div class="sidebar-content">
                 <div class="card">
-                    <h2><span class="material-symbols-outlined">info</span>Quick Info</h2>
+                    <h2><i data-lucide="info"></i>Quick Info</h2>
                     <div class="info-row"><span class="info-label">Application ID</span><span class="info-value">#<?php echo $application['id']; ?></span></div>
                     <div class="info-row"><span class="info-label">Current Stage</span><span class="info-value"><?php echo ucfirst(str_replace('_', ' ', $application['status'])); ?></span></div>
                     <?php if ($application['interview_date']): ?>
@@ -270,11 +271,13 @@ $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']
         </div>
     </div>
 
-    <?php include '../../includes/logout-modal.php'; ?>
-    <script>
-        function openModal(id) { document.getElementById(id).classList.add('active'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-        document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); }); });
-    </script>
-</body>
-</html>
+<script>
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    document.querySelectorAll('.modal').forEach(modal => { modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('active'); }); });
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
+</div>

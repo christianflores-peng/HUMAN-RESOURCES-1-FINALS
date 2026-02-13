@@ -58,7 +58,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Careers - Join Our Team | HR1 Management</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --primary-color: #0ea5e9;
@@ -412,8 +412,9 @@ try {
             font-size: 0.875rem;
         }
 
-        .job-meta-item .material-symbols-outlined {
-            font-size: 18px;
+        .job-meta-item i {
+            width: 18px;
+            height: 18px;
             color: var(--primary-color);
         }
 
@@ -482,9 +483,10 @@ try {
             gap: 0.75rem;
         }
 
-        .job-count .material-symbols-outlined {
+        .job-count i {
             color: var(--primary-color);
-            font-size: 24px;
+            width: 24px;
+            height: 24px;
         }
 
         @media (max-width: 768px) {
@@ -515,27 +517,27 @@ try {
     </style>
 </head>
 <body>
-    <?php $logo_path = 'assets/images/slate.png'; include 'includes/loading-screen.php'; ?>
+    <?php $logo_path = '../assets/images/slate.png'; include '../includes/loading-screen.php'; ?>
     
     <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="logo">
-                <img src="assets/images/slate.png" alt="HR1 Logo">
-                <h1>HR1 Management</h1>
+                <img src="../assets/images/slate.png" alt="HR1 Logo">
+                <h1>Human Resources 1</h1>
             </div>
             <nav class="header-nav">
                 <a href="careers.php" class="active">Careers</a>
-                <a href="index.php">Home</a>
+                <a href="../index.php">Home</a>
                 <?php if ($is_logged_in && $user_role === 'Applicant'): ?>
-                    <a href="my-account.php">My Applications</a>
-                    <a href="logout.php">Logout</a>
+                    <a href="../my-account.php">My Applications</a>
+                    <a href="../logout.php">Logout</a>
                 <?php elseif ($is_logged_in): ?>
-                    <a href="pages/dashboard.php">Dashboard</a>
-                    <a href="logout.php">Logout</a>
+                    <a href="../pages/dashboard.php">Dashboard</a>
+                    <a href="../logout.php">Logout</a>
                 <?php else: ?>
-                    <a href="partials/login.php">Login</a>
-                    <a href="partials/terms.php">Register</a>
+                    <a href="../partials/login.php">Login</a>
+                    <a href="../partials/terms.php">Register</a>
                 <?php endif; ?>
                 <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
             </nav>
@@ -607,7 +609,7 @@ try {
             <?php if (!empty($job_postings)): ?>
             <div style="text-align: center;">
                 <div class="job-count">
-                    <span class="material-symbols-outlined">work</span>
+                    <i data-lucide="briefcase"></i>
                     <span><strong><?php echo count($job_postings); ?></strong> open position<?php echo count($job_postings) != 1 ? 's' : ''; ?> available</span>
                 </div>
             </div>
@@ -631,19 +633,19 @@ try {
                                     <h2 class="job-title"><?php echo htmlspecialchars($job['title']); ?></h2>
                                     <div class="job-meta">
                                         <div class="job-meta-item">
-                                            <span class="material-symbols-outlined">business</span>
+                                            <i data-lucide="building"></i>
                                             <span><?php echo htmlspecialchars($job['department_name']); ?></span>
                                         </div>
                                         <div class="job-meta-item">
-                                            <span class="material-symbols-outlined">location_on</span>
+                                            <i data-lucide="map-pin"></i>
                                             <span><?php echo htmlspecialchars($job['location']); ?></span>
                                         </div>
                                         <div class="job-meta-item">
-                                            <span class="material-symbols-outlined">work</span>
+                                            <i data-lucide="briefcase"></i>
                                             <span><?php echo htmlspecialchars($job['employment_type']); ?></span>
                                         </div>
                                         <div class="job-meta-item">
-                                            <span class="material-symbols-outlined">payments</span>
+                                            <i data-lucide="dollar-sign"></i>
                                             <span><?php echo htmlspecialchars($job['salary_display']); ?></span>
                                         </div>
                                     </div>
@@ -669,7 +671,7 @@ try {
                                 </div>
                                 <div>
                                     <a href="job_details.php?id=<?php echo $job['id']; ?>" class="btn btn-outline">View Details</a>
-                                    <a href="partials/terms.php?job_id=<?php echo $job['id']; ?>&type=applicant" class="btn btn-primary">Apply Now</a>
+                                    <a href="../partials/terms.php?job_id=<?php echo $job['id']; ?>&type=applicant" class="btn btn-primary">Apply Now</a>
                                 </div>
                             </div>
                         </div>
@@ -776,6 +778,11 @@ try {
 
         // Add event listener to theme toggle button
         document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

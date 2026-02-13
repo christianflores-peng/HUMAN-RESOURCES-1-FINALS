@@ -101,7 +101,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assign Tasks - Manager Portal</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <?php 
@@ -172,7 +172,7 @@ include '../partials/header.php';
             </div>
 
             <button type="submit" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 2rem; background: #0ea5e9; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                <span class="material-symbols-outlined">add_task</span>
+                <i data-lucide="list-plus"></i>
                 Assign Task to Employee
             </button>
         </form>

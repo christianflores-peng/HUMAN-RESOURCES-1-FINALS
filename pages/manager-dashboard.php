@@ -124,7 +124,7 @@ $active_page = 'manager-dashboard';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Portal - Slate Freight</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .manager-actions {
             display: flex;
@@ -612,14 +612,14 @@ include '../partials/header.php';
     <!-- Manager Quick Actions -->
     <div class="manager-actions">
         <a href="manager-assign-tasks.php" class="action-card">
-            <span class="material-symbols-outlined icon">add_task</span>
+            <i data-lucide="list-plus" class="icon"></i>
             <div class="content">
                 <h3>Assign Tasks</h3>
                 <p>Create onboarding tasks for team members</p>
             </div>
         </a>
         <a href="manager-upload-handbook.php" class="action-card purple">
-            <span class="material-symbols-outlined icon">upload_file</span>
+            <i data-lucide="upload" class="icon"></i>
             <div class="content">
                 <h3>Upload Handbook</h3>
                 <p>Share policy documents with employees</p>
@@ -639,14 +639,14 @@ include '../partials/header.php';
     <div class="section-card">
         <div class="section-header">
             <h2 class="section-title">
-                <span class="material-symbols-outlined">analytics</span>
+                <i data-lucide="bar-chart-2"></i>
                 Manager Overview
             </h2>
         </div>
         <div class="stats-grid">
             <div class="stat-card alert">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">warning</span>
+                    <i data-lucide="alert-triangle"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['expiring_licenses']; ?></h3>
@@ -660,7 +660,7 @@ include '../partials/header.php';
 
             <div class="stat-card warning">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">rate_review</span>
+                    <i data-lucide="clipboard-check"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['probation_reviews']; ?></h3>
@@ -674,7 +674,7 @@ include '../partials/header.php';
 
             <div class="stat-card info">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">groups</span>
+                    <i data-lucide="users"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['team_count']; ?></h3>
@@ -689,7 +689,7 @@ include '../partials/header.php';
     <div class="section-card">
             <div class="section-header">
                 <h2 class="section-title">
-                    <span class="material-symbols-outlined">badge</span>
+                    <i data-lucide="id-card"></i>
                     My Team Roster
                 </h2>
             </div>
@@ -720,9 +720,7 @@ include '../partials/header.php';
                                 <td><?php echo htmlspecialchars($member['job_title'] ?? $member['role_name'] ?? 'Employee'); ?></td>
                                 <td>
                                     <span class="status-badge <?php echo strtolower($member['employment_status'] ?? 'active'); ?>">
-                                        <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">
-                                            <?php echo $member['employment_status'] === 'Active' ? 'check_circle' : 'pending'; ?>
-                                        </span>
+                                        <i data-lucide="<?php echo $member['employment_status'] === 'Active' ? 'check-circle' : 'clock'; ?>" style="width: 1rem; height: 1rem; vertical-align: middle;"></i>
                                         <?php echo htmlspecialchars($member['employment_status'] ?? 'Active'); ?>
                                     </span>
                                 </td>
@@ -733,7 +731,7 @@ include '../partials/header.php';
                                     $docText = 'Valid';
                                     ?>
                                     <span class="status-badge <?php echo $docStatus; ?>">
-                                        <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">verified</span>
+                                        <i data-lucide="shield-check" style="width: 1rem; height: 1rem; vertical-align: middle;"></i>
                                         <?php echo $docText; ?>
                                     </span>
                                 </td>
@@ -746,16 +744,16 @@ include '../partials/header.php';
                                 </td>
                                 <td>
                                     <button class="btn btn-view" onclick="viewDocuments(<?php echo $member['id']; ?>, '<?php echo htmlspecialchars($member['first_name'] . ' ' . $member['last_name']); ?>')">
-                                        <span class="material-symbols-outlined">visibility</span>
+                                        <i data-lucide="eye"></i>
                                         VIEW DOCS
                                     </button>
                                     <button class="btn btn-view" onclick="window.location.href='manager-view-employee-info.php?id=<?php echo $member['id']; ?>'" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">
-                                        <span class="material-symbols-outlined">person</span>
+                                        <i data-lucide="user"></i>
                                         VIEW INFO
                                     </button>
                                     <?php if ($member['employment_status'] === 'Probation'): ?>
                                         <button class="btn btn-primary" onclick="showReviewForm(<?php echo $member['id']; ?>, '<?php echo htmlspecialchars($member['first_name'] . ' ' . $member['last_name']); ?>')">
-                                            <span class="material-symbols-outlined">rate_review</span>
+                                            <i data-lucide="clipboard-check"></i>
                                             EVALUATE
                                         </button>
                                     <?php endif; ?>
@@ -771,5 +769,12 @@ include '../partials/header.php';
     <?php include '../modals/components/manager-modals.php'; ?>
 
 <?php include '../partials/footer.php'; ?>
+
+<script>
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
 </body>
 </html>

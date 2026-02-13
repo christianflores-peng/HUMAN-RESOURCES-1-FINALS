@@ -67,11 +67,11 @@
 
                 <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">
-                        <span class="material-symbols-outlined">save</span>
+                        <i data-lucide="save"></i>
                         Save Changes
                     </button>
                     <button type="button" class="btn btn-danger" onclick="resetPassword()">
-                        <span class="material-symbols-outlined">lock_reset</span>
+                        <i data-lucide="key-round"></i>
                         Reset Password
                     </button>
                 </div>

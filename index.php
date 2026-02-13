@@ -15,7 +15,7 @@ $last_name = $_SESSION['last_name'] ?? '';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SLATE - Freight Management System</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -32,7 +32,7 @@ $last_name = $_SESSION['last_name'] ?? '';
             overflow-x: hidden;
         }
         
-        .material-symbols-outlined {
+        i[data-lucide] {
             vertical-align: middle;
         }
 
@@ -435,8 +435,9 @@ $last_name = $_SESSION['last_name'] ?? '';
             transform: scale(1.1);
         }
 
-        .feature-icon .material-symbols-outlined {
-            font-size: 2.5rem;
+        .feature-icon i {
+            width: 2.5rem;
+            height: 2.5rem;
             color: #0ea5e9;
         }
         
@@ -495,9 +496,10 @@ $last_name = $_SESSION['last_name'] ?? '';
             border: 1px solid rgba(14, 165, 233, 0.1);
         }
 
-        .about-feature-item .material-symbols-outlined {
+        .about-feature-item i {
             color: #0ea5e9;
-            font-size: 1.5rem;
+            width: 1.5rem;
+            height: 1.5rem;
         }
 
         .about-feature-item span {
@@ -572,17 +574,17 @@ $last_name = $_SESSION['last_name'] ?? '';
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
                 <li><a href="#about">About</a></li>
-                <li><a href="careers.php">Careers</a></li>
+                <li><a href="public/careers.php">Careers</a></li>
                 <?php if ($is_logged_in): ?>
                     <li><a href="pages/dashboard.php" class="btn-primary">
-                        <span class="material-symbols-outlined">dashboard</span>
+                        <i data-lucide="layout-dashboard"></i>
                         Dashboard
                     </a></li>
                     <li><a href="logout.php">Logout</a></li>
                 <?php else: ?>
                     <li><a href="partials/login.php">Login</a></li>
                     <li><a href="partials/register-portal.php" class="btn-primary">
-                        <span class="material-symbols-outlined">person_add</span>
+                        <i data-lucide="user-plus"></i>
                         Register
                     </a></li>
                 <?php endif; ?>
@@ -593,42 +595,42 @@ $last_name = $_SESSION['last_name'] ?? '';
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-content">
-            <div class="hero-badge">🚀 Freight Management Excellence</div>
-            <h1>Streamline Your HR & Logistics Operations</h1>
-            <p>Comprehensive human resources management integrated with freight logistics. From recruitment to performance tracking, manage your entire workforce efficiently.</p>
+            <div class="hero-badge">🚀 SLATE HR Management System</div>
+            <h1>Recruitment to Regularization — All in One Platform</h1>
+            <p>Manage the full employee lifecycle: job requisitions, applicant screening, interviews, road tests, onboarding, performance reviews, and social recognition — built for freight &amp; logistics teams.</p>
             <div class="cta-buttons">
                 <?php if ($is_logged_in): ?>
                     <a href="pages/dashboard.php" class="cta-button">
-                        <span class="material-symbols-outlined">dashboard</span>
+                        <i data-lucide="layout-dashboard"></i>
                         Access Dashboard
                     </a>
-                    <a href="careers.php" class="cta-button secondary">
-                        <span class="material-symbols-outlined">work</span>
+                    <a href="public/careers.php" class="cta-button secondary">
+                        <i data-lucide="briefcase"></i>
                         View Careers
                     </a>
                 <?php else: ?>
                     <a href="partials/register-portal.php" class="cta-button">
-                        <span class="material-symbols-outlined">person_add</span>
+                        <i data-lucide="user-plus"></i>
                         Get Started
                     </a>
                     <a href="partials/login.php" class="cta-button secondary">
-                        <span class="material-symbols-outlined">login</span>
+                        <i data-lucide="log-in"></i>
                         Login
                     </a>
                 <?php endif; ?>
             </div>
             <div class="hero-stats">
                 <div class="stat-item">
-                    <div class="stat-number">10K+</div>
-                    <div class="stat-label">Active Users</div>
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">User Portals</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Companies</div>
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Core Modules</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">99%</div>
-                    <div class="stat-label">Satisfaction</div>
+                    <div class="stat-number">E2E</div>
+                    <div class="stat-label">HR Workflow</div>
                 </div>
             </div>
         </div>
@@ -638,52 +640,52 @@ $last_name = $_SESSION['last_name'] ?? '';
     <section class="features-section" id="features">
         <div class="container">
             <div class="section-header">
-                <div class="section-badge">✨ Our Features</div>
-                <h2 class="section-title">Everything You Need to Manage Your Workforce</h2>
-                <p class="section-subtitle">Powerful tools and features designed to streamline your HR operations and boost productivity</p>
+                <div class="section-badge">✨ System Modules</div>
+                <h2 class="section-title">5 Integrated Modules for Complete HR Management</h2>
+                <p class="section-subtitle">From job requisitions to social recognition — every stage of the employee lifecycle in one platform</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <span class="material-symbols-outlined">groups</span>
+                        <i data-lucide="file-plus"></i>
                     </div>
                     <h3>Recruitment Management</h3>
-                    <p>Streamline your hiring process with applicant tracking, job postings, and candidate management tools.</p>
+                    <p>Managers submit job requisitions with budget approval. HR reviews, approves, and creates job postings from approved requests.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <span class="material-symbols-outlined">analytics</span>
+                        <i data-lucide="filter"></i>
                     </div>
-                    <h3>Performance Tracking</h3>
-                    <p>Monitor employee performance with comprehensive analytics, KPIs, and real-time reporting dashboards.</p>
+                    <h3>Applicant Management</h3>
+                    <p>Screen applicants, schedule interviews, manage road tests, and track candidates through a Kanban-style recruitment pipeline.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <span class="material-symbols-outlined">schedule</span>
+                        <i data-lucide="clipboard-check"></i>
                     </div>
-                    <h3>Time & Attendance</h3>
-                    <p>Automated time tracking, shift scheduling, and leave management for efficient workforce planning.</p>
+                    <h3>New Hire Onboarding</h3>
+                    <p>Automated account creation with company email, onboarding checklists, document submission, and requirement verification.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <span class="material-symbols-outlined">local_shipping</span>
+                        <i data-lucide="target"></i>
                     </div>
-                    <h3>Freight Integration</h3>
-                    <p>Seamlessly integrate HR operations with freight management and logistics workflows.</p>
+                    <h3>Performance Management</h3>
+                    <p>Set probationary goals, conduct 3rd and 5th month reviews, and track employee performance toward regularization.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <span class="material-symbols-outlined">security</span>
+                        <i data-lucide="trophy"></i>
                     </div>
-                    <h3>Secure & Compliant</h3>
-                    <p>Enterprise-grade security with role-based access control and compliance management.</p>
+                    <h3>Social Recognition</h3>
+                    <p>Auto-generated welcome posts for new hires, peer-to-peer kudos, and a public recognition wall to celebrate achievements.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <span class="material-symbols-outlined">support_agent</span>
+                        <i data-lucide="shield"></i>
                     </div>
-                    <h3>24/7 Support</h3>
-                    <p>Round-the-clock customer support and dedicated account management for your success.</p>
+                    <h3>Role-Based Access</h3>
+                    <p>Dedicated portals for Admin, HR Staff, Managers, Employees, and Applicants with granular permission controls.</p>
                 </div>
             </div>
         </div>
@@ -694,39 +696,59 @@ $last_name = $_SESSION['last_name'] ?? '';
         <div class="container">
             <div class="about-content">
                 <div class="about-text">
-                    <h2>Trusted by 10,000+ Companies Worldwide</h2>
-                    <p>SLATE combines powerful HR management with freight logistics expertise. Our comprehensive platform provides everything you need to manage your workforce effectively, from recruitment and onboarding to performance tracking and analytics.</p>
+                    <h2>Built for SLATE Freight Management</h2>
+                    <p>A complete HR management system designed specifically for freight and logistics operations. From hiring truck drivers to tracking probationary performance, every module is tailored to the unique needs of the transportation industry.</p>
                     <div class="about-features">
                         <div class="about-feature-item">
-                            <span class="material-symbols-outlined">check_circle</span>
-                            <span>Integrated HR & Logistics Management</span>
+                            <i data-lucide="check-circle"></i>
+                            <span>Job Requisition &rarr; Posting &rarr; Hiring Pipeline</span>
                         </div>
                         <div class="about-feature-item">
-                            <span class="material-symbols-outlined">check_circle</span>
-                            <span>Real-time Analytics & Reporting</span>
+                            <i data-lucide="check-circle"></i>
+                            <span>Automated Company Email &amp; Employee ID Generation</span>
                         </div>
                         <div class="about-feature-item">
-                            <span class="material-symbols-outlined">check_circle</span>
-                            <span>Automated Workflows & Processes</span>
+                            <i data-lucide="check-circle"></i>
+                            <span>Onboarding Checklists with Document Verification</span>
                         </div>
                         <div class="about-feature-item">
-                            <span class="material-symbols-outlined">check_circle</span>
-                            <span>Enterprise-grade Security</span>
+                            <i data-lucide="check-circle"></i>
+                            <span>Probationary Goal Setting &amp; Performance Reviews</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i data-lucide="check-circle"></i>
+                            <span>Road Test Scheduling &amp; Driver License Tracking</span>
+                        </div>
+                        <div class="about-feature-item">
+                            <i data-lucide="check-circle"></i>
+                            <span>Social Recognition Wall &amp; Welcome Posts</span>
                         </div>
                     </div>
                 </div>
                 <div class="about-stats">
                     <div style="background: rgba(30, 41, 54, 0.6); padding: 3rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px);">
-                        <h3 style="font-size: 4rem; color: #0ea5e9; margin-bottom: 1rem; font-weight: 800;">10K+</h3>
-                        <p style="color: #cbd5e1; font-size: 1.2rem; margin-bottom: 2rem;">Companies Trust SLATE</p>
-                        <div style="display: grid; gap: 1rem; margin-top: 2rem;">
-                            <div style="background: rgba(14, 165, 233, 0.1); padding: 1rem; border-radius: 10px;">
-                                <div style="font-size: 1.8rem; color: #0ea5e9; font-weight: 700;">500+</div>
-                                <div style="color: #94a3b8; font-size: 0.9rem;">Active Clients</div>
+                        <h3 style="font-size: 2.5rem; color: #0ea5e9; margin-bottom: 1rem; font-weight: 800;">5 Modules</h3>
+                        <p style="color: #cbd5e1; font-size: 1.1rem; margin-bottom: 2rem;">End-to-End HR Workflow</p>
+                        <div style="display: grid; gap: 0.75rem; margin-top: 1.5rem; text-align: left;">
+                            <div style="background: rgba(14, 165, 233, 0.1); padding: 0.85rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">1</span>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Recruitment Management</span>
                             </div>
-                            <div style="background: rgba(14, 165, 233, 0.1); padding: 1rem; border-radius: 10px;">
-                                <div style="font-size: 1.8rem; color: #0ea5e9; font-weight: 700;">99%</div>
-                                <div style="color: #94a3b8; font-size: 0.9rem;">Satisfaction Rate</div>
+                            <div style="background: rgba(139, 92, 246, 0.1); padding: 0.85rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">2</span>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Applicant Management</span>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.1); padding: 0.85rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">3</span>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">New Hire Onboarding</span>
+                            </div>
+                            <div style="background: rgba(245, 158, 11, 0.1); padding: 0.85rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">4</span>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Performance Management</span>
+                            </div>
+                            <div style="background: rgba(236, 72, 153, 0.1); padding: 0.85rem 1rem; border-radius: 10px; display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">5</span>
+                                <span style="color: #cbd5e1; font-size: 0.9rem;">Social Recognition</span>
                             </div>
                         </div>
                     </div>
@@ -740,39 +762,69 @@ $last_name = $_SESSION['last_name'] ?? '';
         <div class="container">
             <div class="section-header">
                 <div class="section-badge">🎯 Quick Access</div>
-                <h2 class="section-title">Get Started Today</h2>
-                <p class="section-subtitle">Access your HR tools and manage your workforce efficiently</p>
+                <?php if ($is_logged_in): ?>
+                    <h2 class="section-title">Welcome, <?php echo htmlspecialchars($_SESSION['first_name'] ?? 'User'); ?>!</h2>
+                    <p class="section-subtitle">You are logged in as <strong style="color: #0ea5e9;"><?php echo htmlspecialchars(str_replace('_', ' ', $_SESSION['role_type'] ?? 'User')); ?></strong> — access your portal below</p>
+                <?php else: ?>
+                    <h2 class="section-title">Get Started Today</h2>
+                    <p class="section-subtitle">Login or register to access your HR portal</p>
+                <?php endif; ?>
             </div>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-top: 3rem;">
                 <?php if ($is_logged_in): ?>
-                    <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
-                        <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #0ea5e9;">dashboard</span>
+                    <?php
+                        $role = $_SESSION['role_type'] ?? '';
+                        $portal_cards = [];
+                        if ($role === 'Admin') {
+                            $portal_cards = [
+                                ['icon' => 'shield', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)', 'title' => 'Admin Portal', 'desc' => 'System settings, user management, and audit logs', 'link' => 'modals/admin/index.php'],
+                                ['icon' => 'users', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'HR Staff Portal', 'desc' => 'Recruitment pipeline, screening, and onboarding', 'link' => 'modals/hr_staff/index.php'],
+                                ['icon' => 'briefcase', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Manager Portal', 'desc' => 'Job requisitions, interviews, and performance', 'link' => 'modals/manager/index.php'],
+                            ];
+                        } elseif ($role === 'HR_Staff') {
+                            $portal_cards = [
+                                ['icon' => 'kanban', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'HR Dashboard', 'desc' => 'Recruitment pipeline, screening, and onboarding tracker', 'link' => 'modals/hr_staff/index.php'],
+                                ['icon' => 'file-plus', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)', 'title' => 'Job Requisitions', 'desc' => 'Review and approve manager requests', 'link' => 'modals/hr_staff/index.php?page=job-requisitions'],
+                                ['icon' => 'briefcase', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Careers Page', 'desc' => 'View public job postings', 'link' => 'public/careers.php'],
+                            ];
+                        } elseif ($role === 'Manager') {
+                            $portal_cards = [
+                                ['icon' => 'layout-dashboard', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Manager Dashboard', 'desc' => 'Team overview, requisitions, and performance reviews', 'link' => 'modals/manager/index.php'],
+                                ['icon' => 'file-plus', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Job Requisitions', 'desc' => 'Request new staff for your department', 'link' => 'modals/manager/index.php?page=job-requisitions'],
+                                ['icon' => 'target', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Goal Setting', 'desc' => 'Set and track probationary goals', 'link' => 'modals/manager/index.php?page=goal-setting'],
+                            ];
+                        } elseif ($role === 'Employee') {
+                            $portal_cards = [
+                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Employee Dashboard', 'desc' => 'Onboarding progress, profile, and kudos', 'link' => 'modals/employee/index.php'],
+                                ['icon' => 'list-checks', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Onboarding', 'desc' => 'Complete your onboarding checklist', 'link' => 'modals/employee/index.php?page=onboarding'],
+                                ['icon' => 'trophy', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Recognition Wall', 'desc' => 'Give kudos and celebrate achievements', 'link' => 'modals/employee/index.php?page=recognition-wall'],
+                            ];
+                        } elseif ($role === 'Applicant') {
+                            $portal_cards = [
+                                ['icon' => 'layout-dashboard', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)', 'title' => 'Applicant Dashboard', 'desc' => 'Track your applications and interview schedule', 'link' => 'modals/applicant/index.php'],
+                                ['icon' => 'file-text', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'My Applications', 'desc' => 'View status of all your applications', 'link' => 'modals/applicant/index.php?page=applications'],
+                                ['icon' => 'briefcase', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Browse Jobs', 'desc' => 'Find and apply for open positions', 'link' => 'public/careers.php'],
+                            ];
+                        } else {
+                            $portal_cards = [
+                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Dashboard', 'desc' => 'Access your portal', 'link' => 'pages/dashboard.php'],
+                            ];
+                        }
+                        foreach ($portal_cards as $card):
+                    ?>
+                    <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='<?php echo $card['color']; ?>'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
+                        <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: <?php echo $card['bg']; ?>; border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="<?php echo $card['icon']; ?>" style="width: 2.5rem; height: 2.5rem; color: <?php echo $card['color']; ?>;"></i>
                         </div>
-                        <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Dashboard</h3>
-                        <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Access your HR dashboard and analytics</p>
-                        <a href="pages/dashboard.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">Access Dashboard</a>
+                        <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;"><?php echo htmlspecialchars($card['title']); ?></h3>
+                        <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;"><?php echo htmlspecialchars($card['desc']); ?></p>
+                        <a href="<?php echo $card['link']; ?>" style="background: <?php echo $card['color']; ?>; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.opacity='0.85'; this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)'">Open</a>
                     </div>
-                    <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
-                        <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #0ea5e9;">groups</span>
-                        </div>
-                        <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Applicant Portal</h3>
-                        <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Manage job applications and candidates</p>
-                        <a href="applicant-portal.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">View Portal</a>
-                    </div>
-                    <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
-                        <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #0ea5e9;">work</span>
-                        </div>
-                        <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Job Postings</h3>
-                        <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Browse and apply for available positions</p>
-                        <a href="public/careers.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">View Jobs</a>
-                    </div>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
                         <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #0ea5e9;">login</span>
+                            <i data-lucide="log-in" style="width: 2.5rem; height: 2.5rem; color: #0ea5e9;"></i>
                         </div>
                         <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Login</h3>
                         <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Access your HR management system</p>
@@ -780,7 +832,7 @@ $last_name = $_SESSION['last_name'] ?? '';
                     </div>
                     <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
                         <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #0ea5e9;">person_add</span>
+                            <i data-lucide="user-plus" style="width: 2.5rem; height: 2.5rem; color: #0ea5e9;"></i>
                         </div>
                         <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Register</h3>
                         <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Create your SLATE account</p>
@@ -788,11 +840,11 @@ $last_name = $_SESSION['last_name'] ?? '';
                     </div>
                     <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
                         <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #0ea5e9;">work</span>
+                            <i data-lucide="briefcase" style="width: 2.5rem; height: 2.5rem; color: #0ea5e9;"></i>
                         </div>
                         <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Apply for Jobs</h3>
-                        <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Browse and apply for available positions</p>
-                        <a href="public/careers.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">View Jobs</a>
+                        <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Browse and apply for open positions</p>
+                        <a href="public/careers.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">View Careers</a>
                     </div>
                 <?php endif; ?>
             </div>
@@ -846,6 +898,11 @@ $last_name = $_SESSION['last_name'] ?? '';
                 nav.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
             }
         });
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

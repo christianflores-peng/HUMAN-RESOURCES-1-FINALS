@@ -6,13 +6,12 @@ $error_message = '';
 
 // Get job details
 try {
-    $sql = "SELECT jp.*, d.name as department_name, u.username as posted_by_username,
+    $sql = "SELECT jp.*, d.department_name,
                    COUNT(ja.id) as application_count
             FROM job_postings jp
             LEFT JOIN departments d ON jp.department_id = d.id
-            LEFT JOIN users u ON jp.posted_by = u.id
             LEFT JOIN job_applications ja ON jp.id = ja.job_posting_id
-            WHERE jp.id = ? AND jp.status = 'active'
+            WHERE jp.id = ? AND jp.status = 'Open'
             GROUP BY jp.id";
     
     $job = fetchSingle($sql, [$job_id]);
@@ -47,7 +46,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $job ? htmlspecialchars($job['title']) : 'Job Details'; ?> | HR1 Management</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="../css/styles.css">
     <style>
         :root {
             --primary-color: #3b82f6;

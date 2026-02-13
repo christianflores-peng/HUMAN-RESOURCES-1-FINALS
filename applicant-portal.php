@@ -4,9 +4,9 @@
  * Routes users to their appropriate dashboard based on role_type
  * 
  * Directory Structure:
- * - Admin → admin/dashboard.php
- * - HR_Staff → pages/hr-recruitment-dashboard.php
- * - Manager → pages/manager-dashboard.php
+ * - Admin → modals/admin/dashboard.php
+ * - HR_Staff → modals/hr_staff/dashboard.php
+ * - Manager → modals/manager/dashboard.php
  * - Applicant → modals/applicant/dashboard.php
  * - Employee → modals/employee/dashboard.php
  */
@@ -26,17 +26,17 @@ $role = $_SESSION['role_type'] ?? '';
 switch ($role) {
     case 'Admin':
         // Admin portal - admin/ directory
-        header('Location: admin/dashboard.php');
+        header('Location: modals/admin/dashboard.php');
         break;
         
     case 'HR_Staff':
         // HR Staff - recruitment dashboard
-        header('Location: pages/hr-recruitment-dashboard.php');
+        header('Location: modals/hr_staff/dashboard.php');
         break;
         
     case 'Manager':
         // Manager - manager dashboard
-        header('Location: pages/manager-dashboard.php');
+        header('Location: modals/manager/dashboard.php');
         break;
         
     case 'Applicant':

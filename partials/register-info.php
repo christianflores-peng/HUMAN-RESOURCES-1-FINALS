@@ -7,7 +7,7 @@ session_start();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - HR1 System</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -174,15 +174,16 @@ session_start();
             background: #cbd5e1;
         }
         
-        .material-symbols-outlined {
-            font-size: 20px;
+        i[data-lucide] {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="icon"><span class="material-symbols-outlined" style="font-size: 4rem;">edit_note</span></div>
+            <div class="icon"><i data-lucide="clipboard-pen" style="width: 4rem; height: 4rem;"></i></div>
             <h1>Welcome to HR1!</h1>
             <p>Join our team by submitting your application</p>
         </div>
@@ -232,15 +233,21 @@ session_start();
             
             <div class="button-group">
                 <a href="../careers.php" class="btn btn-primary">
-                    <span class="material-symbols-outlined">work</span>
+                    <i data-lucide="briefcase"></i>
                     View Job Openings
                 </a>
                 <a href="../index.php" class="btn btn-secondary">
-                    <span class="material-symbols-outlined">home</span>
+                    <i data-lucide="home"></i>
                     Back to Home
                 </a>
             </div>
         </div>
     </div>
+    
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

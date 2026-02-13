@@ -144,7 +144,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Slate Freight</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -616,13 +616,13 @@ try {
         <div class="dashboard-header">
             <div class="header-title">
                 <h1>
-                    <span class="material-symbols-outlined">admin_panel_settings</span>
+                    <i data-lucide="shield"></i>
                     System Administration
                 </h1>
                 <p>Admin Dashboard - Full System Control</p>
             </div>
             <a href="dashboard.php" class="btn btn-secondary">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <i data-lucide="arrow-left"></i>
                 Back to Dashboard
             </a>
         </div>
@@ -643,7 +643,7 @@ try {
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">group</span>
+                    <i data-lucide="users"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['total_users']; ?></h3>
@@ -652,7 +652,7 @@ try {
             </div>
             <div class="stat-card">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">check_circle</span>
+                    <i data-lucide="check-circle"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['active_users']; ?></h3>
@@ -661,7 +661,7 @@ try {
             </div>
             <div class="stat-card">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">history</span>
+                    <i data-lucide="history"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['total_actions_today']; ?></h3>
@@ -670,7 +670,7 @@ try {
             </div>
             <div class="stat-card">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">login</span>
+                    <i data-lucide="log-in"></i>
                 </div>
                 <div class="stat-content">
                     <h3><?php echo $stats['login_count_today']; ?></h3>
@@ -682,15 +682,15 @@ try {
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('users')">
-                <span class="material-symbols-outlined">manage_accounts</span>
+                <i data-lucide="user-cog"></i>
                 User Management
             </button>
             <button class="tab-btn" onclick="showTab('audit')">
-                <span class="material-symbols-outlined">security</span>
+                <i data-lucide="shield-check"></i>
                 Audit Logs
             </button>
             <button class="tab-btn" onclick="showTab('settings')">
-                <span class="material-symbols-outlined">settings</span>
+                <i data-lucide="settings"></i>
                 System Settings
             </button>
         </div>
@@ -700,11 +700,11 @@ try {
             <div class="section-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <span class="material-symbols-outlined">badge</span>
+                        <i data-lucide="id-card"></i>
                         User Access Management
                     </h2>
                     <button class="btn btn-primary btn-sm" onclick="showAddUserModal()">
-                        <span class="material-symbols-outlined">person_add</span>
+                        <i data-lucide="user-plus"></i>
                         Add User
                     </button>
                 </div>
@@ -744,7 +744,7 @@ try {
                                     </td>
                                     <td>
                                         <button class="btn btn-secondary btn-sm" onclick="editUserPermissions(<?php echo $u['id']; ?>, '<?php echo htmlspecialchars(($u['first_name'] ?? '') . ' ' . ($u['last_name'] ?? $u['username'] ?? '')); ?>')">
-                                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
                                             Edit
                                         </button>
                                     </td>
@@ -761,7 +761,7 @@ try {
             <div class="section-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <span class="material-symbols-outlined">monitoring</span>
+                        <i data-lucide="activity"></i>
                         Audit Logs - System Activity
                     </h2>
                     <span style="color: #94a3b8; font-size: 0.85rem;">Last 50 actions</span>
@@ -805,7 +805,7 @@ try {
             <div class="section-card">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <span class="material-symbols-outlined">tune</span>
+                        <i data-lucide="sliders"></i>
                         Configuration Settings
                     </h2>
                 </div>
@@ -813,48 +813,48 @@ try {
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                     <div style="background: #2a3544; padding: 1.25rem; border-radius: 8px;">
                         <h3 style="color: #0ea5e9; margin-bottom: 1rem; font-size: 1rem;">
-                            <span class="material-symbols-outlined" style="vertical-align: middle;">work</span>
+                            <i data-lucide="briefcase" style="vertical-align: middle;"></i>
                             Job Titles
                         </h3>
                         <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.75rem;">Manage available job titles/positions</p>
                         <button class="btn btn-secondary btn-sm">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
                             Edit List
                         </button>
                     </div>
 
                     <div style="background: #2a3544; padding: 1.25rem; border-radius: 8px;">
                         <h3 style="color: #0ea5e9; margin-bottom: 1rem; font-size: 1rem;">
-                            <span class="material-symbols-outlined" style="vertical-align: middle;">apartment</span>
+                            <i data-lucide="building-2" style="vertical-align: middle;"></i>
                             Departments
                         </h3>
                         <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.75rem;">Manage company departments</p>
                         <button class="btn btn-secondary btn-sm">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
                             Edit List
                         </button>
                     </div>
 
                     <div style="background: #2a3544; padding: 1.25rem; border-radius: 8px;">
                         <h3 style="color: #0ea5e9; margin-bottom: 1rem; font-size: 1rem;">
-                            <span class="material-symbols-outlined" style="vertical-align: middle;">event_busy</span>
+                            <i data-lucide="calendar-x" style="vertical-align: middle;"></i>
                             Leave Types
                         </h3>
                         <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.75rem;">Configure leave type options</p>
                         <button class="btn btn-secondary btn-sm">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
                             Edit List
                         </button>
                     </div>
 
                     <div style="background: #2a3544; padding: 1.25rem; border-radius: 8px;">
                         <h3 style="color: #0ea5e9; margin-bottom: 1rem; font-size: 1rem;">
-                            <span class="material-symbols-outlined" style="vertical-align: middle;">mail</span>
+                            <i data-lucide="mail" style="vertical-align: middle;"></i>
                             Email Domain
                         </h3>
                         <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.75rem;">Current: @slatefreight.com</p>
                         <button class="btn btn-secondary btn-sm">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                            <i data-lucide="edit" style="width: 16px; height: 16px;"></i>
                             Change
                         </button>
                     </div>
@@ -864,5 +864,19 @@ try {
     </div>
 
     <?php include '../modals/components/admin-modals.php'; ?>
+    
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

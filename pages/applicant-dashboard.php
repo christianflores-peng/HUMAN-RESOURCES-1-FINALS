@@ -67,7 +67,7 @@ $statusLabels = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Applicant Portal - SLATE HR</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -375,8 +375,8 @@ $statusLabels = [
                     <div class="user-name"><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></div>
                     <div class="user-role">Applicant</div>
                 </div>
-                <a href="../partials/logout.php" class="btn btn-secondary">
-                    <span class="material-symbols-outlined">logout</span>
+                <a href="../logout.php" class="btn btn-secondary">
+                    <i data-lucide="log-out"></i>
                     Logout
                 </a>
             </div>
@@ -386,7 +386,7 @@ $statusLabels = [
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="material-symbols-outlined stat-icon">description</span>
+                    <i data-lucide="file-text" class="stat-icon"></i>
                     <div>
                         <div class="stat-value"><?php echo count($applications); ?></div>
                         <div class="stat-label">Total Applications</div>
@@ -396,7 +396,7 @@ $statusLabels = [
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="material-symbols-outlined stat-icon">pending</span>
+                    <i data-lucide="clock" class="stat-icon"></i>
                     <div>
                         <div class="stat-value">
                             <?php 
@@ -411,7 +411,7 @@ $statusLabels = [
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="material-symbols-outlined stat-icon">check_circle</span>
+                    <i data-lucide="check-circle" class="stat-icon"></i>
                     <div>
                         <div class="stat-value">
                             <?php 
@@ -429,11 +429,11 @@ $statusLabels = [
         <div class="content-section">
             <div class="section-header">
                 <h2 class="section-title">
-                    <span class="material-symbols-outlined">work</span>
+                    <i data-lucide="briefcase"></i>
                     My Applications
                 </h2>
                 <a href="../careers.php" class="btn btn-primary">
-                    <span class="material-symbols-outlined">add</span>
+                    <i data-lucide="plus"></i>
                     Apply for New Job
                 </a>
             </div>
@@ -441,12 +441,12 @@ $statusLabels = [
             <?php if (empty($applications)): ?>
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <span class="material-symbols-outlined" style="font-size: inherit;">inbox</span>
+                        <i data-lucide="inbox" style="width: inherit; height: inherit;"></i>
                     </div>
                     <h3>No Applications Yet</h3>
                     <p>You haven't applied for any positions yet. Browse available jobs and submit your application!</p>
                     <a href="../careers.php" class="btn btn-primary" style="margin-top: 1.5rem;">
-                        <span class="material-symbols-outlined">search</span>
+                        <i data-lucide="search"></i>
                         Browse Jobs
                     </a>
                 </div>
@@ -459,19 +459,19 @@ $statusLabels = [
                                     <div class="app-title"><?php echo htmlspecialchars($app['job_title']); ?></div>
                                     <div class="app-meta">
                                         <div class="app-meta-item">
-                                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">business</span>
+                                            <i data-lucide="building" style="width: 1.1rem; height: 1.1rem;"></i>
                                             <?php echo htmlspecialchars($app['department_name'] ?? 'N/A'); ?>
                                         </div>
                                         <div class="app-meta-item">
-                                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">work</span>
+                                            <i data-lucide="briefcase" style="width: 1.1rem; height: 1.1rem;"></i>
                                             <?php echo htmlspecialchars($app['employment_type']); ?>
                                         </div>
                                         <div class="app-meta-item">
-                                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">location_on</span>
+                                            <i data-lucide="map-pin" style="width: 1.1rem; height: 1.1rem;"></i>
                                             <?php echo htmlspecialchars($app['location']); ?>
                                         </div>
                                         <div class="app-meta-item">
-                                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">calendar_today</span>
+                                            <i data-lucide="calendar" style="width: 1.1rem; height: 1.1rem;"></i>
                                             Applied: <?php echo date('M d, Y', strtotime($app['applied_date'])); ?>
                                         </div>
                                     </div>
@@ -483,12 +483,12 @@ $statusLabels = [
 
                             <div class="app-actions">
                                 <a href="application-details.php?id=<?php echo $app['id']; ?>" class="btn btn-primary btn-small">
-                                    <span class="material-symbols-outlined">visibility</span>
+                                    <i data-lucide="eye"></i>
                                     View Details
                                 </a>
                                 <?php if ($app['status'] === 'screening'): ?>
                                     <a href="../screening.php?application_id=<?php echo $app['id']; ?>" class="btn btn-secondary btn-small">
-                                        <span class="material-symbols-outlined">quiz</span>
+                                        <i data-lucide="clipboard-list"></i>
                                         Take Assessment
                                     </a>
                                 <?php endif; ?>
@@ -503,11 +503,11 @@ $statusLabels = [
         <div class="content-section">
             <div class="section-header">
                 <h2 class="section-title">
-                    <span class="material-symbols-outlined">person</span>
+                    <i data-lucide="user"></i>
                     My Profile
                 </h2>
                 <a href="edit-profile.php" class="btn btn-secondary">
-                    <span class="material-symbols-outlined">edit</span>
+                    <i data-lucide="edit"></i>
                     Edit Profile
                 </a>
             </div>
@@ -544,5 +544,12 @@ $statusLabels = [
             </div>
         </div>
     </div>
+    
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

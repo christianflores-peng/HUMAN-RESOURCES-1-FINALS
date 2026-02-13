@@ -2,22 +2,22 @@
 <div class="logout-modal-overlay" id="logoutModalOverlay">
     <div class="logout-modal">
         <div class="logout-modal-icon">
-            <span class="material-symbols-outlined">logout</span>
+            <i data-lucide="log-out"></i>
         </div>
         <h3>Confirm Logout</h3>
         <p>Are you sure you want to logout from your account?</p>
         <div class="logout-timestamp" id="logoutTimestamp">
-            <span class="material-symbols-outlined">schedule</span>
+            <i data-lucide="clock"></i>
             <span id="currentDateTime"></span>
         </div>
         <div class="logout-timer-notice" id="logoutTimerNotice">
-            <span class="material-symbols-outlined">timer</span>
+            <i data-lucide="timer"></i>
             Please wait <span id="waitCountdown">3</span> seconds before logging out
         </div>
         <div class="logout-modal-buttons">
             <button type="button" class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
             <button type="button" class="btn-logout" id="logoutBtn" onclick="performLogout()" disabled>
-                <span class="material-symbols-outlined" style="font-size:1rem;">lock</span>
+                <i data-lucide="lock" style="width:1rem;height:1rem;"></i>
                 <span id="logoutBtnText">Wait (3s)</span>
             </button>
         </div>
@@ -82,8 +82,9 @@
         margin: 0 auto 1.5rem;
     }
 
-    .logout-modal-icon .material-symbols-outlined {
-        font-size: 2rem;
+    .logout-modal-icon i {
+        width: 2rem;
+        height: 2rem;
         color: #ef4444;
     }
 
@@ -168,8 +169,9 @@
         font-size: 0.9rem;
     }
 
-    .logout-timestamp .material-symbols-outlined {
-        font-size: 1.1rem;
+    .logout-timestamp i {
+        width: 1.1rem;
+        height: 1.1rem;
     }
 
     .logout-timer-notice {
@@ -186,8 +188,9 @@
         font-size: 0.85rem;
     }
 
-    .logout-timer-notice .material-symbols-outlined {
-        font-size: 1.1rem;
+    .logout-timer-notice i {
+        width: 1.1rem;
+        height: 1.1rem;
         animation: pulse 1s ease-in-out infinite;
     }
 
@@ -251,6 +254,20 @@
         resetLogoutButton();
     }
 
+    function setLogoutBtnIcon(iconName) {
+        const logoutBtn = document.getElementById('logoutBtn');
+        // Remove existing icon (could be <i> or <svg> after Lucide processes it)
+        const oldIcon = logoutBtn.querySelector('i, svg.lucide');
+        if (oldIcon) oldIcon.remove();
+        // Create fresh <i> tag for Lucide to process
+        const newIcon = document.createElement('i');
+        newIcon.setAttribute('data-lucide', iconName);
+        newIcon.style.width = '1rem';
+        newIcon.style.height = '1rem';
+        logoutBtn.insertBefore(newIcon, logoutBtn.firstChild);
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
     function resetLogoutButton() {
         logoutCountdownValue = 3;
         const logoutBtn = document.getElementById('logoutBtn');
@@ -260,7 +277,7 @@
         
         logoutBtn.disabled = true;
         logoutBtn.classList.remove('ready');
-        logoutBtn.querySelector('.material-symbols-outlined').textContent = 'lock';
+        setLogoutBtnIcon('lock');
         logoutBtnText.textContent = 'Wait (3s)';
         waitCountdown.textContent = '3';
         timerNotice.classList.remove('hidden');
@@ -276,7 +293,7 @@
         // Initially disabled
         logoutBtn.disabled = true;
         logoutBtn.classList.remove('ready');
-        logoutBtn.querySelector('.material-symbols-outlined').textContent = 'lock';
+        setLogoutBtnIcon('lock');
         logoutBtnText.textContent = 'Wait (3s)';
         timerNotice.classList.remove('hidden');
         
@@ -290,7 +307,7 @@
                 // Enable the logout button
                 logoutBtn.disabled = false;
                 logoutBtn.classList.add('ready');
-                logoutBtn.querySelector('.material-symbols-outlined').textContent = 'logout';
+                setLogoutBtnIcon('log-out');
                 logoutBtnText.textContent = 'Logout Now';
                 timerNotice.classList.add('hidden');
             }
@@ -307,8 +324,9 @@
         const logoutBtnText = document.getElementById('logoutBtnText');
         
         logoutBtn.disabled = true;
-        logoutBtn.querySelector('.material-symbols-outlined').textContent = 'sync';
-        logoutBtn.querySelector('.material-symbols-outlined').style.animation = 'spin 1s linear infinite';
+        setLogoutBtnIcon('loader-2');
+        const spinIcon = logoutBtn.querySelector('svg.lucide, i');
+        if (spinIcon) spinIcon.style.animation = 'spin 1s linear infinite';
         logoutBtnText.textContent = 'Logging out...';
         
         // Show loading screen if available
@@ -345,4 +363,9 @@
             closeLogoutModal();
         }
     });
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 </script>

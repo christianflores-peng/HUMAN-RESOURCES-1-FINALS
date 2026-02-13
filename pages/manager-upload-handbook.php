@@ -99,7 +99,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Handbook - Manager Portal</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <?php 
@@ -152,7 +152,7 @@ include '../partials/header.php';
                 <div style="border: 2px dashed #3a4554; border-radius: 8px; padding: 2rem; text-align: center; background: #2a3544;">
                     <input type="file" name="handbook_file" accept=".pdf" required id="handbookFile" style="display: none;" onchange="updateFileName(this)">
                     <label for="handbookFile" style="cursor: pointer;">
-                        <span class="material-symbols-outlined" style="font-size: 3rem; color: #0ea5e9; display: block; margin-bottom: 0.5rem;">upload_file</span>
+                        <i data-lucide="upload" style="width: 3rem; height: 3rem; color: #0ea5e9; display: block; margin: 0 auto 0.5rem;"></i>
                         <p style="color: #94a3b8; margin-bottom: 0.5rem;">Click to select PDF file</p>
                         <p id="fileName" style="color: #0ea5e9; font-weight: 500;">No file selected</p>
                     </label>
@@ -161,7 +161,7 @@ include '../partials/header.php';
             </div>
 
             <button type="submit" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem 2rem; background: #0ea5e9; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                <span class="material-symbols-outlined">cloud_upload</span>
+                <i data-lucide="cloud-upload"></i>
                 Upload Handbook
             </button>
         </form>
@@ -178,7 +178,7 @@ include '../partials/header.php';
                 <?php foreach ($handbooks as $handbook): ?>
                     <div style="background: #2a3544; border-radius: 8px; padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 1rem;">
-                            <span class="material-symbols-outlined" style="font-size: 2.5rem; color: #ef4444;">picture_as_pdf</span>
+                            <i data-lucide="file-text" style="width: 2.5rem; height: 2.5rem; color: #ef4444;"></i>
                             <div>
                                 <h3 style="color: #ffffff; margin-bottom: 0.25rem;"><?php echo htmlspecialchars($handbook['document_name']); ?></h3>
                                 <p style="color: #94a3b8; font-size: 0.85rem;">
@@ -191,7 +191,7 @@ include '../partials/header.php';
                             </div>
                         </div>
                         <a href="<?php echo htmlspecialchars($handbook['file_path']); ?>" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 1.25rem; background: #0ea5e9; color: white; text-decoration: none; border-radius: 6px; font-weight: 500;">
-                            <span class="material-symbols-outlined">visibility</span>
+                            <i data-lucide="eye"></i>
                             View PDF
                         </a>
                     </div>
@@ -208,6 +208,11 @@ function updateFileName(input) {
         fileName.textContent = input.files[0].name;
         fileName.style.color = '#10b981';
     }
+}
+
+// Initialize Lucide icons
+if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
 }
 </script>
 

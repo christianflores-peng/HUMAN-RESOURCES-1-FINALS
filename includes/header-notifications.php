@@ -1,32 +1,70 @@
 <?php
-// Fetch unread notifications for current user (using unique variable names to avoid conflicts)
+// Fetch notifications for current user (using unique variable names to avoid conflicts)
 $_header_user_id = $_SESSION['user_id'] ?? 0;
+$_header_role = $_SESSION['role_type'] ?? '';
 $_header_unread = [];
 $_header_unread_count = 0;
+$_header_recent = [];
+$_header_is_applicant = ($_header_role === 'Applicant');
 
-try {
-    $_header_unread = fetchAll("
-        SELECT * FROM applicant_notifications 
-        WHERE user_id = ? AND is_read = 0 
-        ORDER BY created_at DESC 
-        LIMIT 5
-    ", [$_header_user_id]);
-    $_header_unread_count = count($_header_unread);
-} catch (Exception $e) {
-    // Table might not exist yet
-    $_header_unread = [];
-}
+if ($_header_is_applicant) {
+    // Applicants: use applicant_notifications table
+    try {
+        $_header_unread = fetchAll("
+            SELECT * FROM applicant_notifications 
+            WHERE user_id = ? AND is_read = 0 
+            ORDER BY created_at DESC 
+            LIMIT 5
+        ", [$_header_user_id]);
+        $_header_unread_count = count($_header_unread);
+    } catch (Exception $e) {
+        $_header_unread = [];
+    }
 
-// Get all recent notifications for dropdown
-try {
-    $_header_recent = fetchAll("
-        SELECT * FROM applicant_notifications 
-        WHERE user_id = ? 
-        ORDER BY created_at DESC 
-        LIMIT 10
-    ", [$_header_user_id]);
-} catch (Exception $e) {
-    $_header_recent = [];
+    try {
+        $_header_recent = fetchAll("
+            SELECT * FROM applicant_notifications 
+            WHERE user_id = ? 
+            ORDER BY created_at DESC 
+            LIMIT 10
+        ", [$_header_user_id]);
+    } catch (Exception $e) {
+        $_header_recent = [];
+    }
+} else {
+    // Other roles: use audit_logs as activity feed
+    try {
+        if (in_array($_header_role, ['Admin', 'HR_Staff'])) {
+            // Admin/HR see all recent system activity
+            $_header_recent = fetchAll("
+                SELECT id, user_email, action, module, detail, created_at 
+                FROM audit_logs 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            ");
+            $_header_unread = fetchAll("
+                SELECT id FROM audit_logs 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+            ");
+        } else {
+            // Manager/Employee see only their own activity
+            $_header_recent = fetchAll("
+                SELECT id, user_email, action, module, detail, created_at 
+                FROM audit_logs 
+                WHERE user_id = ?
+                ORDER BY created_at DESC 
+                LIMIT 10
+            ", [$_header_user_id]);
+            $_header_unread = fetchAll("
+                SELECT id FROM audit_logs 
+                WHERE user_id = ? AND created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+            ", [$_header_user_id]);
+        }
+        $_header_unread_count = count($_header_unread);
+    } catch (Exception $e) {
+        $_header_recent = [];
+        $_header_unread = [];
+    }
 }
 ?>
 
@@ -60,8 +98,9 @@ try {
         border-color: rgba(14, 165, 233, 0.4);
     }
     
-    .notification-bell .bell-icon .material-symbols-outlined {
-        font-size: 1.4rem;
+    .notification-bell .bell-icon i {
+        width: 1.4rem;
+        height: 1.4rem;
         color: #cbd5e1;
     }
     
@@ -178,8 +217,9 @@ try {
     .notification-icon.offer { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
     .notification-icon.rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
     
-    .notification-icon .material-symbols-outlined {
-        font-size: 1.2rem;
+    .notification-icon i {
+        width: 1.2rem;
+        height: 1.2rem;
     }
     
     .notification-content {
@@ -205,8 +245,9 @@ try {
         color: #64748b;
     }
     
-    .notification-empty .material-symbols-outlined {
-        font-size: 2.5rem;
+    .notification-empty i {
+        width: 2.5rem;
+        height: 2.5rem;
         opacity: 0.5;
         margin-bottom: 0.5rem;
         display: block;
@@ -236,7 +277,7 @@ try {
 <!-- Notification Bell HTML -->
 <div class="notification-bell" id="notificationBell">
     <div class="bell-icon">
-        <span class="material-symbols-outlined">notifications</span>
+        <i data-lucide="bell"></i>
     </div>
     <?php if ($_header_unread_count > 0): ?>
     <span class="badge"><?php echo $_header_unread_count > 9 ? '9+' : $_header_unread_count; ?></span>
@@ -253,25 +294,36 @@ try {
         <div class="notification-list">
             <?php if (empty($_header_recent)): ?>
             <div class="notification-empty">
-                <span class="material-symbols-outlined">notifications_off</span>
+                <i data-lucide="bell-off"></i>
                 <p>No notifications yet</p>
             </div>
             <?php else: ?>
             <?php foreach ($_header_recent as $notif): 
+                // Get message text - applicant_notifications uses 'message', audit_logs uses 'detail'
+                $_notif_msg = $notif['message'] ?? $notif['detail'] ?? ($notif['action'] ?? 'Activity') . ' on ' . ($notif['module'] ?? 'system');
+                $_notif_is_read = isset($notif['is_read']) ? $notif['is_read'] : 1;
+                
                 $icon_class = 'status';
                 $icon_name = 'info';
-                if (strpos(strtolower($notif['message']), 'interview') !== false) {
-                    $icon_class = 'interview';
-                    $icon_name = 'event';
-                } elseif (strpos(strtolower($notif['message']), 'offer') !== false) {
-                    $icon_class = 'offer';
-                    $icon_name = 'card_giftcard';
-                } elseif (strpos(strtolower($notif['message']), 'rejected') !== false) {
-                    $icon_class = 'rejected';
-                    $icon_name = 'cancel';
-                } elseif (strpos(strtolower($notif['message']), 'screening') !== false) {
-                    $icon_class = 'status';
-                    $icon_name = 'fact_check';
+                $_msg_lower = strtolower($_notif_msg);
+                $_action_lower = strtolower($notif['action'] ?? '');
+                
+                if (strpos($_msg_lower, 'interview') !== false || strpos($_msg_lower, 'schedule') !== false) {
+                    $icon_class = 'interview'; $icon_name = 'calendar';
+                } elseif (strpos($_msg_lower, 'offer') !== false || $_action_lower === 'approve') {
+                    $icon_class = 'offer'; $icon_name = 'gift';
+                } elseif (strpos($_msg_lower, 'rejected') !== false || $_action_lower === 'reject') {
+                    $icon_class = 'rejected'; $icon_name = 'x-circle';
+                } elseif (strpos($_msg_lower, 'screening') !== false || strpos($_msg_lower, 'review') !== false) {
+                    $icon_class = 'status'; $icon_name = 'clipboard-check';
+                } elseif ($_action_lower === 'login' || $_action_lower === 'logout') {
+                    $icon_class = 'status'; $icon_name = 'log-in';
+                } elseif ($_action_lower === 'create' || $_action_lower === 'hire') {
+                    $icon_class = 'offer'; $icon_name = 'plus-circle';
+                } elseif ($_action_lower === 'edit') {
+                    $icon_class = 'interview'; $icon_name = 'edit-3';
+                } elseif ($_action_lower === 'delete') {
+                    $icon_class = 'rejected'; $icon_name = 'trash-2';
                 }
                 
                 $time_ago = time() - strtotime($notif['created_at']);
@@ -280,12 +332,12 @@ try {
                 elseif ($time_ago < 86400) $time_str = floor($time_ago / 3600) . 'h ago';
                 else $time_str = date('M d', strtotime($notif['created_at']));
             ?>
-            <div class="notification-item <?php echo $notif['is_read'] ? '' : 'unread'; ?>" onclick="window.location.href='notifications.php'">
+            <div class="notification-item <?php echo $_notif_is_read ? '' : 'unread'; ?>">
                 <div class="notification-icon <?php echo $icon_class; ?>">
-                    <span class="material-symbols-outlined"><?php echo $icon_name; ?></span>
+                    <i data-lucide="<?php echo $icon_name; ?>"></i>
                 </div>
                 <div class="notification-content">
-                    <p><?php echo htmlspecialchars($notif['message']); ?></p>
+                    <p><?php echo htmlspecialchars($_notif_msg); ?></p>
                     <span class="time"><?php echo $time_str; ?></span>
                 </div>
             </div>
@@ -293,9 +345,15 @@ try {
             <?php endif; ?>
         </div>
         
+        <?php if ($_header_is_applicant): ?>
         <div class="notification-dropdown-footer">
-            <a href="notifications.php"><span class="material-symbols-outlined" style="font-size: 1rem;">visibility</span>View All Notifications</a>
+            <a href="notifications.php"><i data-lucide="eye" style="width: 1rem; height: 1rem;"></i>View All Notifications</a>
         </div>
+        <?php else: ?>
+        <div class="notification-dropdown-footer">
+            <a href="dashboard.php"><i data-lucide="eye" style="width: 1rem; height: 1rem;"></i>View Dashboard</a>
+        </div>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -320,4 +378,9 @@ try {
     document.getElementById('notificationDropdown').addEventListener('click', function(e) {
         e.stopPropagation();
     });
+    
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 </script>

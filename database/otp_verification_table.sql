@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS otp_verifications (
     email VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20) NULL,
     otp_code VARCHAR(6) NOT NULL,
-    otp_type ENUM('login', 'registration', 'password_reset') DEFAULT 'login',
+    otp_type ENUM('login', 'registration', 'password_reset', 'delete_user', 'toggle_status') DEFAULT 'login',
     is_verified BOOLEAN DEFAULT FALSE,
     expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

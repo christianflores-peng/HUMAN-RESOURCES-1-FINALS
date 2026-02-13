@@ -1,10 +1,17 @@
 <?php
 require_once '../../includes/session_helper.php';
+require_once '../../includes/spa_helper.php';
 startSecureSession();
+$is_ajax = is_spa_ajax();
 
 // Check if user is logged in and is an applicant
 if (!isset($_SESSION['user_id']) || $_SESSION['role_type'] !== 'Applicant') {
     header('Location: ../../partials/login.php');
+    exit();
+}
+
+if (!$is_ajax) {
+    header('Location: index.php?page=dashboard');
     exit();
 }
 
@@ -66,28 +73,8 @@ foreach ($applications as $app) {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Applicant Dashboard - HR1</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%); min-height: 100vh; color: #f8fafc; }
-        .dashboard-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(58, 69, 84, 0.5); padding: 1.5rem 0; position: fixed; height: 100vh; overflow-y: auto; }
-        .logo-section { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(58, 69, 84, 0.5); margin-bottom: 1.5rem; }
-        .logo-section img { width: 60px; margin-bottom: 0.5rem; }
-        .logo-section h2 { font-size: 1.1rem; color: #0ea5e9; margin-bottom: 0.25rem; }
-        .logo-section p { font-size: 0.75rem; color: #94a3b8; }
-        .nav-menu { list-style: none; }
-        .nav-item { margin-bottom: 0.25rem; }
-        .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; color: #cbd5e1; text-decoration: none; transition: all 0.3s; font-size: 0.9rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border-left: 3px solid #0ea5e9; }
-        .nav-link .material-symbols-outlined { font-size: 1.3rem; }
-        .main-content { flex: 1; margin-left: 260px; padding: 2rem; }
+<div data-page-title="Applicant Dashboard">
+<style>
         .header { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 1.5rem; color: #e2e8f0; }
         .header p { color: #94a3b8; font-size: 0.9rem; }
@@ -121,29 +108,8 @@ foreach ($applications as $app) {
         .btn-primary { background: #0ea5e9; color: white; }
         .btn-primary:hover { background: #0284c7; }
         .empty-state { text-align: center; padding: 3rem; color: #94a3b8; }
-        .empty-state .material-symbols-outlined { font-size: 4rem; margin-bottom: 1rem; opacity: 0.3; }
+        .empty-state i { width: 4rem; height: 4rem; margin-bottom: 1rem; opacity: 0.3; }
     </style>
-</head>
-<body>
-    <?php $logo_path = '../../assets/images/slate.png'; include '../../includes/loading-screen.php'; ?>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo-section">
-                <img src="../../assets/images/slate.png" alt="SLATE Logo">
-                <h2>Applicant Portal</h2>
-                <p><?php echo htmlspecialchars($user_name); ?></p>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="dashboard.php" class="nav-link active"><span class="material-symbols-outlined">dashboard</span>Dashboard</a></li>
-                <li class="nav-item"><a href="applications.php" class="nav-link"><span class="material-symbols-outlined">work</span>My Applications</a></li>
-                <li class="nav-item"><a href="../../careers.php" class="nav-link"><span class="material-symbols-outlined">search</span>Browse Jobs</a></li>
-                <li class="nav-item"><a href="profile.php" class="nav-link"><span class="material-symbols-outlined">person</span>My Profile</a></li>
-                <li class="nav-item"><a href="notifications.php" class="nav-link"><span class="material-symbols-outlined">notifications</span>Notifications</a></li>
-                <li class="nav-item"><a href="../../logout.php" class="nav-link"><span class="material-symbols-outlined">logout</span>Logout</a></li>
-            </ul>
-        </aside>
-
-        <main class="main-content">
             <div class="header">
                 <div>
                     <h1>Welcome back, <?php echo htmlspecialchars($_SESSION['first_name']); ?>!</h1>
@@ -156,23 +122,23 @@ foreach ($applications as $app) {
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card total"><div class="icon"><span class="material-symbols-outlined">work</span></div><h3><?php echo $stats['total']; ?></h3><p>Total Applications</p></div>
-                <div class="stat-card screening"><div class="icon"><span class="material-symbols-outlined">fact_check</span></div><h3><?php echo $stats['screening']; ?></h3><p>In Screening</p></div>
-                <div class="stat-card interview"><div class="icon"><span class="material-symbols-outlined">groups</span></div><h3><?php echo $stats['interview']; ?></h3><p>For Interview</p></div>
-                <div class="stat-card hired"><div class="icon"><span class="material-symbols-outlined">check_circle</span></div><h3><?php echo $stats['hired']; ?></h3><p>Hired</p></div>
+                <div class="stat-card total"><div class="icon"><i data-lucide="briefcase"></i></div><h3><?php echo $stats['total']; ?></h3><p>Total Applications</p></div>
+                <div class="stat-card screening"><div class="icon"><i data-lucide="clipboard-check"></i></div><h3><?php echo $stats['screening']; ?></h3><p>In Screening</p></div>
+                <div class="stat-card interview"><div class="icon"><i data-lucide="users"></i></div><h3><?php echo $stats['interview']; ?></h3><p>For Interview</p></div>
+                <div class="stat-card hired"><div class="icon"><i data-lucide="check-circle"></i></div><h3><?php echo $stats['hired']; ?></h3><p>Hired</p></div>
             </div>
 
             <div class="applications-section">
                 <div class="section-header">
                     <h2>Recent Applications</h2>
-                    <a href="../../careers.php" class="btn btn-primary">Browse Jobs</a>
+                    <a href="../../public/careers.php" class="btn btn-primary">Browse Jobs</a>
                 </div>
                 <?php if (empty($applications)): ?>
                     <div class="empty-state">
-                        <span class="material-symbols-outlined">work_off</span>
+                        <i data-lucide="briefcase-x"></i>
                         <h3>No Applications Yet</h3>
                         <p>Start your journey by applying to available positions</p>
-                        <a href="../../careers.php" class="btn btn-primary" style="margin-top: 1rem;">Browse Jobs</a>
+                        <a href="../../public/careers.php" class="btn btn-primary" style="margin-top: 1rem;">Browse Jobs</a>
                     </div>
                 <?php else: ?>
                     <table class="applications-table">
@@ -192,8 +158,9 @@ foreach ($applications as $app) {
                     </table>
                 <?php endif; ?>
             </div>
-        </main>
-    </div>
-    <?php include '../../includes/logout-modal.php'; ?>
-</body>
-</html>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
+</div>

@@ -243,6 +243,7 @@ if (isset($_GET['view']) && is_numeric($_GET['view'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Management System - Applicant Management</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <?php 
@@ -370,25 +371,25 @@ include '../partials/header.php';
                         <h3>Document Management</h3>
                         <div class="document-grid">
                             <div class="document-card">
-                                <div class="document-icon"><span class="material-symbols-outlined">description</span></div>
+                                <div class="document-icon"><i data-lucide="file-text"></i></div>
                                 <h4>Resumes</h4>
                                 <p><?php echo $documentStats['resumes']; ?> files</p>
                                 <button class="btn btn-sm" onclick="filterDocuments('resume')">Manage</button>
                             </div>
                             <div class="document-card">
-                                <div class="document-icon"><span class="material-symbols-outlined" style="font-size: 2rem; color: #0ea5e9;">description</span></div>
+                                <div class="document-icon"><i data-lucide="file-text" style="width: 2rem; height: 2rem; color: #0ea5e9;"></i></div>
                                 <h4>Cover Letters</h4>
                                 <p><?php echo $documentStats['cover_letters']; ?> files</p>
                                 <button class="btn btn-sm" onclick="filterDocuments('cover_letter')">Manage</button>
                             </div>
                             <div class="document-card">
-                                <div class="document-icon"><span class="material-symbols-outlined">workspace_premium</span></div>
+                                <div class="document-icon"><i data-lucide="award"></i></div>
                                 <h4>Certificates</h4>
                                 <p><?php echo $documentStats['certificates']; ?> files</p>
                                 <button class="btn btn-sm" onclick="filterDocuments('certificate')">Manage</button>
                             </div>
                             <div class="document-card">
-                                <div class="document-icon"><span class="material-symbols-outlined">verified</span></div>
+                                <div class="document-icon"><i data-lucide="shield-check"></i></div>
                                 <h4>Background Checks</h4>
                                 <p><?php echo $documentStats['background_checks']; ?> files</p>
                                 <button class="btn btn-sm" onclick="filterDocuments('background')">Manage</button>
@@ -425,7 +426,7 @@ include '../partials/header.php';
                                                 <td>
                                                     <?php if (!empty($applicant['resume_path'])): ?>
                                                         <a href="view_file.php?file=<?php echo urlencode($applicant['resume_path']); ?>" target="_blank" class="btn btn-sm btn-primary">
-                                                            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">visibility</span> View
+                                                            <i data-lucide="eye" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> View
                                                         </a>
                                                     <?php else: ?>
                                                         <span style="color: #64748b;">No resume</span>
@@ -434,7 +435,7 @@ include '../partials/header.php';
                                                 <td>
                                                     <?php if (!empty($applicant['cover_letter'])): ?>
                                                         <button class="btn btn-sm btn-primary" onclick="viewCoverLetter(<?php echo $applicant['id']; ?>, '<?php echo h(addslashes($applicant['first_name'] . ' ' . $applicant['last_name'])); ?>')">
-                                                            <span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">description</span> View
+                                                            <i data-lucide="file-text" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> View
                                                         </button>
                                                     <?php else: ?>
                                                         <span style="color: #64748b;">No cover letter</span>
@@ -552,7 +553,7 @@ include '../partials/header.php';
             <h4 style="color:#60a5fa; margin-bottom:1rem;">Documents</h4>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                 <div style="background:#0f172a; padding:1rem; border-radius:6px;">
-                    <p style="margin:0 0 0.5rem 0;"><strong><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">description</span> Resume:</strong></p>
+                    <p style="margin:0 0 0.5rem 0;"><strong><i data-lucide="file-text" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> Resume:</strong></p>
                     <?php if (!empty($selectedApplicant['resume_path'])): ?>
                         <button class="btn btn-sm btn-primary" onclick="toggleResumeViewer()">View Resume</button>
                         <a href="view_file.php?file=<?= urlencode($selectedApplicant['resume_path']) ?>&download=1" target="_blank" class="btn btn-sm btn-primary" style="margin-left:0.5rem;">Download</a>
@@ -561,7 +562,7 @@ include '../partials/header.php';
                     <?php endif; ?>
                 </div>
                 <div style="background:#0f172a; padding:1rem; border-radius:6px;">
-                    <p style="margin:0 0 0.5rem 0;"><strong><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">description</span> Cover Letter:</strong></p>
+                    <p style="margin:0 0 0.5rem 0;"><strong><i data-lucide="file-text" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> Cover Letter:</strong></p>
                     <?php if (!empty($selectedApplicant['cover_letter'])): ?>
                         <button class="btn btn-sm btn-primary" onclick="viewCoverLetterInline('<?= h(addslashes($selectedApplicant['first_name'] . ' ' . $selectedApplicant['last_name'])) ?>')">View Cover Letter</button>
                     <?php else: ?>
@@ -807,6 +808,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Initialize Lucide icons
+if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+}
 </script>
 
 <?php include '../partials/footer.php'; ?>

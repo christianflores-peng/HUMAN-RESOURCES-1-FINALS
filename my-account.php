@@ -164,7 +164,7 @@ function h($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account - HR1</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -910,7 +910,7 @@ function h($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
             <div class="app-management">
                 <div class="app-header">
                     <h2>Applicant Management</h2>
-                    <a href="careers.php" class="btn btn-primary">View Pipeline</a>
+                    <a href="public/careers.php" class="btn btn-primary">View Pipeline</a>
                 </div>
 
                 <!-- Tabs -->
@@ -1101,7 +1101,7 @@ function h($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                             <div class="empty-state-icon">📋</div>
                             <h3>No Applications Yet</h3>
                             <p>You haven't applied for any positions yet.</p>
-                            <a href="careers.php" class="btn btn-primary" style="margin-top: 1rem;">Browse Job Openings</a>
+                            <a href="public/careers.php" class="btn btn-primary" style="margin-top: 1rem;">Browse Job Openings</a>
                         </div>
                     <?php endif; ?>
                 </div>

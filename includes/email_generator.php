@@ -300,6 +300,13 @@ function processApplicantHire($applicantId, $roleId, $departmentId, $jobTitle, $
             // Onboarding task initialization is non-critical
         }
         
+        // Create welcome post in social_recognitions (non-critical)
+        try {
+            createWelcomePost($userId, $applicant['first_name'], $applicant['last_name'], $jobTitle);
+        } catch (Exception $e) {
+            error_log("Welcome post creation failed (non-critical): " . $e->getMessage());
+        }
+        
         $pdo->commit();
         
         return [
@@ -368,6 +375,37 @@ function initializeOnboardingTasks($userId, $departmentId) {
         }
     } catch (Exception $e) {
         error_log("Failed to initialize onboarding tasks: " . $e->getMessage());
+    }
+}
+
+/**
+ * Create a welcome post in social_recognitions for a new hire
+ * 
+ * @param int $userId The new employee's user ID
+ * @param string $firstName Employee's first name
+ * @param string $lastName Employee's last name
+ * @param string $jobTitle The job title assigned
+ */
+function createWelcomePost($userId, $firstName, $lastName, $jobTitle) {
+    try {
+        $pdo = getDBConnection();
+        $tableCheck = $pdo->query("SHOW TABLES LIKE 'social_recognitions'");
+        if ($tableCheck->rowCount() === 0) {
+            error_log("social_recognitions table does not exist - skipping welcome post");
+            return;
+        }
+        
+        $message = "Welcome to the SLATE Freight Management team, {$firstName} {$lastName}! "
+                 . "We're excited to have you join us as {$jobTitle}. "
+                 . "Wishing you a great start and a rewarding journey ahead!";
+        
+        insertRecord(
+            "INSERT INTO social_recognitions (recipient_id, given_by, recognition_type, message, badge_icon, is_system_generated, is_public)
+             VALUES (?, NULL, 'Welcome', ?, 'party-popper', 1, 1)",
+            [$userId, $message]
+        );
+    } catch (Exception $e) {
+        error_log("Failed to create welcome post: " . $e->getMessage());
     }
 }
 

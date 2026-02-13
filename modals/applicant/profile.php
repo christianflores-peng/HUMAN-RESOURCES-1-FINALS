@@ -1,9 +1,16 @@
 <?php
 require_once '../../includes/session_helper.php';
+require_once '../../includes/spa_helper.php';
 startSecureSession();
+$is_ajax = is_spa_ajax();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role_type'] !== 'Applicant') {
     header('Location: ../../index.php');
+    exit();
+}
+
+if (!$is_ajax) {
+    header('Location: index.php?page=profile');
     exit();
 }
 
@@ -50,26 +57,8 @@ try {
     $applicant_profile = null;
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - HR1</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%); min-height: 100vh; color: #f8fafc; }
-        .dashboard-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(58, 69, 84, 0.5); padding: 1.5rem 0; position: fixed; height: 100vh; overflow-y: auto; }
-        .logo-section { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(58, 69, 84, 0.5); margin-bottom: 1.5rem; }
-        .logo-section img { width: 60px; margin-bottom: 0.5rem; }
-        .logo-section h2 { font-size: 1.1rem; color: #0ea5e9; }
-        .logo-section p { font-size: 0.75rem; color: #94a3b8; }
-        .nav-menu { list-style: none; }
-        .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; color: #cbd5e1; text-decoration: none; transition: all 0.3s; font-size: 0.9rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border-left: 3px solid #0ea5e9; }
-        .main-content { flex: 1; margin-left: 260px; padding: 2rem; }
+<div data-page-title="My Profile">
+<style>
         .header { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
         .header h1 { font-size: 1.5rem; color: #e2e8f0; }
         .card { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(58, 69, 84, 0.5); margin-bottom: 1.5rem; }
@@ -91,28 +80,6 @@ try {
         .info-label { color: #94a3b8; font-size: 0.9rem; }
         .info-value { color: #e2e8f0; font-size: 0.9rem; }
     </style>
-</head>
-<body>
-    <?php $logo_path = '../../assets/images/slate.png'; include '../../includes/loading-screen.php'; ?>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo-section">
-                <img src="../../assets/images/slate.png" alt="SLATE Logo">
-                <h2>Applicant Portal</h2>
-                <p><?php echo htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_name']); ?></p>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="dashboard.php" class="nav-link"><span class="material-symbols-outlined">dashboard</span>Dashboard</a></li>
-                <li class="nav-item"><a href="applications.php" class="nav-link"><span class="material-symbols-outlined">work</span>My Applications</a></li>
-                <li class="nav-item"><a href="profile.php" class="nav-link active"><span class="material-symbols-outlined">person</span>My Profile</a></li>
-                <li class="nav-item"><a href="notifications.php" class="nav-link"><span class="material-symbols-outlined">notifications</span>Notifications</a></li>
-                <li class="nav-item"><a href="interview-schedule.php" class="nav-link"><span class="material-symbols-outlined">event</span>Interview Schedule</a></li>
-                <li class="nav-item"><a href="road-test-info.php" class="nav-link"><span class="material-symbols-outlined">directions_car</span>Road Test Info</a></li>
-                <li class="nav-item"><a href="../../logout.php" class="nav-link"><span class="material-symbols-outlined">logout</span>Logout</a></li>
-            </ul>
-        </aside>
-
-        <main class="main-content">
             <div class="header">
                 <h1>My Profile</h1>
                 <div class="header-actions">
@@ -121,14 +88,14 @@ try {
             </div>
 
             <?php if ($success_message): ?>
-            <div class="alert alert-success"><span class="material-symbols-outlined">check_circle</span><?php echo $success_message; ?></div>
+            <div class="alert alert-success"><i data-lucide="check-circle"></i><?php echo $success_message; ?></div>
             <?php endif; ?>
             <?php if ($error_message): ?>
-            <div class="alert alert-error"><span class="material-symbols-outlined">error</span><?php echo $error_message; ?></div>
+            <div class="alert alert-error"><i data-lucide="alert-circle"></i><?php echo $error_message; ?></div>
             <?php endif; ?>
 
             <div class="card">
-                <h2><span class="material-symbols-outlined">edit</span>Edit Personal Information</h2>
+                <h2><i data-lucide="edit"></i>Edit Personal Information</h2>
                 <form method="POST">
                     <div class="form-grid">
                         <div class="form-group">
@@ -152,12 +119,12 @@ try {
                             <textarea name="address" class="form-textarea"><?php echo htmlspecialchars($profile['address'] ?? ''); ?></textarea>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary"><span class="material-symbols-outlined">save</span>Save Changes</button>
+                    <button type="submit" class="btn btn-primary"><i data-lucide="save"></i>Save Changes</button>
                 </form>
             </div>
 
             <div class="card">
-                <h2><span class="material-symbols-outlined">description</span>Application Documents</h2>
+                <h2><i data-lucide="file-text"></i>Application Documents</h2>
                 <?php if ($applicant_profile): ?>
                 <div class="info-row">
                     <span class="info-label">Resume</span>
@@ -173,7 +140,7 @@ try {
             </div>
 
             <div class="card">
-                <h2><span class="material-symbols-outlined">info</span>Account Information</h2>
+                <h2><i data-lucide="info"></i>Account Information</h2>
                 <div class="info-row">
                     <span class="info-label">Account Status</span>
                     <span class="info-value" style="color: <?php echo $profile['status'] === 'Active' ? '#10b981' : '#f59e0b'; ?>;"><?php echo htmlspecialchars($profile['status']); ?></span>
@@ -183,8 +150,9 @@ try {
                     <span class="info-value"><?php echo date('F d, Y', strtotime($profile['created_at'])); ?></span>
                 </div>
             </div>
-        </main>
-    </div>
-    <?php include '../../includes/logout-modal.php'; ?>
-</body>
-</html>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
+</div>

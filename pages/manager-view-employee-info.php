@@ -88,7 +88,7 @@ $progressPercent = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Information - Manager Dashboard</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <?php 
@@ -111,7 +111,7 @@ include '../partials/header.php';
                 </p>
             </div>
             <a href="manager-dashboard.php" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: #334155; color: #e2e8f0; text-decoration: none; border-radius: 8px;">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <i data-lucide="arrow-left"></i>
                 Back to Team
             </a>
         </div>
@@ -120,7 +120,7 @@ include '../partials/header.php';
     <!-- Onboarding Progress -->
     <div style="background: #1e2936; border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
         <h2 style="color: #ffffff; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span class="material-symbols-outlined">assignment</span>
+            <i data-lucide="clipboard-check"></i>
             Onboarding Progress
         </h2>
         <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 1rem;">
@@ -164,7 +164,7 @@ include '../partials/header.php';
         <!-- Contact Information -->
         <div style="background: #1e2936; border-radius: 12px; padding: 2rem;">
             <h2 style="color: #ffffff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span class="material-symbols-outlined">contact_mail</span>
+                <i data-lucide="mail"></i>
                 Contact Information
             </h2>
             
@@ -194,7 +194,7 @@ include '../partials/header.php';
         <!-- Emergency Contact -->
         <div style="background: #1e2936; border-radius: 12px; padding: 2rem;">
             <h2 style="color: #ffffff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                <span class="material-symbols-outlined">emergency</span>
+                <i data-lucide="phone-call"></i>
                 Emergency Contact
             </h2>
             
@@ -217,7 +217,7 @@ include '../partials/header.php';
                 </div>
             <?php else: ?>
                 <div style="text-align: center; padding: 2rem; color: #64748b;">
-                    <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 0.5rem;">person_off</span>
+                    <i data-lucide="user-x" style="width: 3rem; height: 3rem; display: block; margin: 0 auto 0.5rem;"></i>
                     <p>No emergency contact information provided yet.</p>
                 </div>
             <?php endif; ?>
@@ -227,7 +227,7 @@ include '../partials/header.php';
     <!-- Employment Details -->
     <div style="background: #1e2936; border-radius: 12px; padding: 2rem; margin-top: 2rem;">
         <h2 style="color: #ffffff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-            <span class="material-symbols-outlined">badge</span>
+            <i data-lucide="badge-check"></i>
             Employment Details
         </h2>
         
@@ -258,6 +258,13 @@ include '../partials/header.php';
         </div>
     </div>
 </div>
+
+<script>
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
 
 <?php include '../partials/footer.php'; ?>
 </body>

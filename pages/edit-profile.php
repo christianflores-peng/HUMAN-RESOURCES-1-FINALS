@@ -70,7 +70,7 @@ $profile = fetchSingle(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile - SLATE HR</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -261,11 +261,11 @@ $profile = fetchSingle(
         <!-- Header -->
         <div class="header">
             <h1>
-                <span class="material-symbols-outlined">edit</span>
+                <i data-lucide="edit"></i>
                 Edit Profile
             </h1>
             <a href="applicant-dashboard.php" class="btn btn-secondary">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <i data-lucide="arrow-left"></i>
                 Back to Dashboard
             </a>
         </div>
@@ -274,21 +274,21 @@ $profile = fetchSingle(
         <div class="form-container">
             <?php if ($success_message): ?>
             <div class="alert alert-success">
-                <span class="material-symbols-outlined">check_circle</span>
+                <i data-lucide="check-circle"></i>
                 <span><?php echo htmlspecialchars($success_message); ?></span>
             </div>
             <?php endif; ?>
 
             <?php if ($error_message): ?>
             <div class="alert alert-error">
-                <span class="material-symbols-outlined">error</span>
+                <i data-lucide="alert-circle"></i>
                 <span><?php echo htmlspecialchars($error_message); ?></span>
             </div>
             <?php endif; ?>
 
             <div class="form-info">
                 <p>
-                    <span class="material-symbols-outlined">info</span>
+                    <i data-lucide="info"></i>
                     Update your personal information. Email address cannot be changed.
                 </p>
             </div>
@@ -356,16 +356,23 @@ $profile = fetchSingle(
 
                 <div class="form-actions">
                     <a href="applicant-dashboard.php" class="btn btn-secondary">
-                        <span class="material-symbols-outlined">cancel</span>
+                        <i data-lucide="x"></i>
                         Cancel
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <span class="material-symbols-outlined">save</span>
+                        <i data-lucide="save"></i>
                         Save Changes
                     </button>
                 </div>
             </form>
         </div>
     </div>
+    
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

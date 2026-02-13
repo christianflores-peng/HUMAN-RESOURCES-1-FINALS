@@ -1,9 +1,16 @@
 <?php
 require_once '../../includes/session_helper.php';
+require_once '../../includes/spa_helper.php';
 startSecureSession();
+$is_ajax = is_spa_ajax();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role_type'] !== 'Employee') {
     header('Location: ../../index.php');
+    exit();
+}
+
+if (!$is_ajax) {
+    header('Location: index.php?page=requirements');
     exit();
 }
 
@@ -12,8 +19,12 @@ require_once '../../database/config.php';
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
 
-$employee = fetchSingle("SELECT * FROM employees WHERE user_id = ?", [$user_id]);
-$employee_id = $employee['id'] ?? 0;
+$employee = fetchSingle("
+    SELECT ua.*, d.department_name, ua.job_title AS position_name
+    FROM user_accounts ua
+    LEFT JOIN departments d ON d.id = ua.department_id
+    WHERE ua.id = ?
+", [$user_id]);
 
 // Define required documents
 $required_documents = [
@@ -32,7 +43,7 @@ $required_documents = [
 ];
 
 // Fetch submitted requirements
-$submitted = fetchAll("SELECT * FROM employee_requirements WHERE employee_id = ?", [$employee_id]);
+$submitted = fetchAll("SELECT * FROM employee_requirements WHERE user_id = ?", [$user_id]);
 $submitted_types = array_column($submitted, 'document_type');
 $submitted_map = [];
 foreach ($submitted as $s) {
@@ -42,9 +53,10 @@ foreach ($submitted as $s) {
 $success_message = '';
 $error_message = '';
 
-// Handle file upload
+// Handle file upload (supports both AJAX and regular POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_requirement'])) {
     $document_type = $_POST['document_type'] ?? '';
+    $is_ajax_post = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     
     if (isset($_FILES['requirement_file']) && $_FILES['requirement_file']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['requirement_file'];
@@ -56,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_requirement'])
         } elseif ($file['size'] > $max_size) {
             $error_message = 'File size exceeds 5MB limit.';
         } else {
-            $upload_dir = '../../uploads/requirements/' . $employee_id . '/';
+            $upload_dir = '../../uploads/requirements/' . $user_id . '/';
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0755, true);
             }
@@ -66,21 +78,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_requirement'])
             $filepath = $upload_dir . $filename;
             
             if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                $relative_path = 'uploads/requirements/' . $employee_id . '/' . $filename;
+                $relative_path = 'uploads/requirements/' . $user_id . '/' . $filename;
                 
                 // Check if already exists and update, otherwise insert
-                $existing = fetchSingle("SELECT id FROM employee_requirements WHERE employee_id = ? AND document_type = ?", [$employee_id, $document_type]);
+                $existing = fetchSingle("SELECT id FROM employee_requirements WHERE user_id = ? AND document_type = ?", [$user_id, $document_type]);
                 
                 if ($existing) {
                     executeQuery("UPDATE employee_requirements SET file_path = ?, status = 'pending', updated_at = NOW() WHERE id = ?", [$relative_path, $existing['id']]);
                 } else {
-                    insertRecord("INSERT INTO employee_requirements (employee_id, document_type, file_path, status, uploaded_at) VALUES (?, ?, ?, 'pending', NOW())", [$employee_id, $document_type, $relative_path]);
+                    executeQuery("INSERT INTO employee_requirements (user_id, document_type, file_path, status) VALUES (?, ?, ?, 'pending')", [$user_id, $document_type, $relative_path]);
                 }
                 
                 $success_message = 'Document uploaded successfully! Waiting for HR verification.';
                 
                 // Refresh submitted documents
-                $submitted = fetchAll("SELECT * FROM employee_requirements WHERE employee_id = ?", [$employee_id]);
+                $submitted = fetchAll("SELECT * FROM employee_requirements WHERE user_id = ?", [$user_id]);
                 $submitted_types = array_column($submitted, 'document_type');
                 $submitted_map = [];
                 foreach ($submitted as $s) {
@@ -93,6 +105,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_requirement'])
     } else {
         $error_message = 'Please select a file to upload.';
     }
+    
+    // If AJAX request, return JSON response
+    if ($is_ajax_post) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => empty($error_message),
+            'message' => $success_message ?: $error_message,
+            'reload' => empty($error_message)
+        ]);
+        exit();
+    }
 }
 
 $total_required = count($required_documents);
@@ -100,27 +123,9 @@ $total_submitted = count($submitted);
 $total_approved = count(array_filter($submitted, fn($s) => $s['status'] === 'approved'));
 $progress_percent = $total_required > 0 ? round(($total_approved / $total_required) * 100) : 0;
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit Requirements - HR1</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0a1929 0%, #1a2942 100%); min-height: 100vh; color: #f8fafc; }
-        .dashboard-container { display: flex; min-height: 100vh; }
-        .sidebar { width: 260px; background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(58, 69, 84, 0.5); padding: 1.5rem 0; position: fixed; height: 100vh; overflow-y: auto; }
-        .logo-section { padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(58, 69, 84, 0.5); margin-bottom: 1.5rem; }
-        .logo-section img { width: 60px; margin-bottom: 0.5rem; }
-        .logo-section h2 { font-size: 1.1rem; color: #0ea5e9; }
-        .logo-section p { font-size: 0.75rem; color: #94a3b8; }
-        .nav-menu { list-style: none; }
-        .nav-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; color: #cbd5e1; text-decoration: none; transition: all 0.3s; font-size: 0.9rem; }
-        .nav-link:hover, .nav-link.active { background: rgba(14, 165, 233, 0.1); color: #0ea5e9; border-left: 3px solid #0ea5e9; }
-        .main-content { flex: 1; margin-left: 260px; padding: 2rem; }
-        .header { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+<div data-page-title="Submit Requirements">
+<style>
+        .header { background: rgba(30, 41, 54, 0.6); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 1.5rem; color: #e2e8f0; margin-bottom: 0.5rem; }
         .header p { color: #94a3b8; font-size: 0.9rem; }
         
@@ -147,7 +152,7 @@ $progress_percent = $total_required > 0 ? round(($total_approved / $total_requir
         .requirement-icon.submitted { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
         .requirement-icon.approved { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         .requirement-icon.rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .requirement-icon .material-symbols-outlined { font-size: 1.5rem; }
+        .requirement-icon i[data-lucide] { width: 1.5rem; height: 1.5rem; }
         
         .requirement-info h4 { color: #e2e8f0; font-size: 1rem; margin-bottom: 0.25rem; }
         .requirement-info p { color: #94a3b8; font-size: 0.85rem; line-height: 1.4; }
@@ -174,7 +179,7 @@ $progress_percent = $total_required > 0 ? round(($total_approved / $total_requir
         .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; }
         
         .uploaded-file { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(15, 23, 42, 0.4); border-radius: 8px; margin-top: 0.75rem; }
-        .uploaded-file .material-symbols-outlined { color: #0ea5e9; }
+        .uploaded-file i[data-lucide] { color: #0ea5e9; width: 1.2rem; height: 1.2rem; }
         .uploaded-file a { color: #0ea5e9; text-decoration: none; font-size: 0.85rem; }
         .uploaded-file a:hover { text-decoration: underline; }
         .uploaded-file .date { color: #64748b; font-size: 0.75rem; margin-left: auto; }
@@ -186,41 +191,26 @@ $progress_percent = $total_required > 0 ? round(($total_approved / $total_requir
             .progress-stats { flex-direction: column; gap: 1rem; }
         }
     </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo-section">
-                <img src="../../assets/images/slate.png" alt="SLATE Logo">
-                <h2>Employee Portal</h2>
-                <p><?php echo htmlspecialchars($user_name); ?></p>
-            </div>
-            <ul class="nav-menu">
-                <li class="nav-item"><a href="dashboard.php" class="nav-link"><span class="material-symbols-outlined">dashboard</span>Dashboard</a></li>
-                <li class="nav-item"><a href="onboarding.php" class="nav-link"><span class="material-symbols-outlined">checklist</span>Onboarding</a></li>
-                <li class="nav-item"><a href="requirements.php" class="nav-link active"><span class="material-symbols-outlined">upload_file</span>Submit Requirements</a></li>
-                <li class="nav-item"><a href="profile.php" class="nav-link"><span class="material-symbols-outlined">person</span>My Profile</a></li>
-                <li class="nav-item"><a href="documents.php" class="nav-link"><span class="material-symbols-outlined">folder</span>Documents</a></li>
-                <li class="nav-item"><a href="../../logout.php" class="nav-link"><span class="material-symbols-outlined">logout</span>Logout</a></li>
-            </ul>
-        </aside>
-
-        <main class="main-content">
             <div class="header">
-                <h1>Submit Requirements</h1>
-                <p>Upload your required documents for employment verification</p>
+                <div>
+                    <h1>Submit Requirements</h1>
+                    <p>Upload your required documents for employment verification</p>
+                </div>
+                <div class="header-actions">
+                    <?php include '../../includes/header-notifications.php'; ?>
+                </div>
             </div>
 
             <?php if ($success_message): ?>
             <div class="alert alert-success">
-                <span class="material-symbols-outlined">check_circle</span>
+                <i data-lucide="check-circle"></i>
                 <span><?php echo htmlspecialchars($success_message); ?></span>
             </div>
             <?php endif; ?>
 
             <?php if ($error_message): ?>
             <div class="alert alert-error">
-                <span class="material-symbols-outlined">error</span>
+                <i data-lucide="alert-circle"></i>
                 <span><?php echo htmlspecialchars($error_message); ?></span>
             </div>
             <?php endif; ?>
@@ -259,7 +249,23 @@ $progress_percent = $total_required > 0 ? round(($total_approved / $total_requir
                 <div class="requirement-card <?php echo $status; ?>">
                     <div class="requirement-header">
                         <div class="requirement-icon <?php echo $status; ?>">
-                            <span class="material-symbols-outlined"><?php echo $req['icon']; ?></span>
+                            <i data-lucide="<?php 
+                                $icon_map = [
+                                    'badge' => 'badge-check',
+                                    'verified_user' => 'shield-check',
+                                    'location_city' => 'building',
+                                    'article' => 'file-text',
+                                    'credit_card' => 'credit-card',
+                                    'health_and_safety' => 'heart-pulse',
+                                    'home' => 'home',
+                                    'receipt_long' => 'receipt',
+                                    'school' => 'graduation-cap',
+                                    'medical_information' => 'stethoscope',
+                                    'directions_car' => 'car',
+                                    'photo_camera' => 'camera'
+                                ];
+                                echo $icon_map[$req['icon']] ?? 'file';
+                            ?>"></i>
                         </div>
                         <div class="requirement-info">
                             <h4><?php echo htmlspecialchars($req['name']); ?></h4>
@@ -267,34 +273,35 @@ $progress_percent = $total_required > 0 ? round(($total_approved / $total_requir
                         </div>
                     </div>
                     
-                    <span class="requirement-status <?php echo $status; ?>">
-                        <?php if ($status === 'pending'): ?>
-                            <span class="material-symbols-outlined" style="font-size: 0.9rem;">hourglass_empty</span> Not Submitted
-                        <?php elseif ($status === 'submitted' || $status === 'pending'): ?>
-                            <span class="material-symbols-outlined" style="font-size: 0.9rem;">schedule</span> Pending Review
+                    <span class="requirement-status <?php echo $submitted_doc ? $status : 'pending'; ?>">
+                        <?php if (!$submitted_doc): ?>
+                            <i data-lucide="hourglass" style="width: 0.9rem; height: 0.9rem;"></i> Not Submitted
+                        <?php elseif ($status === 'pending'): ?>
+                            <i data-lucide="clock" style="width: 0.9rem; height: 0.9rem;"></i> Pending Review
                         <?php elseif ($status === 'approved'): ?>
-                            <span class="material-symbols-outlined" style="font-size: 0.9rem;">check_circle</span> Approved
+                            <i data-lucide="check-circle" style="width: 0.9rem; height: 0.9rem;"></i> Approved
                         <?php elseif ($status === 'rejected'): ?>
-                            <span class="material-symbols-outlined" style="font-size: 0.9rem;">cancel</span> Rejected - Please Resubmit
+                            <i data-lucide="x-circle" style="width: 0.9rem; height: 0.9rem;"></i> Rejected - Please Resubmit
                         <?php endif; ?>
                     </span>
                     
                     <?php if ($submitted_doc): ?>
                     <div class="uploaded-file">
-                        <span class="material-symbols-outlined">attachment</span>
+                        <i data-lucide="paperclip"></i>
                         <a href="../../<?php echo htmlspecialchars($submitted_doc['file_path']); ?>" target="_blank">View Uploaded File</a>
                         <span class="date"><?php echo date('M d, Y', strtotime($submitted_doc['uploaded_at'])); ?></span>
                     </div>
                     <?php endif; ?>
                     
                     <?php if ($status !== 'approved'): ?>
-                    <form method="POST" enctype="multipart/form-data" class="upload-form">
+                    <form method="POST" enctype="multipart/form-data" class="upload-form" data-upload-form>
                         <input type="hidden" name="document_type" value="<?php echo $req['type']; ?>">
+                        <input type="hidden" name="upload_requirement" value="1">
                         <div class="file-input-wrapper">
                             <input type="file" name="requirement_file" class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
                         </div>
-                        <button type="submit" name="upload_requirement" class="btn btn-primary">
-                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">cloud_upload</span>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="cloud-upload" style="width: 1.1rem; height: 1.1rem;"></i>
                             <?php echo $submitted_doc ? 'Re-upload Document' : 'Upload Document'; ?>
                         </button>
                     </form>
@@ -302,8 +309,60 @@ $progress_percent = $total_required > 0 ? round(($total_approved / $total_requir
                 </div>
                 <?php endforeach; ?>
             </div>
-        </main>
-    </div>
-    <?php include '../../includes/logout-modal.php'; ?>
-</body>
-</html>
+<script>
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
+    // AJAX file upload handler for requirement forms
+    document.querySelectorAll('form[data-upload-form]').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            var btn = form.querySelector('button[type="submit"]');
+            var originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" style="width:1.1rem;height:1.1rem;animation:spin 1s linear infinite;"></i> Uploading...';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            var formData = new FormData(form);
+            fetch('requirements.php?ajax=1', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    if (typeof HR1SPA !== 'undefined') {
+                        HR1SPA.showToast(data.message, 'success');
+                        HR1SPA.loadPage('requirements');
+                    } else {
+                        alert(data.message);
+                        location.reload();
+                    }
+                } else {
+                    if (typeof HR1SPA !== 'undefined') {
+                        HR1SPA.showToast(data.message, 'error');
+                    } else {
+                        alert(data.message);
+                    }
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            })
+            .catch(function(err) {
+                console.error('Upload error:', err);
+                if (typeof HR1SPA !== 'undefined') {
+                    HR1SPA.showToast('Upload failed. Please try again.', 'error');
+                } else {
+                    alert('Upload failed. Please try again.');
+                }
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        });
+    });
+</script>
+</div>

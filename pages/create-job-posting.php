@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_job'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Job Posting - Slate Freight</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -242,11 +242,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_job'])) {
     <div class="container">
         <div class="header">
             <h1>
-                <span class="material-symbols-outlined">work</span>
+                <i data-lucide="briefcase"></i>
                 Create New Job Posting
             </h1>
             <a href="hr-recruitment-dashboard.php" class="btn btn-secondary">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <i data-lucide="arrow-left"></i>
                 Back
             </a>
         </div>
@@ -349,16 +349,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_job'])) {
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">
-                        <span class="material-symbols-outlined">add_circle</span>
+                        <i data-lucide="plus-circle"></i>
                         Create Job Posting
                     </button>
                     <a href="hr-recruitment-dashboard.php" class="btn btn-secondary">
-                        <span class="material-symbols-outlined">cancel</span>
+                        <i data-lucide="x-circle"></i>
                         Cancel
                     </a>
                 </div>
             </form>
         </div>
     </div>
+    
+    <script>
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
 </body>
 </html>

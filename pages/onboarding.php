@@ -537,7 +537,7 @@ include '../partials/header.php';
                                                 <span>📍 <?php echo h($session['location']); ?></span>
                                                 <?php endif; ?>
                                                 <?php if ($session['facilitator']): ?>
-                                                <span><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">person</span> <?php echo h($session['facilitator']); ?></span>
+                                                <span><i data-lucide="user" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> <?php echo h($session['facilitator']); ?></span>
                                                 <?php endif; ?>
                                                 <span style="background: <?php echo $session['status'] === 'completed' ? '#10b981' : ($session['status'] === 'cancelled' ? '#ef4444' : '#3b82f6'); ?>; color: white; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
                                                     <?php echo ucfirst($session['status']); ?>

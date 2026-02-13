@@ -163,7 +163,7 @@ $stats = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Recruitment Dashboard - Slate Freight</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -714,8 +714,9 @@ $stats = [
             color: #64748b;
         }
 
-        .doc-preview-placeholder .material-symbols-outlined {
-            font-size: 4rem;
+        .doc-preview-placeholder i {
+            width: 4rem;
+            height: 4rem;
             margin-bottom: 1rem;
         }
 
@@ -832,18 +833,18 @@ $stats = [
         <div class="dashboard-header">
             <div class="header-title">
                 <h1>
-                    <span class="material-symbols-outlined">work</span>
+                    <i data-lucide="briefcase"></i>
                     Recruitment Dashboard
                 </h1>
                 <p>HR Staff View - Manage applicants and hiring process</p>
             </div>
             <div class="header-actions">
                 <a href="create-job-posting.php" class="btn btn-primary">
-                    <span class="material-symbols-outlined">add</span>
+                    <i data-lucide="plus"></i>
                     Post New Job
                 </a>
                 <a href="dashboard.php" class="btn btn-secondary">
-                    <span class="material-symbols-outlined">arrow_back</span>
+                    <i data-lucide="arrow-left"></i>
                     Back to Dashboard
                 </a>
             </div>
@@ -852,15 +853,15 @@ $stats = [
         <!-- Tab Navigation -->
         <div class="tab-nav">
             <button class="tab-btn active" onclick="showTab('kanban')">
-                <span class="material-symbols-outlined">view_kanban</span>
+                <i data-lucide="columns"></i>
                 Recruitment Pipeline
             </button>
             <button class="tab-btn" onclick="showTab('documents')">
-                <span class="material-symbols-outlined">verified</span>
+                <i data-lucide="check-circle"></i>
                 Document Verification
             </button>
             <button class="tab-btn" onclick="showTab('onboarding')">
-                <span class="material-symbols-outlined">assignment_turned_in</span>
+                <i data-lucide="clipboard-check"></i>
                 Onboarding Status
             </button>
         </div>
@@ -888,7 +889,7 @@ $stats = [
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">group</span>
+                    <i data-lucide="users"></i>
                 </div>
                 <div>
                     <div class="stat-value"><?php echo $stats['total_applicants']; ?></div>
@@ -897,7 +898,7 @@ $stats = [
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">fiber_new</span>
+                    <i data-lucide="sparkles"></i>
                 </div>
                 <div>
                     <div class="stat-value"><?php echo $stats['new_today']; ?></div>
@@ -906,7 +907,7 @@ $stats = [
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">event</span>
+                    <i data-lucide="calendar"></i>
                 </div>
                 <div>
                     <div class="stat-value"><?php echo $stats['pending_interviews']; ?></div>
@@ -915,7 +916,7 @@ $stats = [
             </div>
             <div class="stat-item">
                 <div class="stat-icon">
-                    <span class="material-symbols-outlined">mark_email_read</span>
+                    <i data-lucide="mail-check"></i>
                 </div>
                 <div>
                     <div class="stat-value"><?php echo $stats['offers_pending']; ?></div>
@@ -943,7 +944,7 @@ $stats = [
                             </div>
                             <div class="applicant-actions">
                                 <button class="action-btn move" onclick="event.stopPropagation(); moveToStatus(<?php echo $applicant['id']; ?>, 'screening')">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span> Screen
+                                    <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i> Screen
                                 </button>
                             </div>
                         </div>
@@ -968,7 +969,7 @@ $stats = [
                             </div>
                             <div class="applicant-actions">
                                 <button class="action-btn move" onclick="event.stopPropagation(); moveToStatus(<?php echo $applicant['id']; ?>, 'interview')">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span> Interview
+                                    <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i> Interview
                                 </button>
                             </div>
                         </div>
@@ -993,7 +994,7 @@ $stats = [
                             </div>
                             <div class="applicant-actions">
                                 <button class="action-btn move" onclick="event.stopPropagation(); moveToStatus(<?php echo $applicant['id']; ?>, 'road_test')">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span> Road Test
+                                    <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i> Road Test
                                 </button>
                             </div>
                         </div>
@@ -1018,7 +1019,7 @@ $stats = [
                             </div>
                             <div class="applicant-actions">
                                 <button class="action-btn move" onclick="event.stopPropagation(); moveToStatus(<?php echo $applicant['id']; ?>, 'offer_sent')">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">arrow_forward</span> Send Offer
+                                    <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i> Send Offer
                                 </button>
                             </div>
                         </div>
@@ -1043,7 +1044,7 @@ $stats = [
                             </div>
                             <div class="applicant-actions">
                                 <button class="action-btn hire" onclick="event.stopPropagation(); showHireModal(<?php echo $applicant['id']; ?>, '<?php echo htmlspecialchars($applicant['first_name'] . ' ' . $applicant['last_name']); ?>', '<?php echo htmlspecialchars($applicant['job_title'] ?? ''); ?>')">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span> HIRE
+                                    <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> HIRE
                                 </button>
                             </div>
                         </div>
@@ -1079,7 +1080,7 @@ $stats = [
                 <!-- Document List Panel -->
                 <div class="doc-list-panel">
                     <div class="panel-header">
-                        <span><span class="material-symbols-outlined" style="font-size: 1rem; vertical-align: middle;">description</span> Pending Documents</span>
+                        <span><i data-lucide="file-text" style="width: 1rem; height: 1rem; vertical-align: middle;"></i> Pending Documents</span>
                         <span class="column-count">5</span>
                     </div>
                     <div class="panel-body">
@@ -1139,17 +1140,17 @@ $stats = [
                     </div>
                     <div class="doc-preview-area" id="docPreviewArea">
                         <div class="doc-preview-placeholder">
-                            <span class="material-symbols-outlined">description</span>
+                            <i data-lucide="file-text"></i>
                             <p>Select a document from the list to preview</p>
                         </div>
                     </div>
                     <div class="doc-actions">
                         <button class="btn btn-verify" onclick="verifyDocument()">
-                            <span class="material-symbols-outlined">check_circle</span>
+                            <i data-lucide="check-circle"></i>
                             Verify
                         </button>
                         <button class="btn btn-reject" onclick="rejectDocument()">
-                            <span class="material-symbols-outlined">cancel</span>
+                            <i data-lucide="x-circle"></i>
                             Reject
                         </button>
                     </div>
@@ -1170,7 +1171,7 @@ $stats = [
                         <span class="doc-status pending">In Progress</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.5rem;">
-                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">calendar_today</span>
+                        <i data-lucide="calendar" style="width: 14px; height: 14px; vertical-align: middle;"></i>
                         Start Date: Feb 1, 2026
                     </div>
                     <div class="onboarding-progress">
@@ -1193,7 +1194,7 @@ $stats = [
                         <span class="doc-status verified">Completed</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.5rem;">
-                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">calendar_today</span>
+                        <i data-lucide="calendar" style="width: 14px; height: 14px; vertical-align: middle;"></i>
                         Start Date: Jan 15, 2026
                     </div>
                     <div class="onboarding-progress">
@@ -1216,7 +1217,7 @@ $stats = [
                         <span class="doc-status pending">Just Started</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.5rem;">
-                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">calendar_today</span>
+                        <i data-lucide="calendar" style="width: 14px; height: 14px; vertical-align: middle;"></i>
                         Start Date: Feb 5, 2026
                     </div>
                     <div class="onboarding-progress">
@@ -1291,7 +1292,7 @@ $stats = [
             // Show sample preview (in real app, this would load actual document)
             document.getElementById('docPreviewArea').innerHTML = `
                 <div style="text-align: center; color: #94a3b8;">
-                    <span class="material-symbols-outlined" style="font-size: 6rem; color: #0ea5e9;">image</span>
+                    <i data-lucide="image" style="width: 6rem; height: 6rem; color: #0ea5e9;"></i>
                     <p style="margin-top: 1rem; font-size: 1.1rem;">${docTypes[docType] || docType}</p>
                     <p style="margin-top: 0.5rem; font-size: 0.9rem;">Document preview would appear here</p>
                     <p style="margin-top: 0.25rem; font-size: 0.8rem; color: #64748b;">Click Verify or Reject to process</p>
@@ -1372,7 +1373,7 @@ $stats = [
                     const submitBtn = document.getElementById('hireSubmitBtn');
                     if (submitBtn) {
                         submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Processing...';
+                        submitBtn.innerHTML = '<i data-lucide="hourglass" style="width: 1rem; height: 1rem;"></i> Processing...'; if (typeof lucide !== "undefined") lucide.createIcons();
                     }
                     
                     return true;
@@ -1385,6 +1386,11 @@ $stats = [
                 // Scroll to success message
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             <?php endif; ?>
+            
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         });
     </script>
 </body>

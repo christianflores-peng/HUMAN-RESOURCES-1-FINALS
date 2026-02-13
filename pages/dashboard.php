@@ -25,6 +25,7 @@ $current_role = $_SESSION['role'] ?? 'Employee';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Management System - Dashboard</title>
     <link rel="stylesheet" href="../css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 <?php $logo_path = '../assets/images/slate.png'; include '../includes/loading-screen.php'; ?>
@@ -45,7 +46,7 @@ include '../partials/header.php';
                         <?php if (isAdmin($userId)): ?>
                         <a href="admin-dashboard.php" style="text-decoration: none;">
                             <div style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <span class="material-symbols-outlined" style="font-size: 3rem; color: white; display: block; margin-bottom: 1rem;">admin_panel_settings</span>
+                                <i data-lucide="shield" style="width: 3rem; height: 3rem; color: white; display: block; margin-bottom: 1rem;"></i>
                                 <h3 style="color: white; font-size: 1.25rem; margin-bottom: 0.5rem;">Admin Dashboard</h3>
                                 <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem;">User management, audit logs, system settings</p>
                             </div>
@@ -55,7 +56,7 @@ include '../partials/header.php';
                         <?php if (in_array($user['role_id'] ?? 0, [7, 8])): ?>
                         <a href="employee-portal.php" style="text-decoration: none;">
                             <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <span class="material-symbols-outlined" style="font-size: 3rem; color: white; display: block; margin-bottom: 1rem;">badge</span>
+                                <i data-lucide="id-card" style="width: 3rem; height: 3rem; color: white; display: block; margin-bottom: 1rem;"></i>
                                 <h3 style="color: white; font-size: 1.25rem; margin-bottom: 0.5rem;">Employee Portal</h3>
                                 <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem;">Onboarding tasks, handbook, personal info</p>
                             </div>
@@ -65,7 +66,7 @@ include '../partials/header.php';
                         <?php if (isHRStaff($userId) || isAdmin($userId)): ?>
                         <a href="hr-recruitment-dashboard.php" style="text-decoration: none;">
                             <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <span class="material-symbols-outlined" style="font-size: 3rem; color: white; display: block; margin-bottom: 1rem;">work</span>
+                                <i data-lucide="briefcase" style="width: 3rem; height: 3rem; color: white; display: block; margin-bottom: 1rem;"></i>
                                 <h3 style="color: white; font-size: 1.25rem; margin-bottom: 0.5rem;">HR Recruitment</h3>
                                 <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem;">Kanban board, applicant pipeline, hiring</p>
                             </div>
@@ -75,7 +76,7 @@ include '../partials/header.php';
                         <?php if (isManager($userId) || isAdmin($userId)): ?>
                         <a href="manager-dashboard.php" style="text-decoration: none;">
                             <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <span class="material-symbols-outlined" style="font-size: 3rem; color: white; display: block; margin-bottom: 1rem;">supervisor_account</span>
+                                <i data-lucide="user-check" style="width: 3rem; height: 3rem; color: white; display: block; margin-bottom: 1rem;"></i>
                                 <h3 style="color: white; font-size: 1.25rem; margin-bottom: 0.5rem;">Manager Portal</h3>
                                 <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem;">Team roster, assign tasks, upload handbooks</p>
                             </div>
@@ -85,7 +86,7 @@ include '../partials/header.php';
                         <?php if (!in_array($user['role_id'] ?? 0, [7, 8])): ?>
                         <a href="recruitment.php" style="text-decoration: none;">
                             <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <span class="material-symbols-outlined" style="font-size: 3rem; color: white; display: block; margin-bottom: 1rem;">description</span>
+                                <i data-lucide="file-text" style="width: 3rem; height: 3rem; color: white; display: block; margin-bottom: 1rem;"></i>
                                 <h3 style="color: white; font-size: 1.25rem; margin-bottom: 0.5rem;">Job Postings</h3>
                                 <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem;">View and manage job requisitions</p>
                             </div>
@@ -131,7 +132,7 @@ include '../partials/header.php';
                     <h2 style="color: #ffffff; margin-bottom: 1rem; font-size: 1.5rem;">My Overview</h2>
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #10b981;">assignment</span></div>
+                            <div class="stat-icon"><i data-lucide="clipboard-check" style="width: 3rem; height: 3rem; color: #10b981;"></i></div>
                             <div class="stat-info">
                                 <h3>Onboarding Progress</h3>
                                 <p class="stat-number"><?php echo $onboardingProgress; ?>%</p>
@@ -140,7 +141,7 @@ include '../partials/header.php';
                         </div>
                         
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #0ea5e9;">calendar_today</span></div>
+                            <div class="stat-icon"><i data-lucide="calendar" style="width: 3rem; height: 3rem; color: #0ea5e9;"></i></div>
                             <div class="stat-info">
                                 <h3>Days with Company</h3>
                                 <p class="stat-number"><?php echo $daysSinceHire; ?></p>
@@ -149,7 +150,7 @@ include '../partials/header.php';
                         </div>
                         
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #8b5cf6;">badge</span></div>
+                            <div class="stat-icon"><i data-lucide="id-card" style="width: 3rem; height: 3rem; color: #8b5cf6;"></i></div>
                             <div class="stat-info">
                                 <h3>My Department</h3>
                                 <p class="stat-number" style="font-size: 1.5rem;"><?php echo htmlspecialchars($user['department_name'] ?? 'N/A'); ?></p>
@@ -158,7 +159,7 @@ include '../partials/header.php';
                         </div>
                         
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #f59e0b;">pending_actions</span></div>
+                            <div class="stat-icon"><i data-lucide="clock" style="width: 3rem; height: 3rem; color: #f59e0b;"></i></div>
                             <div class="stat-info">
                                 <h3>Pending Tasks</h3>
                                 <p class="stat-number"><?php echo $totalTasks - $completedTasks; ?></p>
@@ -171,7 +172,7 @@ include '../partials/header.php';
                     <h2 style="color: #ffffff; margin-bottom: 1rem; font-size: 1.5rem;">System Overview</h2>
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #0ea5e9;">groups</span></div>
+                            <div class="stat-icon"><i data-lucide="users" style="width: 3rem; height: 3rem; color: #0ea5e9;"></i></div>
                             <div class="stat-info">
                                 <h3>Total Employees</h3>
                                 <p class="stat-number">1,247</p>
@@ -180,7 +181,7 @@ include '../partials/header.php';
                         </div>
                         
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #0ea5e9;">description</span></div>
+                            <div class="stat-icon"><i data-lucide="file-text" style="width: 3rem; height: 3rem; color: #0ea5e9;"></i></div>
                             <div class="stat-info">
                                 <h3>Active Recruitments</h3>
                                 <p class="stat-number">34</p>
@@ -189,7 +190,7 @@ include '../partials/header.php';
                         </div>
                         
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #0ea5e9;">trending_up</span></div>
+                            <div class="stat-icon"><i data-lucide="trending-up" style="width: 3rem; height: 3rem; color: #0ea5e9;"></i></div>
                             <div class="stat-info">
                                 <h3>Performance Score</h3>
                                 <p class="stat-number">4.2/5</p>
@@ -198,7 +199,7 @@ include '../partials/header.php';
                         </div>
                         
                         <div class="stat-card">
-                            <div class="stat-icon"><span class="material-symbols-outlined" style="font-size: 3rem; color: #0ea5e9;">emoji_events</span></div>
+                            <div class="stat-icon"><i data-lucide="award" style="width: 3rem; height: 3rem; color: #0ea5e9;"></i></div>
                             <div class="stat-info">
                                 <h3>Recognition Awards</h3>
                                 <p class="stat-number">156</p>
@@ -249,28 +250,28 @@ include '../partials/header.php';
                         <h3>Recent Activities</h3>
                         <div class="activity-list">
                             <div class="activity-item">
-                                <span class="activity-icon"><span class="material-symbols-outlined" style="color: #0ea5e9;">description</span></span>
+                                <span class="activity-icon"><i data-lucide="file-text" style="color: #0ea5e9;"></i></span>
                                 <div class="activity-content">
                                     <p>New job requisition created</p>
                                     <small>2 hours ago</small>
                                 </div>
                             </div>
                             <div class="activity-item">
-                                <span class="activity-icon"><span class="material-symbols-outlined" style="color: #0ea5e9;">person</span></span>
+                                <span class="activity-icon"><i data-lucide="user" style="color: #0ea5e9;"></i></span>
                                 <div class="activity-content">
                                     <p>Interview scheduled with John Doe</p>
                                     <small>4 hours ago</small>
                                 </div>
                             </div>
                             <div class="activity-item">
-                                <span class="activity-icon"><span class="material-symbols-outlined" style="color: #0ea5e9;">emoji_events</span></span>
+                                <span class="activity-icon"><i data-lucide="award" style="color: #0ea5e9;"></i></span>
                                 <div class="activity-content">
                                     <p>Employee recognition awarded</p>
                                     <small>1 day ago</small>
                                 </div>
                             </div>
                             <div class="activity-item">
-                                <span class="activity-icon"><span class="material-symbols-outlined" style="color: #0ea5e9;">trending_up</span></span>
+                                <span class="activity-icon"><i data-lucide="trending-up" style="color: #0ea5e9;"></i></span>
                                 <div class="activity-content">
                                     <p>Performance review completed</p>
                                     <small>2 days ago</small>
@@ -282,3 +283,10 @@ include '../partials/header.php';
                 <?php endif; ?>
             </div>
 <?php include '../partials/footer.php'; ?>
+
+<script>
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>

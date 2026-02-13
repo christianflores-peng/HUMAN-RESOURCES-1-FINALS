@@ -177,7 +177,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Portal - Slate Freight</title>
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .employee-container {
             padding: 2rem;
@@ -489,7 +489,7 @@ include '../partials/header.php';
     <div class="employee-container">
         <div class="page-header">
             <h1>
-                <span class="material-symbols-outlined">badge</span>
+                <i data-lucide="id-card"></i>
                 Employee Self-Service Portal
             </h1>
         </div>
@@ -519,15 +519,15 @@ include '../partials/header.php';
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('onboarding')">
-                <span class="material-symbols-outlined">assignment</span>
+                <i data-lucide="clipboard-check"></i>
                 Onboarding Tasks
             </button>
             <button class="tab-btn" onclick="showTab('handbook')">
-                <span class="material-symbols-outlined">menu_book</span>
+                <i data-lucide="book-open"></i>
                 Employee Handbook
             </button>
             <button class="tab-btn" onclick="showTab('personal')">
-                <span class="material-symbols-outlined">person</span>
+                <i data-lucide="user"></i>
                 Personal Information
             </button>
         </div>
@@ -553,18 +553,18 @@ include '../partials/header.php';
                                 <div class="upload-area">
                                     <input type="file" name="document" id="doc_<?php echo $task['task_id']; ?>" style="display: none;" required>
                                     <label for="doc_<?php echo $task['task_id']; ?>" style="cursor: pointer;">
-                                        <span class="material-symbols-outlined" style="font-size: 2rem; color: #0ea5e9;">upload_file</span>
+                                        <i data-lucide="upload" style="width: 2rem; height: 2rem; color: #0ea5e9;"></i>
                                         <p style="color: #94a3b8; margin-top: 0.5rem;">Click to upload document</p>
                                     </label>
                                 </div>
                                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; justify-content: center;">
-                                    <span class="material-symbols-outlined">check_circle</span>
+                                    <i data-lucide="check-circle"></i>
                                     Submit Document
                                 </button>
                             </form>
                         <?php else: ?>
                             <div style="display: flex; align-items: center; gap: 0.5rem; color: #10b981; margin-top: 1rem;">
-                                <span class="material-symbols-outlined">check_circle</span>
+                                <i data-lucide="check-circle"></i>
                                 <span>Completed on <?php echo date('M d, Y', strtotime($task['completed_at'])); ?></span>
                             </div>
                         <?php endif; ?>
@@ -573,7 +573,7 @@ include '../partials/header.php';
 
                 <?php if (empty($onboardingTasks)): ?>
                     <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #64748b;">
-                        <span class="material-symbols-outlined" style="font-size: 4rem;">task_alt</span>
+                        <i data-lucide="check-circle-2" style="width: 4rem; height: 4rem;"></i>
                         <p style="margin-top: 1rem;">No onboarding tasks assigned yet.</p>
                     </div>
                 <?php endif; ?>
@@ -585,7 +585,7 @@ include '../partials/header.php';
             <div class="handbook-list">
                 <?php if (empty($handbooks)): ?>
                     <div style="text-align: center; padding: 3rem; color: #64748b;">
-                        <span class="material-symbols-outlined" style="font-size: 4rem; display: block; margin-bottom: 1rem;">menu_book</span>
+                        <i data-lucide="book-open" style="width: 4rem; height: 4rem; display: block; margin-bottom: 1rem;"></i>
                         <p>No handbooks available yet. Your manager will upload them soon.</p>
                     </div>
                 <?php else: ?>
@@ -600,11 +600,11 @@ include '../partials/header.php';
                             </div>
                             <div style="display: flex; gap: 0.5rem;">
                                 <button onclick="viewHandbook('<?php echo htmlspecialchars($handbook['file_path']); ?>', '<?php echo htmlspecialchars($handbook['document_name']); ?>')" class="btn btn-primary">
-                                    <span class="material-symbols-outlined">visibility</span>
+                                    <i data-lucide="eye"></i>
                                     View Handbook
                                 </button>
                                 <a href="<?php echo htmlspecialchars($handbook['file_path']); ?>" download class="btn btn-primary" style="background: #10b981;">
-                                    <span class="material-symbols-outlined">download</span>
+                                    <i data-lucide="download"></i>
                                     Download
                                 </a>
                             </div>
@@ -657,7 +657,7 @@ include '../partials/header.php';
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
-                        <span class="material-symbols-outlined">save</span>
+                        <i data-lucide="save"></i>
                         Save Changes
                     </button>
                 </form>
@@ -708,6 +708,11 @@ include '../partials/header.php';
                 closePdfModal();
             }
         });
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

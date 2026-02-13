@@ -137,8 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - HR1 Management System</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
-    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../css/styles.css">
     <style>
         /* Registration page specific styles */
         body {
@@ -505,7 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
                             <div class="password-container">
                                 <input type="password" id="password" name="password" class="form-input" 
                                        placeholder="Create a password" required>
-                                <button type="button" class="password-toggle material-symbols-outlined" onclick="togglePassword('password')">visibility</button>
+                                <button type="button" class="password-toggle" onclick="togglePassword('password')"><i data-lucide="eye"></i></button>
                             </div>
                         </div>
                         <div class="form-group">
@@ -513,7 +513,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
                             <div class="password-container">
                                 <input type="password" id="confirm_password" name="confirm_password" class="form-input" 
                                        placeholder="Confirm your password" required>
-                                <button type="button" class="password-toggle material-symbols-outlined" onclick="togglePassword('confirm_password')">visibility</button>
+                                <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')"><i data-lucide="eye"></i></button>
                             </div>
                         </div>
                     </div>
@@ -552,14 +552,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
     <script>
         function togglePassword(fieldId) {
             const field = document.getElementById(fieldId);
-            const toggle = field.nextElementSibling;
-            
-            if (field.type === 'password') {
-                field.type = 'text';
-                toggle.textContent = 'visibility_off';
-            } else {
-                field.type = 'password';
-                toggle.textContent = 'visibility';
+            const container = field.closest('.password-container');
+            const isPassword = field.type === 'password';
+            field.type = isPassword ? 'text' : 'password';
+            const oldIcon = container.querySelector('svg.lucide') || container.querySelector('[data-lucide]');
+            if (oldIcon) {
+                const newIcon = document.createElement('i');
+                newIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+                oldIcon.replaceWith(newIcon);
+                lucide.createIcons();
             }
         }
         
@@ -596,7 +597,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
         <div class="otp-modal-content">
             <div class="otp-header">
                 <h2>Verify Your Account</h2>
-                <p>Enter the 6-digit code sent to your email<?php echo !empty($pending_phone) ? ' and phone' : ''; ?></p>
+                <p>Enter the 6-digit code sent to <strong style="color:#0ea5e9;"><?php echo htmlspecialchars(maskEmail($pending_email)); ?></strong></p>
             </div>
 
             <?php if (!empty($error_message) && $show_otp_modal): ?>
@@ -637,7 +638,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
             </div>
 
             <div class="otp-timer">
-                <span class="material-symbols-outlined">timer</span>
+                <i data-lucide="timer"></i>
                 <span id="otpTimer">Code expires in 5:00</span>
             </div>
         </div>
@@ -712,7 +713,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             color: #f59e0b; font-size: 0.85rem;
         }
-        .otp-timer .material-symbols-outlined { font-size: 1.1rem; }
+        .otp-timer i { width: 1.1rem; height: 1.1rem; }
     </style>
 
     <script>
@@ -777,6 +778,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_general'])) 
 
         document.querySelector('.otp-digit[data-index="0"]')?.focus();
         <?php endif; ?>
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $job ? 'Apply for ' . htmlspecialchars($job['title']) : 'Job Application'; ?> | HR1 Management</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -265,8 +265,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
             background: rgba(14, 165, 233, 0.1);
         }
 
-        .back-btn .material-symbols-outlined {
-            font-size: 1.1rem;
+        .back-btn i {
+            width: 1.1rem;
+            height: 1.1rem;
         }
 
         .job-header {
@@ -300,8 +301,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
             font-size: 0.7rem;
         }
 
-        .job-meta-item .material-symbols-outlined {
-            font-size: 0.85rem;
+        .job-meta-item i {
+            width: 0.85rem;
+            height: 0.85rem;
             color: #0ea5e9;
         }
 
@@ -500,8 +502,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
             text-decoration: none;
         }
 
-        .btn .material-symbols-outlined {
-            font-size: 0.95rem;
+        .btn i {
+            width: 0.95rem;
+            height: 0.95rem;
         }
 
         .btn-secondary {
@@ -550,17 +553,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
     </style>
 </head>
 <body>
-    <?php $logo_path = 'assets/images/slate.png'; include 'includes/loading-screen.php'; ?>
+    <?php $logo_path = '../assets/images/slate.png'; include '../includes/loading-screen.php'; ?>
     
     <div class="application-wrapper">
         <!-- Header -->
         <div class="header">
             <div class="logo-section">
-                <img src="assets/images/slate.png" alt="SLATE Logo">
+                <img src="../assets/images/slate.png" alt="SLATE Logo">
                 <h1>SLATE</h1>
             </div>
             <a href="careers.php" class="back-btn">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <i data-lucide="arrow-left"></i>
                 Back to Careers
             </a>
         </div>
@@ -571,19 +574,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                 <h1 class="job-title"><?php echo htmlspecialchars($job['title']); ?></h1>
                 <div class="job-meta">
                     <div class="job-meta-item">
-                        <span class="material-symbols-outlined">business</span>
+                        <i data-lucide="building"></i>
                         <span><?php echo htmlspecialchars($job['department_name']); ?></span>
                     </div>
                     <div class="job-meta-item">
-                        <span class="material-symbols-outlined">location_on</span>
+                        <i data-lucide="map-pin"></i>
                         <span><?php echo htmlspecialchars($job['location']); ?></span>
                     </div>
                     <div class="job-meta-item">
-                        <span class="material-symbols-outlined">work</span>
+                        <i data-lucide="briefcase"></i>
                         <span><?php echo htmlspecialchars($job['employment_type']); ?></span>
                     </div>
                     <div class="job-meta-item">
-                        <span class="material-symbols-outlined">payments</span>
+                        <i data-lucide="dollar-sign"></i>
                         <span><?php echo htmlspecialchars($job['salary_display']); ?></span>
                     </div>
                 </div>
@@ -596,7 +599,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                 <div class="alert alert-success">
                     <strong>✓ Success!</strong> <?php echo htmlspecialchars($success_message); ?>
                     <div style="margin-top: 0.75rem;">
-                        <a href="partials/terms.php" class="btn btn-primary" style="display: inline-flex;">Continue to Registration</a>
+                        <a href="../partials/terms.php" class="btn btn-primary" style="display: inline-flex;">Continue to Registration</a>
                     </div>
                 </div>
             <?php endif; ?>
@@ -618,7 +621,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                         <!-- Personal Information -->
                         <div class="form-section">
                             <div class="section-header">
-                                <span class="material-symbols-outlined section-icon">person</span>
+                                <i data-lucide="user" class="section-icon"></i>
                                 <h3 class="section-title">Personal Information</h3>
                             </div>
 
@@ -652,7 +655,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                         <!-- Resume Upload -->
                         <div class="form-section">
                             <div class="section-header">
-                                <span class="material-symbols-outlined section-icon">description</span>
+                                <i data-lucide="file-text" class="section-icon"></i>
                                 <h3 class="section-title">Resume</h3>
                             </div>
 
@@ -661,7 +664,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                                 <div class="file-upload" onclick="document.getElementById('resume').click()">
                                     <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
                                     <div class="file-upload-label" id="file-label">
-                                        <span class="material-symbols-outlined" style="font-size: 1.5rem; color: #0ea5e9;">upload_file</span>
+                                        <i data-lucide="upload" style="width: 1.5rem; height: 1.5rem; color: #0ea5e9;"></i>
                                         <p style="margin-top: 0.35rem; font-size: 0.7rem;">Click to upload your resume</p>
                                         <p style="font-size: 0.65rem; color: #64748b;">No file chosen</p>
                                     </div>
@@ -674,7 +677,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                     <!-- Cover Letter -->
                     <div class="form-section" style="margin-top: 0.5rem;">
                         <div class="section-header">
-                            <span class="material-symbols-outlined section-icon">edit_note</span>
+                            <i data-lucide="edit" class="section-icon"></i>
                             <h3 class="section-title">Cover Letter</h3>
                         </div>
                         <div class="form-group">
@@ -686,11 +689,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
 
                     <div class="button-group" style="margin-top: 0.75rem;">
                         <a href="careers.php" class="btn btn-secondary">
-                            <span class="material-symbols-outlined">arrow_back</span>
+                            <i data-lucide="arrow-left"></i>
                             Cancel
                         </a>
                         <button type="submit" name="submit_application" class="btn btn-primary">
-                            <span class="material-symbols-outlined">send</span>
+                            <i data-lucide="send"></i>
                             Submit Application
                         </button>
                     </div>
@@ -711,11 +714,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                 const file = input.files[0];
                 const sizeMB = (file.size / 1024 / 1024).toFixed(2);
                 label.innerHTML = `
-                    <span class="material-symbols-outlined" style="font-size: 1.5rem; color: #10b981;">check_circle</span>
+                    <i data-lucide="check-circle" style="width: 1.5rem; height: 1.5rem; color: #10b981;"></i>
                     <p style="margin-top: 0.35rem; color: #10b981; font-size: 0.7rem;">File Selected</p>
                     <p style="font-size: 0.65rem; color: #cbd5e1;">${file.name} (${sizeMB} MB)</p>
                 `;
+                lucide.createIcons();
             }
+        }
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
     </script>
 </body>

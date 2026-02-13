@@ -13,6 +13,13 @@ $success_message = '';
 $show_otp_modal = false;
 $pending_email = '';
 
+// Ensure username column exists in user_accounts
+try {
+    executeQuery("ALTER TABLE user_accounts ADD COLUMN username VARCHAR(50) UNIQUE AFTER employee_id");
+} catch (Exception $e) {
+    // Column may already exist, continue
+}
+
 // Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: ../index.php');
@@ -39,8 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
                     "SELECT ua.*, r.role_name, r.role_type, r.access_level 
                      FROM user_accounts ua 
                      LEFT JOIN roles r ON ua.role_id = r.id 
-                     WHERE (ua.company_email = ? OR ua.personal_email = ?) AND ua.status = 'Active'",
-                    [$pending_email, $pending_email]
+                     WHERE (ua.company_email = ? OR ua.personal_email = ? OR ua.username = ?) AND ua.status = 'Active'",
+                    [$pending_email, $pending_email, $pending_email]
                 );
                 
                 if (!$user) {
@@ -87,13 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
                     
                     switch ($roleType) {
                         case 'Admin':
-                            header('Location: ../admin/dashboard.php');
+                            header('Location: ../modals/admin/dashboard.php');
                             break;
                         case 'HR_Staff':
-                            header('Location: ../pages/hr-recruitment-dashboard.php');
+                            header('Location: ../modals/hr_staff/dashboard.php');
                             break;
                         case 'Manager':
-                            header('Location: ../pages/manager-dashboard.php');
+                            header('Location: ../modals/manager/dashboard.php');
                             break;
                         case 'Applicant':
                             header('Location: ../modals/applicant/dashboard.php');
@@ -122,14 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
     
     if (!empty($pending_email)) {
         $user = fetchSingle(
-            "SELECT * FROM user_accounts WHERE (company_email = ? OR personal_email = ?) AND status = 'Active'",
-            [$pending_email, $pending_email]
+            "SELECT * FROM user_accounts WHERE (company_email = ? OR personal_email = ? OR username = ?) AND status = 'Active'",
+            [$pending_email, $pending_email, $pending_email]
         );
         
         if ($user) {
-            $otp_code = createOTP($pending_email, $user['phone_number'] ?? null, 'login', $user['id']);
+            $otp_email = $user['personal_email'] ?? $user['company_email'] ?? $pending_email;
+            $otp_code = createOTP($otp_email, $user['phone_number'] ?? null, 'login', $user['id']);
             $user_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
-            sendOTP($pending_email, $otp_code, $user_name, $user['phone_number'] ?? null);
+            sendOTP($otp_email, $otp_code, $user_name, $user['phone_number'] ?? null);
+            $pending_email = $otp_email;
             $success_message = 'A new verification code has been sent.';
         }
     }
@@ -152,8 +161,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     "SELECT ua.*, r.role_name, r.role_type, r.access_level 
                      FROM user_accounts ua 
                      LEFT JOIN roles r ON ua.role_id = r.id 
-                     WHERE (ua.company_email = ? OR ua.personal_email = ?) AND ua.status = 'Active'",
-                    [$username, $username]
+                     WHERE (ua.company_email = ? OR ua.personal_email = ? OR ua.username = ?) AND ua.status = 'Active'",
+                    [$username, $username, $username]
                 );
                 
                 if (!$user) {
@@ -168,16 +177,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 }
 
                 if (!$user) {
-                    $error_message = "Email not found. Please check your credentials.";
+                    $error_message = "Account not found. Please check your credentials.";
                 } elseif (!password_verify($password, $user['password_hash'] ?? $user['password'])) {
                     $error_message = "Invalid password. Please try again.";
                 } else {
-                    // Generate and send OTP
-                    $otp_code = createOTP($username, $user['phone_number'] ?? null, 'login', $user['id']);
-                    $user_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
-                    sendOTP($username, $otp_code, $user_name, $user['phone_number'] ?? null);
+                    // Use the user's actual email from DB, not the login input
+                    $otp_email = $user['personal_email'] ?? $user['company_email'] ?? $username;
                     
-                    $pending_email = $username;
+                    // Generate and send OTP
+                    $otp_code = createOTP($otp_email, $user['phone_number'] ?? null, 'login', $user['id']);
+                    $user_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
+                    sendOTP($otp_email, $otp_code, $user_name, $user['phone_number'] ?? null);
+                    
+                    $pending_email = $otp_email;
                     $show_otp_modal = true;
                     $success_message = 'Verification code sent to your email' . (!empty($user['phone_number']) ? ' and phone' : '') . '.';
                 }
@@ -194,8 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - HR1 Management System</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -208,80 +219,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             background: #0a1929;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        .login-screen {
-            flex: 1;
-            display: flex;
-            background: #0a1929;
-        }
-
-        .login-container {
-            display: flex;
-            width: 100%;
-            min-height: calc(100vh - 50px);
-        }
-
-        .welcome-panel {
-            flex: 1.4;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            padding: 2rem 3rem;
-            background: linear-gradient(135deg, #1a3a52 0%, #2d5a7b 50%, #3a7a9e 100%);
-            position: relative;
-            overflow: hidden;
+            padding: 2rem;
         }
 
-        .welcome-panel .system-label {
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
+            .login-screen {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .system-label {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             color: #ffffff;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
+            margin-bottom: 1.5rem;
         }
 
-        .welcome-panel .system-label img {
-            width: 28px;
-            height: 28px;
+        .system-label img {
+            width: 24px;
+            height: 24px;
         }
 
-        .welcome-panel .illustration {
-            width: 100%;
-            height: 100%;
+        .login-container {
+            display: flex;
+            background: linear-gradient(135deg, #1e3a52 0%, #2d5a7b 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            min-height: 500px;
+        }
+
+        .welcome-panel {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 3rem;
+            background: linear-gradient(135deg, #1e3a52 0%, #2d5a7b 100%);
         }
 
-        .welcome-panel .illustration img {
-            max-width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-        }
-
-        .welcome-panel .illustration-placeholder {
-            width: 100%;
-            max-width: 500px;
-            height: 350px;
-            background: url('../assets/images/warehouse-illustration.png') center/contain no-repeat;
+        .welcome-content {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .welcome-logo {
+            width: 280px;
+            height: auto;
+        }
+
+        .welcome-text {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
         }
 
         .login-panel {
-            width: 320px;
-            min-width: 320px;
-            padding: 2rem 2rem;
-            background: #1a2332;
+            width: 400px;
+            min-width: 400px;
+            padding: 3rem 2.5rem;
+            background: #1e2936;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -293,16 +299,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .login-box img {
-            width: 80px;
+            width: 150px;
             height: auto;
-            margin-bottom: 0.75rem;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+            margin-top: 10px;
+            margin-bottom: 20px;
         }
 
         .login-box h2 {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.75rem;
             color: #ffffff;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
         }
 
@@ -314,19 +320,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
         .login-box input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.875rem 1rem;
             background: #2a3544;
-            border: 1px solid #3a4554;
+            border: 2px solid #3a4554;
             border-radius: 6px;
             color: #e2e8f0;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
 
         .login-box input:focus {
             outline: none;
             border-color: #0ea5e9;
-            background: #2f3a4a;
+            background: #2a3544;
+            box-shadow: 0 0 0 1px #0ea5e9;
         }
 
         .login-box input::placeholder {
@@ -358,12 +365,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .login-box button {
-            padding: 0.75rem;
+            padding: 0.875rem;
             background: #0ea5e9;
             border: none;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -398,10 +405,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
 
         .signup-link {
-            margin-top: 1.25rem;
+            margin-top: 1.5rem;
             text-align: center;
             color: #cbd5e1;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
         .signup-link a {
@@ -417,32 +424,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
         .footer {
             text-align: center;
-            padding: 0.875rem;
-            color: #64748b;
-            font-size: 0.8rem;
-            background: #0a1929;
-            border-top: 1px solid rgba(100, 116, 139, 0.2);
+            padding: 2rem 1.0rem;
+            margin-top: 3rem;
+            color: #eaecf0ff;
+            font-size: 0.9rem;
         }
 
         .footer a {
-            color: #64748b;
+            color: #eaecf0ff;
             text-decoration: none;
             margin: 0 0.5rem;
             transition: color 0.3s;
         }
 
         .footer a:hover {
-            color: #94a3b8;
+            color: #739bd3ff;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 990px) {
+            body {
+                padding: 1rem;
+            }
+
             .login-container {
                 flex-direction: column;
             }
             
             .welcome-panel {
-                min-height: 250px;
-                padding: 1.5rem;
+                min-height: 300px;
+                padding: 2rem;
             }
             
             .login-panel {
@@ -451,126 +461,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 padding: 2rem 1.5rem;
             }
         }
-    </style>
-</head>
-<body>
-    <?php include '../includes/loading-screen.php'; ?>
-    
-    <div class="login-screen">
-        <div class="login-container">
-            <div class="welcome-panel">
-                <div class="system-label">
-                    <img src="../assets/images/slate.png" alt="Logo">
-                    Freight Management System
-                </div>
-                <div class="illustration">
-                    <img src="../assets/images/warehouse-illustration.png" alt="Warehouse" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="illustration-placeholder" style="display:none;">🏭</div>
-                </div>
-            </div>
-            <div class="login-panel">
-                <div class="login-box">
-                    <img src="../assets/images/slate.png" alt="SLATE Logo">
-                    <h2>Login</h2>
-                        
-                        <?php if (!empty($error_message)): ?>
-                            <div class="error-message">
-                                <?php echo htmlspecialchars($error_message); ?>
-                            </div>
-                        <?php endif; ?>
 
-                        <?php if (!empty($success_message)): ?>
-                            <div class="success-message">
-                                <?php echo htmlspecialchars($success_message); ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <form method="POST" action="" class="show-loading">
-                            <?php echo getCSRFTokenField(); ?>
-                            <input type="hidden" name="login" value="1">
-                            <input type="text" id="username" name="username" placeholder="Email Address" required 
-                                   value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
-                            <div class="password-field">
-                                <input type="password" id="password" name="password" placeholder="Password" required>
-                                <span class="material-symbols-outlined password-icon" id="togglePassword" onclick="togglePasswordVisibility()">visibility</span>
-                            </div>
-                            <button type="submit">Log In</button>
-                        </form>
-
-                        <div class="signup-link">
-                            Don't have an account? <a href="terms.php">Become a Partner</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        © 2025 SLATE Freight Management System. All rights reserved. &nbsp;|&nbsp;
-        <a href="terms.php">Terms & Conditions</a> &nbsp;|&nbsp;
-        <a href="#">Privacy Policy</a>
-    </div>
-
-    <!-- OTP Verification Modal -->
-    <div id="otpModal" class="otp-modal <?php echo $show_otp_modal ? 'active' : ''; ?>">
-        <div class="otp-modal-content">
-            <div class="otp-header">
-                <img src="../assets/images/slate.png" alt="SLATE Logo" class="otp-logo">
-                <h2>Verification Code</h2>
-                <p>Enter the 6-digit code sent to your email<?php echo !empty($user['phone_number'] ?? '') ? ' and phone' : ''; ?></p>
-            </div>
-
-            <?php if (!empty($error_message) && $show_otp_modal): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
-            <?php endif; ?>
-
-            <?php if (!empty($success_message) && $show_otp_modal): ?>
-            <div class="success-message"><?php echo htmlspecialchars($success_message); ?></div>
-            <?php endif; ?>
-
-            <form method="POST" action="" class="otp-form">
-                <?php echo getCSRFTokenField(); ?>
-                <input type="hidden" name="verify_otp" value="1">
-                <input type="hidden" name="pending_email" value="<?php echo htmlspecialchars($pending_email); ?>">
-                
-                <div class="otp-inputs">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="0" autofocus>
-                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
-                </div>
-                <input type="hidden" name="otp_code" id="otp_code_hidden">
-                
-                <button type="submit" class="otp-submit-btn">Verify Code</button>
-            </form>
-
-            <div class="otp-footer">
-                <p>Didn't receive the code?</p>
-                <form method="POST" action="" style="display: inline;">
-                    <?php echo getCSRFTokenField(); ?>
-                    <input type="hidden" name="resend_otp" value="1">
-                    <input type="hidden" name="pending_email" value="<?php echo htmlspecialchars($pending_email); ?>">
-                    <button type="submit" class="resend-btn">Resend Code</button>
-                </form>
-                <button type="button" class="back-btn" onclick="closeOtpModal()">Back to Login</button>
-            </div>
-
-            <div class="otp-timer">
-                <span class="material-symbols-outlined">timer</span>
-                <span id="otpTimer">Code expires in 5:00</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        © 2025 SLATE Freight Management System. All rights reserved.
-        <a href="#">Terms & Conditions</a> | <a href="#">Privacy Policy</a>
-    </div>
-
-    <style>
         /* OTP Modal Styles */
         .otp-modal {
             display: none;
@@ -708,24 +599,137 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             font-size: 0.85rem;
         }
 
-        .otp-timer .material-symbols-outlined {
-            font-size: 1.1rem;
+        .otp-timer i {
+            width: 1.1rem;
+            height: 1.1rem;
         }
     </style>
+</head>
+<body>
+    <?php include '../includes/loading-screen.php'; ?>
+    
+    <div class="login-screen">
+        <div class="login-container">
+            <div class="welcome-panel">
+                <div class="welcome-content">
+                    <img src="../assets/images/slate.png" alt="SLATE Logo" class="welcome-logo">
+                    <p class="welcome-text">Freight Management System</p>
+                </div>
+            </div>
+            <div class="login-panel">
+                <div class="login-box">
+                    <img src="../assets/images/slate.png" alt="SLATE Logo">
+                    <h2>Login</h2>
+                        
+                    <?php if (!empty($error_message)): ?>
+                        <div class="error-message">
+                            <?php echo htmlspecialchars($error_message); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($success_message)): ?>
+                        <div class="success-message">
+                            <?php echo htmlspecialchars($success_message); ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <form method="POST" action="" class="show-loading">
+                        <?php echo getCSRFTokenField(); ?>
+                        <input type="hidden" name="login" value="1">
+                        <input type="text" id="username" name="username" placeholder="Email Address" required 
+                               value="<?php echo htmlspecialchars($_POST['username'] ?? ''); ?>">
+                        <div class="password-field">
+                            <input type="password" id="password" name="password" placeholder="Password" required>
+                            <i data-lucide="eye" class="password-icon" id="togglePassword"></i>
+                        </div>
+                        <button type="submit">Log In</button>
+                    </form>
+
+                    <div class="signup-link">
+                        Don't have an account? <a href="terms.php">Become a Partner</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            © 2025 SLATE Freight Management System. All rights reserved. &nbsp;|&nbsp;
+            <a href="terms.php">Terms & Conditions</a> &nbsp;|&nbsp;
+            <a href="#">Privacy Policy</a>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div id="otpModal" class="otp-modal <?php echo $show_otp_modal ? 'active' : ''; ?>">
+        <div class="otp-modal-content">
+            <div class="otp-header">
+                <img src="../assets/images/slate.png" alt="SLATE Logo" class="otp-logo">
+                <h2>Verification Code</h2>
+                <p>Enter the 6-digit code sent to <strong style="color:#0ea5e9;"><?php echo htmlspecialchars(maskEmail($pending_email)); ?></strong></p>
+            </div>
+
+            <?php if (!empty($error_message) && $show_otp_modal): ?>
+            <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($success_message) && $show_otp_modal): ?>
+            <div class="success-message"><?php echo htmlspecialchars($success_message); ?></div>
+            <?php endif; ?>
+
+            <form method="POST" action="" class="otp-form">
+                <?php echo getCSRFTokenField(); ?>
+                <input type="hidden" name="verify_otp" value="1">
+                <input type="hidden" name="pending_email" value="<?php echo htmlspecialchars($pending_email); ?>">
+                
+                <div class="otp-inputs">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="0" autofocus>
+                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                </div>
+                <input type="hidden" name="otp_code" id="otp_code_hidden">
+                
+                <button type="submit" class="otp-submit-btn">Verify Code</button>
+            </form>
+
+            <div class="otp-footer">
+                <p>Didn't receive the code?</p>
+                <form method="POST" action="" style="display: inline;">
+                    <?php echo getCSRFTokenField(); ?>
+                    <input type="hidden" name="resend_otp" value="1">
+                    <input type="hidden" name="pending_email" value="<?php echo htmlspecialchars($pending_email); ?>">
+                    <button type="submit" class="resend-btn">Resend Code</button>
+                </form>
+                <button type="button" class="back-btn" onclick="closeOtpModal()">Back to Login</button>
+            </div>
+
+            <div class="otp-timer">
+                <i data-lucide="timer"></i>
+                <span id="otpTimer">Code expires in 5:00</span>
+            </div>
+        </div>
+    </div>
 
     <script>
-        function togglePasswordVisibility() {
-            const passwordField = document.getElementById('password');
-            const toggleIcon = document.getElementById('togglePassword');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggleIcon.textContent = 'visibility_off';
-            } else {
-                passwordField.type = 'password';
-                toggleIcon.textContent = 'visibility';
-            }
-        }
+        // Password toggle using event delegation
+        document.querySelectorAll('.password-field').forEach(field => {
+            field.addEventListener('click', function(e) {
+                if (e.target.closest('.password-icon') || e.target.closest('svg.lucide')) {
+                    const input = field.querySelector('input');
+                    const isPassword = input.getAttribute('type') === 'password';
+                    input.setAttribute('type', isPassword ? 'text' : 'password');
+                    const oldIcon = field.querySelector('svg.lucide') || field.querySelector('.password-icon');
+                    const newIcon = document.createElement('i');
+                    newIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+                    newIcon.className = 'password-icon';
+                    newIcon.id = 'togglePassword';
+                    oldIcon.replaceWith(newIcon);
+                    lucide.createIcons();
+                }
+            });
+        });
 
         // OTP Input handling
         const otpDigits = document.querySelectorAll('.otp-digit');
@@ -797,6 +801,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         // Auto focus first OTP digit when modal opens
         document.querySelector('.otp-digit[data-index="0"]')?.focus();
         <?php endif; ?>
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     </script>
 </body>
 </html>

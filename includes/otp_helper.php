@@ -128,6 +128,22 @@ function sendOTP($email, $otp_code, $user_name = 'User', $phone_number = null) {
 }
 
 /**
+ * Mask email address for display (e.g. ch*****es@gmail.com)
+ */
+function maskEmail($email) {
+    if (empty($email) || strpos($email, '@') === false) return '***@***.com';
+    list($local, $domain) = explode('@', $email);
+    $len = strlen($local);
+    if ($len <= 2) {
+        $masked_local = $local[0] . str_repeat('*', max($len - 1, 1));
+    } else {
+        $show = max(2, floor($len * 0.3));
+        $masked_local = substr($local, 0, $show) . str_repeat('*', $len - $show);
+    }
+    return $masked_local . '@' . $domain;
+}
+
+/**
  * Clean up expired OTPs
  */
 function cleanupExpiredOTPs() {

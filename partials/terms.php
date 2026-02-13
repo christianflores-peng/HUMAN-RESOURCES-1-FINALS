@@ -12,7 +12,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms & Conditions - HR1 Management System</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=block" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -370,7 +370,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
             </div>
         </div>
 
-        <div class="agreement-section" onclick="document.getElementById('agree-checkbox').click(); event.stopPropagation();">
+        <div class="agreement-section">
             <input type="checkbox" id="agree-checkbox" onchange="toggleProceedButton()">
             <label for="agree-checkbox">I have read and agree to the Terms & Conditions</label>
         </div>
@@ -393,7 +393,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
             if (checkbox.checked) {
                 <?php if ($job_id && $type === 'applicant'): ?>
                 // Redirect to apply page with job_id
-                window.location.href = '../apply.php?job_id=<?php echo $job_id; ?>&terms_accepted=true';
+                window.location.href = '../public/apply.php?job_id=<?php echo $job_id; ?>&terms_accepted=true';
                 <?php else: ?>
                 // Redirect to applicant registration with terms acceptance flag
                 window.location.href = 'register-applicant.php?terms_accepted=true';
