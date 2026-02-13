@@ -31,7 +31,7 @@ try {
     
     echo "<h2 style='color: green;'>✅ OTP Verification table created successfully!</h2>";
     echo "<p>You can now use the registration and login pages with OTP verification.</p>";
-    echo "<p><a href='../partials/register-applicant.php?terms_accepted=true'>Go to Registration</a></p>";
+    echo "<p><a href='../auth/register-applicant.php?terms_accepted=true'>Go to Registration</a></p>";
     
 } catch (PDOException $e) {
     echo "<h2 style='color: red;'>❌ Error creating table:</h2>";

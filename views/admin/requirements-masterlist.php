@@ -170,6 +170,26 @@ try {
     $recent_employees = [];
 }
 
+// Fetch employee submitted requirements for filtering
+try {
+    $employee_submissions = fetchAll("
+        SELECT er.user_id, orq.id as requirement_id, orq.document_type
+        FROM employee_requirements er
+        JOIN onboarding_requirements orq ON orq.document_type = er.document_type
+        WHERE er.status IN ('approved', 'pending')
+        OR er.file_path = 'admin_bypass'
+    ");
+    $submitted_map = [];
+    foreach ($employee_submissions as $sub) {
+        if (!isset($submitted_map[$sub['user_id']])) {
+            $submitted_map[$sub['user_id']] = [];
+        }
+        $submitted_map[$sub['user_id']][] = $sub['requirement_id'];
+    }
+} catch (Exception $e) {
+    $submitted_map = [];
+}
+
 $categories = ['General', 'Government IDs', 'Medical', 'Employment', 'Education', 'Company-Specific'];
 ?>
 <div data-page-title="Requirements Masterlist">
@@ -340,7 +360,7 @@ $categories = ['General', 'Government IDs', 'Medical', 'Employment', 'Education'
         <div class="form-grid">
             <div class="form-group">
                 <label>Employee</label>
-                <select name="user_id" required>
+                <select name="user_id" id="bypass_employee" required onchange="filterRequirements()">
                     <option value="">Select employee...</option>
                     <?php foreach ($recent_employees as $emp): ?>
                     <option value="<?php echo $emp['id']; ?>"><?php echo htmlspecialchars($emp['first_name'] . ' ' . $emp['last_name'] . ' — ' . ($emp['department_name'] ?? 'N/A')); ?></option>
@@ -349,10 +369,10 @@ $categories = ['General', 'Government IDs', 'Medical', 'Employment', 'Education'
             </div>
             <div class="form-group">
                 <label>Requirement to Bypass</label>
-                <select name="requirement_id" required>
-                    <option value="">Select requirement...</option>
+                <select name="requirement_id" id="bypass_requirement" required>
+                    <option value="">Select employee first...</option>
                     <?php foreach ($requirements as $req): ?>
-                    <option value="<?php echo $req['id']; ?>"><?php echo htmlspecialchars($req['document_type']); ?></option>
+                    <option value="<?php echo $req['id']; ?>" data-req-id="<?php echo $req['id']; ?>"><?php echo htmlspecialchars($req['document_type']); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -366,6 +386,50 @@ $categories = ['General', 'Government IDs', 'Medical', 'Employment', 'Education'
 </div>
 
 <script>
+// Employee submitted requirements map (PHP to JS)
+const employeeSubmissions = <?php echo json_encode($submitted_map); ?>;
+
+function filterRequirements() {
+    const employeeSelect = document.getElementById('bypass_employee');
+    const requirementSelect = document.getElementById('bypass_requirement');
+    const selectedEmployeeId = employeeSelect.value;
+    
+    // Reset requirement dropdown
+    requirementSelect.innerHTML = '<option value="">Select requirement...</option>';
+    
+    if (!selectedEmployeeId) {
+        requirementSelect.innerHTML = '<option value="">Select employee first...</option>';
+        return;
+    }
+    
+    // Get submitted requirement IDs for this employee
+    const submittedReqIds = employeeSubmissions[selectedEmployeeId] || [];
+    
+    // Get all requirement options and filter
+    const allOptions = <?php echo json_encode(array_map(function($req) {
+        return ['id' => $req['id'], 'name' => $req['document_type']];
+    }, $requirements)); ?>;
+    
+    let availableCount = 0;
+    allOptions.forEach(req => {
+        // Only show requirements NOT yet submitted/bypassed by this employee
+        if (!submittedReqIds.includes(req.id)) {
+            const option = document.createElement('option');
+            option.value = req.id;
+            option.textContent = req.name;
+            requirementSelect.appendChild(option);
+            availableCount++;
+        }
+    });
+    
+    if (availableCount === 0) {
+        requirementSelect.innerHTML = '<option value="">All requirements submitted/bypassed</option>';
+        requirementSelect.disabled = true;
+    } else {
+        requirementSelect.disabled = false;
+    }
+}
+
 if (typeof lucide !== 'undefined') lucide.createIcons();
 </script>
 </div>

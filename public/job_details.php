@@ -46,7 +46,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $job ? htmlspecialchars($job['title']) : 'Job Details'; ?> | HR1 Management</title>
-    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <style>
         :root {
             --primary-color: #3b82f6;

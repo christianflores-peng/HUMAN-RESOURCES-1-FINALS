@@ -144,7 +144,7 @@ function get_nav_items($role) {
                 [
                     'title' => 'Account',
                     'links' => [
-                        ['href' => '../../logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
+                        ['href' => '../../auth/logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
                     ]
                 ]
             ];
@@ -179,7 +179,7 @@ function get_nav_items($role) {
                 [
                     'title' => 'Account',
                     'links' => [
-                        ['href' => '../../logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
+                        ['href' => '../../auth/logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
                     ]
                 ]
             ];
@@ -215,7 +215,7 @@ function get_nav_items($role) {
                 [
                     'title' => 'Account',
                     'links' => [
-                        ['href' => '../../logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
+                        ['href' => '../../auth/logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
                     ]
                 ]
             ];
@@ -252,7 +252,7 @@ function get_nav_items($role) {
                 [
                     'title' => 'Account',
                     'links' => [
-                        ['href' => '../../logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
+                        ['href' => '../../auth/logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
                     ]
                 ]
             ];
@@ -289,7 +289,7 @@ function get_nav_items($role) {
                 [
                     'title' => 'Account',
                     'links' => [
-                        ['href' => '../../logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
+                        ['href' => '../../auth/logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
                     ]
                 ]
             ];

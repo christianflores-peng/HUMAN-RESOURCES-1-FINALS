@@ -216,7 +216,7 @@
 <script>
     let logoutCountdownInterval = null;
     let logoutCountdownValue = 3;
-    let logoutUrl = '<?php echo isset($logout_url) ? $logout_url : "../../logout.php"; ?>';
+    let logoutUrl = '<?php echo isset($logout_url) ? $logout_url : "../../auth/logout.php"; ?>';
 
     function updateCurrentDateTime() {
         const now = new Date();

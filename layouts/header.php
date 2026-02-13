@@ -15,7 +15,7 @@ $current_role = $current_role ?? ($_SESSION['role'] ?? 'Employee');
             <span id="currentRole" class="role-badge"><?php echo htmlspecialchars($current_role); ?></span>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><i data-lucide="moon"></i></button>
             <a href="../index.php" class="home-btn">Home</a>
-            <a href="../logout.php" class="logout-btn">Logout</a>
+            <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
     </header>
 

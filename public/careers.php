@@ -51,6 +51,16 @@ try {
 } catch (Exception $e) {
     $departments = [];
 }
+
+// Build dynamic employment type filter values from current open postings
+$employment_types = [];
+foreach ($job_postings as $job) {
+    $type = trim((string)($job['employment_type'] ?? ''));
+    if ($type !== '') {
+        $employment_types[strtolower($type)] = $type;
+    }
+}
+asort($employment_types);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -531,13 +541,13 @@ try {
                 <a href="../index.php">Home</a>
                 <?php if ($is_logged_in && $user_role === 'Applicant'): ?>
                     <a href="../my-account.php">My Applications</a>
-                    <a href="../logout.php">Logout</a>
+                    <a href="../auth/logout.php">Logout</a>
                 <?php elseif ($is_logged_in): ?>
-                    <a href="../login.php">Dashboard</a>
-                    <a href="../logout.php">Logout</a>
+                    <a href="../auth/login-redirect.php">Dashboard</a>
+                    <a href="../auth/logout.php">Logout</a>
                 <?php else: ?>
-                    <a href="../partials/login.php">Login</a>
-                    <a href="../partials/terms.php">Register</a>
+                    <a href="../auth/login.php">Login</a>
+                    <a href="../auth/register-portal.php?terms_accepted=true">Register</a>
                 <?php endif; ?>
                 <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
             </nav>
@@ -588,11 +598,9 @@ try {
                         <label for="type_filter">Employment Type</label>
                         <select id="type_filter" onchange="filterJobs()">
                             <option value="">All Types</option>
-                            <option value="Full-time">Full-time</option>
-                            <option value="Part-time">Part-time</option>
-                            <option value="Contract">Contract</option>
-                            <option value="Internship">Internship</option>
-                            <option value="Remote">Remote</option>
+                            <?php foreach ($employment_types as $type): ?>
+                                <option value="<?php echo htmlspecialchars($type); ?>"><?php echo htmlspecialchars($type); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -671,7 +679,7 @@ try {
                                 </div>
                                 <div>
                                     <a href="job_details.php?id=<?php echo $job['id']; ?>" class="btn btn-outline">View Details</a>
-                                    <a href="../partials/terms.php?job_id=<?php echo $job['id']; ?>&type=applicant" class="btn btn-primary">Apply Now</a>
+                                    <a href="../auth/register-portal.php?terms_accepted=true&type=applicant&job_id=<?php echo $job['id']; ?>&source=apply" class="btn btn-primary">Apply Now</a>
                                 </div>
                             </div>
                         </div>

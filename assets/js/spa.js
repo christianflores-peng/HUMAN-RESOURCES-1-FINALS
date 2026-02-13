@@ -170,12 +170,12 @@ const HR1SPA = {
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                await this.submitForm(form);
+                await this.submitForm(form, e.submitter || null);
             });
         });
     },
 
-    async submitForm(form) {
+    async submitForm(form, submitter = null) {
         const submitBtn = form.querySelector('[type="submit"]');
         const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
 
@@ -187,6 +187,11 @@ const HR1SPA = {
 
         try {
             const formData = new FormData(form);
+            // Preserve clicked submit button name/value for server-side action routing.
+            // Many backend handlers rely on button names (e.g., request_toggle, verify_toggle_otp).
+            if (submitter && submitter.name && !formData.has(submitter.name)) {
+                formData.append(submitter.name, submitter.value || '1');
+            }
             const method = (form.getAttribute('method') || 'POST').toUpperCase();
             const rawAction = (form.getAttribute('action') || '').trim();
             const action = (!rawAction || rawAction === '#')

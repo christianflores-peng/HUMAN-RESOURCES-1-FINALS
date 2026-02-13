@@ -101,14 +101,14 @@ $is_logged_in = isset($_SESSION['user_id']);
             <div class="user-info">
                 <h3>Welcome, <?php echo htmlspecialchars($_SESSION['username'] ?? 'User'); ?>!</h3>
                 <p>Role: <?php echo htmlspecialchars($_SESSION['role'] ?? 'Employee'); ?></p>
-                <a href="logout.php" style="color: #ef4444;">Logout</a>
+                <a href="../auth/logout.php" style="color: #ef4444;">Logout</a>
             </div>
         <?php else: ?>
             <div class="user-info">
                 <h3>Not Logged In</h3>
                 <p>Some features require authentication</p>
-                <a href="partials/login.php" style="color: #3b82f6;">Login</a> | 
-                <a href="partials/register.php" style="color: #3b82f6;">Register</a>
+                <a href="../auth/login.php" style="color: #3b82f6;">Login</a> | 
+                <a href="../auth/register.php" style="color: #3b82f6;">Register</a>
             </div>
         <?php endif; ?>
         
@@ -118,9 +118,9 @@ $is_logged_in = isset($_SESSION['user_id']);
                 <h3>🏠 Main System</h3>
                 <ul class="nav-links">
                     <li><a href="index.php">Home Page <span class="status status-public">Public</span></a></li>
-                    <li><a href="partials/login.php">Login <span class="status status-public">Public</span></a></li>
-                    <li><a href="partials/register.php">Register <span class="status status-public">Public</span></a></li>
-                    <li><a href="applicant-portal.php">Applicant Portal <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../auth/login.php">Login <span class="status status-public">Public</span></a></li>
+                    <li><a href="../auth/register.php">Register <span class="status status-public">Public</span></a></li>
+                    <li><a href="../auth/applicant-portal.php">Applicant Portal <span class="status status-protected">Protected</span></a></li>
                 </ul>
             </div>
             
@@ -138,11 +138,11 @@ $is_logged_in = isset($_SESSION['user_id']);
             <div class="nav-section">
                 <h3>👨‍💼 Admin Portal</h3>
                 <ul class="nav-links">
-                    <li><a href="../modals/admin/index.php">Admin Dashboard <span class="status status-admin">Admin</span></a></li>
-                    <li><a href="../modals/admin/index.php?page=accounts">User Management <span class="status status-admin">Admin</span></a></li>
-                    <li><a href="../modals/admin/index.php?page=applicant-database">Applicant Database <span class="status status-admin">Admin</span></a></li>
-                    <li><a href="../modals/admin/index.php?page=regularization-approval">Regularization <span class="status status-admin">Admin</span></a></li>
-                    <li><a href="../modals/admin/index.php?page=recognition-moderation">Recognition Moderation <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../views/admin/index.php">Admin Dashboard <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../views/admin/index.php?page=accounts">User Management <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../views/admin/index.php?page=applicant-database">Applicant Database <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../views/admin/index.php?page=regularization-approval">Regularization <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../views/admin/index.php?page=recognition-moderation">Recognition Moderation <span class="status status-admin">Admin</span></a></li>
                 </ul>
             </div>
             
@@ -150,12 +150,12 @@ $is_logged_in = isset($_SESSION['user_id']);
             <div class="nav-section">
                 <h3>📋 HR Staff Portal</h3>
                 <ul class="nav-links">
-                    <li><a href="../modals/hr_staff/index.php">HR Dashboard <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/hr_staff/index.php?page=job-requisitions">Job Requisitions <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/hr_staff/index.php?page=job-postings">Job Postings <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/hr_staff/index.php?page=applicant-screening">Applicant Screening <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/hr_staff/index.php?page=recruitment-pipeline">Recruitment Pipeline <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/hr_staff/index.php?page=onboarding-tracker">Onboarding Tracker <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/hr_staff/index.php">HR Dashboard <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/hr_staff/index.php?page=job-requisitions">Job Requisitions <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/hr_staff/index.php?page=job-postings">Job Postings <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/hr_staff/index.php?page=applicant-screening">Applicant Screening <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/hr_staff/index.php?page=recruitment-pipeline">Recruitment Pipeline <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/hr_staff/index.php?page=onboarding-tracker">Onboarding Tracker <span class="status status-protected">Protected</span></a></li>
                 </ul>
             </div>
             
@@ -163,10 +163,10 @@ $is_logged_in = isset($_SESSION['user_id']);
             <div class="nav-section">
                 <h3>� Manager Portal</h3>
                 <ul class="nav-links">
-                    <li><a href="../modals/manager/index.php">Manager Dashboard <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/manager/index.php?page=job-requisitions">Job Requisitions <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/manager/index.php?page=goal-setting">Goal Setting <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="../modals/manager/index.php?page=performance-reviews">Performance Reviews <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/manager/index.php">Manager Dashboard <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/manager/index.php?page=job-requisitions">Job Requisitions <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/manager/index.php?page=goal-setting">Goal Setting <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../views/manager/index.php?page=performance-reviews">Performance Reviews <span class="status status-protected">Protected</span></a></li>
                 </ul>
             </div>
             

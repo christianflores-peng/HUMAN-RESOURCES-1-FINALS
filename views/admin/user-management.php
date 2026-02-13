@@ -12,7 +12,7 @@ $is_ajax = is_spa_ajax();
 
 // Check if user is logged in and has admin privileges using RBAC
 if (!isset($_SESSION['user_id'])) {
-    header('Location: ../../partials/login.php');
+    header('Location: ../../auth/login.php');
     exit();
 }
 
@@ -557,7 +557,7 @@ try {
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
                     <a href="dashboard.php" class="btn btn-primary">Admin Dashboard</a>
                     <a href="accounts.php" class="btn btn-primary">Manage Accounts</a>
-                    <a href="../../partials/register.php" class="btn btn-primary">Test Registration</a>
+                    <a href="../../auth/register.php" class="btn btn-primary">Test Registration</a>
                 </div>
             </div>
         </div>

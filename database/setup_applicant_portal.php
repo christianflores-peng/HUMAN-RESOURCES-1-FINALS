@@ -57,7 +57,7 @@ try {
     echo "- work_authorization<br>";
     echo "- created_at<br>";
     echo "- updated_at<br><br>";
-    echo "<a href='../partials/register-portal.php'>← Back to Registration</a>";
+    echo "<a href='../auth/register-portal.php'>← Back to Registration</a>";
     
 } catch (Exception $e) {
     echo "❌ ERROR: " . $e->getMessage() . "<br><br>";

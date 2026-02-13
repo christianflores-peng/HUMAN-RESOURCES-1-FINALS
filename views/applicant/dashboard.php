@@ -6,7 +6,7 @@ $is_ajax = is_spa_ajax();
 
 // Check if user is logged in and is an applicant
 if (!isset($_SESSION['user_id']) || $_SESSION['role_type'] !== 'Applicant') {
-    header('Location: ../../partials/login.php');
+    header('Location: ../../auth/login.php');
     exit();
 }
 

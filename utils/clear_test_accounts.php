@@ -67,7 +67,7 @@ try {
         <?php endif; ?>
         
         <div class="actions">
-            <a href="partials/register-portal.php" class="btn btn-primary">← Back to Registration</a>
+            <a href="auth/register-portal.php" class="btn btn-primary">← Back to Registration</a>
         </div>
         
         <?php if (empty($accounts)): ?>

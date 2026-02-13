@@ -576,16 +576,16 @@ $last_name = $_SESSION['last_name'] ?? '';
                 <li><a href="#about">About</a></li>
                 <li><a href="public/careers.php">Careers</a></li>
                 <?php if ($is_logged_in): ?>
-                    <li><a href="login.php" class="btn-primary">
+                    <li><a href="auth/login-redirect.php" class="btn-primary">
                         <i data-lucide="layout-dashboard"></i>
                         Dashboard
                     </a></li>
-                    <li><a href="logout.php">Logout</a></li>
+                    <li><a href="auth/logout.php">Logout</a></li>
                 <?php else: ?>
-                    <li><a href="partials/login.php">Login</a></li>
-                    <li><a href="partials/register-portal.php" class="btn-primary">
-                        <i data-lucide="user-plus"></i>
-                        Register
+                    <li><a href="auth/login.php">Login</a></li>
+                    <li><a href="#quick-access" class="btn-primary">
+                        <i data-lucide="navigation"></i>
+                        Quick Access
                     </a></li>
                 <?php endif; ?>
             </ul>
@@ -595,12 +595,12 @@ $last_name = $_SESSION['last_name'] ?? '';
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-content">
-            <div class="hero-badge">🚀 SLATE HR Management System</div>
+            <div class="hero-badge"> SLATE HR Management System</div>
             <h1>Recruitment to Regularization — All in One Platform</h1>
             <p>Manage the full employee lifecycle: job requisitions, applicant screening, interviews, road tests, onboarding, performance reviews, and social recognition — built for freight &amp; logistics teams.</p>
             <div class="cta-buttons">
                 <?php if ($is_logged_in): ?>
-                    <a href="login.php" class="cta-button">
+                    <a href="auth/login-redirect.php" class="cta-button">
                         <i data-lucide="layout-dashboard"></i>
                         Access Dashboard
                     </a>
@@ -609,11 +609,11 @@ $last_name = $_SESSION['last_name'] ?? '';
                         View Careers
                     </a>
                 <?php else: ?>
-                    <a href="partials/register-portal.php" class="cta-button">
+                    <a href="auth/register-portal.php" class="cta-button">
                         <i data-lucide="user-plus"></i>
                         Get Started
                     </a>
-                    <a href="partials/login.php" class="cta-button secondary">
+                    <a href="auth/login.php" class="cta-button secondary">
                         <i data-lucide="log-in"></i>
                         Login
                     </a>
@@ -640,7 +640,7 @@ $last_name = $_SESSION['last_name'] ?? '';
     <section class="features-section" id="features">
         <div class="container">
             <div class="section-header">
-                <div class="section-badge">✨ System Modules</div>
+                <div class="section-badge"> System Modules</div>
                 <h2 class="section-title">5 Integrated Modules for Complete HR Management</h2>
                 <p class="section-subtitle">From job requisitions to social recognition — every stage of the employee lifecycle in one platform</p>
             </div>
@@ -758,10 +758,10 @@ $last_name = $_SESSION['last_name'] ?? '';
     </section>
 
     <!-- Quick Access Section -->
-    <section style="padding: 6rem 0; background: transparent;">
+    <section id="quick-access" style="padding: 6rem 0; background: transparent;">
         <div class="container">
             <div class="section-header">
-                <div class="section-badge">🎯 Quick Access</div>
+                <div class="section-badge"> Quick Access</div>
                 <?php if ($is_logged_in): ?>
                     <h2 class="section-title">Welcome, <?php echo htmlspecialchars($_SESSION['first_name'] ?? 'User'); ?>!</h2>
                     <p class="section-subtitle">You are logged in as <strong style="color: #0ea5e9;"><?php echo htmlspecialchars(str_replace('_', ' ', $_SESSION['role_type'] ?? 'User')); ?></strong> — access your portal below</p>
@@ -777,37 +777,37 @@ $last_name = $_SESSION['last_name'] ?? '';
                         $portal_cards = [];
                         if ($role === 'Admin') {
                             $portal_cards = [
-                                ['icon' => 'shield', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)', 'title' => 'Admin Portal', 'desc' => 'System settings, user management, and audit logs', 'link' => 'modals/admin/index.php'],
-                                ['icon' => 'users', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'HR Staff Portal', 'desc' => 'Recruitment pipeline, screening, and onboarding', 'link' => 'modals/hr_staff/index.php'],
-                                ['icon' => 'briefcase', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Manager Portal', 'desc' => 'Job requisitions, interviews, and performance', 'link' => 'modals/manager/index.php'],
+                                ['icon' => 'shield', 'color' => '#ef4444', 'bg' => 'rgba(239,68,68,0.1)', 'title' => 'Admin Portal', 'desc' => 'System settings, user management, and audit logs', 'link' => 'views/admin/index.php'],
+                                ['icon' => 'users', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'HR Staff Portal', 'desc' => 'Recruitment pipeline, screening, and onboarding', 'link' => 'views/hr_staff/index.php'],
+                                ['icon' => 'briefcase', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Manager Portal', 'desc' => 'Job requisitions, interviews, and performance', 'link' => 'views/manager/index.php'],
                             ];
                         } elseif ($role === 'HR_Staff') {
                             $portal_cards = [
-                                ['icon' => 'kanban', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'HR Dashboard', 'desc' => 'Recruitment pipeline, screening, and onboarding tracker', 'link' => 'modals/hr_staff/index.php'],
-                                ['icon' => 'file-plus', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)', 'title' => 'Job Requisitions', 'desc' => 'Review and approve manager requests', 'link' => 'modals/hr_staff/index.php?page=job-requisitions'],
+                                ['icon' => 'kanban', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'HR Dashboard', 'desc' => 'Recruitment pipeline, screening, and onboarding tracker', 'link' => 'views/hr_staff/index.php'],
+                                ['icon' => 'file-plus', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)', 'title' => 'Job Requisitions', 'desc' => 'Review and approve manager requests', 'link' => 'views/hr_staff/index.php?page=job-requisitions'],
                                 ['icon' => 'briefcase', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Careers Page', 'desc' => 'View public job postings', 'link' => 'public/careers.php'],
                             ];
                         } elseif ($role === 'Manager') {
                             $portal_cards = [
-                                ['icon' => 'layout-dashboard', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Manager Dashboard', 'desc' => 'Team overview, requisitions, and performance reviews', 'link' => 'modals/manager/index.php'],
-                                ['icon' => 'file-plus', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Job Requisitions', 'desc' => 'Request new staff for your department', 'link' => 'modals/manager/index.php?page=job-requisitions'],
-                                ['icon' => 'target', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Goal Setting', 'desc' => 'Set and track probationary goals', 'link' => 'modals/manager/index.php?page=goal-setting'],
+                                ['icon' => 'layout-dashboard', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Manager Dashboard', 'desc' => 'Team overview, requisitions, and performance reviews', 'link' => 'views/manager/index.php'],
+                                ['icon' => 'file-plus', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Job Requisitions', 'desc' => 'Request new staff for your department', 'link' => 'views/manager/index.php?page=job-requisitions'],
+                                ['icon' => 'target', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Goal Setting', 'desc' => 'Set and track probationary goals', 'link' => 'views/manager/index.php?page=goal-setting'],
                             ];
                         } elseif ($role === 'Employee') {
                             $portal_cards = [
-                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Employee Dashboard', 'desc' => 'Onboarding progress, profile, and kudos', 'link' => 'modals/employee/index.php'],
-                                ['icon' => 'list-checks', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Onboarding', 'desc' => 'Complete your onboarding checklist', 'link' => 'modals/employee/index.php?page=onboarding'],
-                                ['icon' => 'trophy', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Recognition Wall', 'desc' => 'Give kudos and celebrate achievements', 'link' => 'modals/employee/index.php?page=recognition-wall'],
+                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Employee Dashboard', 'desc' => 'Onboarding progress, profile, and kudos', 'link' => 'views/employee/index.php'],
+                                ['icon' => 'list-checks', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Onboarding', 'desc' => 'Complete your onboarding checklist', 'link' => 'views/employee/index.php?page=onboarding'],
+                                ['icon' => 'trophy', 'color' => '#f59e0b', 'bg' => 'rgba(245,158,11,0.1)', 'title' => 'Recognition Wall', 'desc' => 'Give kudos and celebrate achievements', 'link' => 'views/employee/index.php?page=recognition-wall'],
                             ];
                         } elseif ($role === 'Applicant') {
                             $portal_cards = [
-                                ['icon' => 'layout-dashboard', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)', 'title' => 'Applicant Dashboard', 'desc' => 'Track your applications and interview schedule', 'link' => 'modals/applicant/index.php'],
-                                ['icon' => 'file-text', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'My Applications', 'desc' => 'View status of all your applications', 'link' => 'modals/applicant/index.php?page=applications'],
+                                ['icon' => 'layout-dashboard', 'color' => '#8b5cf6', 'bg' => 'rgba(139,92,246,0.1)', 'title' => 'Applicant Dashboard', 'desc' => 'Track your applications and interview schedule', 'link' => 'views/applicant/index.php'],
+                                ['icon' => 'file-text', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'My Applications', 'desc' => 'View status of all your applications', 'link' => 'views/applicant/index.php?page=applications'],
                                 ['icon' => 'briefcase', 'color' => '#10b981', 'bg' => 'rgba(16,185,129,0.1)', 'title' => 'Browse Jobs', 'desc' => 'Find and apply for open positions', 'link' => 'public/careers.php'],
                             ];
                         } else {
                             $portal_cards = [
-                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Dashboard', 'desc' => 'Access your portal', 'link' => 'login.php'],
+                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Dashboard', 'desc' => 'Access your portal', 'link' => 'auth/login-redirect.php'],
                             ];
                         }
                         foreach ($portal_cards as $card):
@@ -828,7 +828,7 @@ $last_name = $_SESSION['last_name'] ?? '';
                         </div>
                         <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Login</h3>
                         <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Access your HR management system</p>
-                        <a href="partials/login.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">Login</a>
+                        <a href="auth/login.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">Login</a>
                     </div>
                     <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
                         <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
@@ -836,7 +836,7 @@ $last_name = $_SESSION['last_name'] ?? '';
                         </div>
                         <h3 style="margin-bottom: 1rem; color: #ffffff; font-size: 1.3rem;">Register</h3>
                         <p style="color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.6;">Create your SLATE account</p>
-                        <a href="partials/register-portal.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">Register</a>
+                        <a href="auth/register-portal.php" style="background: #0ea5e9; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#0284c7'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#0ea5e9'; this.style.transform='translateY(0)'">Register</a>
                     </div>
                     <div style="background: rgba(30, 41, 54, 0.6); padding: 2.5rem; border-radius: 16px; text-align: center; border: 1px solid rgba(58, 69, 84, 0.5); backdrop-filter: blur(10px); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-8px)'; this.style.borderColor='rgba(14, 165, 233, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(58, 69, 84, 0.5)'">
                         <div style="width: 70px; height: 70px; margin: 0 auto 1.5rem; background: rgba(14, 165, 233, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
@@ -855,7 +855,7 @@ $last_name = $_SESSION['last_name'] ?? '';
     <footer style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); color: white; padding: 3rem 0; text-align: center; border-top: 1px solid rgba(58, 69, 84, 0.5);">
         <div class="container">
             <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 1rem;">&copy; 2025 SLATE Freight Management System. All rights reserved.</p>
-            <?php include 'partials/legal_links.php'; ?>
+            <?php include 'layouts/legal_links.php'; ?>
         </div>
     </footer>
     

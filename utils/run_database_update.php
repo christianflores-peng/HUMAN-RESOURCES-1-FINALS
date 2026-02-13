@@ -105,8 +105,8 @@ try {
     echo "<strong>✓ Your database is now ready for the Applicant Tracking System!</strong>";
     echo "</div>";
     
-    echo "<p><a href='../modals/applicant/index.php' style='color: #0ea5e9;'>Go to Applicant Portal</a></p>";
-    echo "<p><a href='../modals/manager/index.php' style='color: #0ea5e9;'>Go to Manager Portal</a></p>";
+    echo "<p><a href='../views/applicant/index.php' style='color: #0ea5e9;'>Go to Applicant Portal</a></p>";
+    echo "<p><a href='../views/manager/index.php' style='color: #0ea5e9;'>Go to Manager Portal</a></p>";
     
 } catch (Exception $e) {
     echo "<div class='error'><strong>Fatal Error:</strong> " . htmlspecialchars($e->getMessage()) . "</div>";

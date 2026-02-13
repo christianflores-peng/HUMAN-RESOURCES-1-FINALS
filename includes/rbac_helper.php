@@ -420,7 +420,7 @@ function getDashboardStats($userId) {
  * @param array $allowedRoles Array of allowed role types
  * @param string $redirectUrl URL to redirect to if not authorized
  */
-function requireRole($allowedRoles, $redirectUrl = '../partials/login.php') {
+function requireRole($allowedRoles, $redirectUrl = '../auth/login.php') {
     if (!isset($_SESSION['user_id'])) {
         header("Location: {$redirectUrl}");
         exit();

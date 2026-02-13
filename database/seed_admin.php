@@ -76,7 +76,7 @@ try {
     echo "<li><strong>Password:</strong> " . htmlspecialchars($admin_password) . "</li>";
     echo "</ul>";
     echo "<p style='color: red;'><strong>⚠️ DELETE this file after use!</strong> (database/seed_admin.php)</p>";
-    echo "<p><a href='../partials/login.php'>→ Go to Login</a></p>";
+    echo "<p><a href='../auth/login.php'>→ Go to Login</a></p>";
 
 } catch (Exception $e) {
     echo "<p style='color: red;'>❌ Error: " . htmlspecialchars($e->getMessage()) . "</p>";

@@ -5,7 +5,7 @@ startSecureSession();
 $is_ajax = is_spa_ajax();
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role_type'] !== 'Applicant') {
-    header('Location: ../../login.php');
+    header('Location: ../../auth/login.php');
     exit();
 }
 

@@ -72,6 +72,11 @@ if (isset($_POST['request_archive'])) {
 if (isset($_POST['verify_archive_otp'])) {
     $archive_id = $_POST['user_id'];
     $otp_code = trim($_POST['otp_code'] ?? '');
+    if (empty($otp_code) && isset($_POST['archive_otp_digits']) && is_array($_POST['archive_otp_digits'])) {
+        $otp_code = implode('', array_map(function ($d) {
+            return preg_replace('/\D/', '', (string)$d);
+        }, $_POST['archive_otp_digits']));
+    }
     $admin_email = $_SESSION['personal_email'] ?? $_SESSION['company_email'] ?? '';
     
     if (empty($otp_code)) {
@@ -131,6 +136,11 @@ if (isset($_POST['verify_toggle_otp'])) {
     $toggle_id = $_POST['user_id'];
     $new_status = $_POST['new_status'];
     $otp_code = trim($_POST['otp_code'] ?? '');
+    if (empty($otp_code) && isset($_POST['toggle_otp_digits']) && is_array($_POST['toggle_otp_digits'])) {
+        $otp_code = implode('', array_map(function ($d) {
+            return preg_replace('/\D/', '', (string)$d);
+        }, $_POST['toggle_otp_digits']));
+    }
     $admin_email = $_SESSION['personal_email'] ?? $_SESSION['company_email'] ?? '';
     
     if (empty($otp_code)) {
@@ -805,12 +815,12 @@ try {
             <form method="POST">
                 <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($pending_archive_id); ?>">
                 <div class="otp-inputs" style="display: flex; gap: 0.6rem; justify-content: center; margin-bottom: 1.5rem;">
-                    <input type="text" maxlength="1" class="archive-otp-digit" data-index="0" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="archive-otp-digit" data-index="1" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="archive-otp-digit" data-index="2" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="archive-otp-digit" data-index="3" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="archive-otp-digit" data-index="4" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="archive-otp-digit" data-index="5" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="archive_otp_digits[]" maxlength="1" class="archive-otp-digit" data-index="0" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="archive_otp_digits[]" maxlength="1" class="archive-otp-digit" data-index="1" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="archive_otp_digits[]" maxlength="1" class="archive-otp-digit" data-index="2" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="archive_otp_digits[]" maxlength="1" class="archive-otp-digit" data-index="3" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="archive_otp_digits[]" maxlength="1" class="archive-otp-digit" data-index="4" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="archive_otp_digits[]" maxlength="1" class="archive-otp-digit" data-index="5" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
                 </div>
                 <input type="hidden" name="otp_code" id="archiveOtpHidden">
                 
@@ -893,12 +903,12 @@ try {
                 <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($pending_toggle_id); ?>">
                 <input type="hidden" name="new_status" value="<?php echo htmlspecialchars($pending_toggle_status); ?>">
                 <div class="otp-inputs" style="display: flex; gap: 0.6rem; justify-content: center; margin-bottom: 1.5rem;">
-                    <input type="text" maxlength="1" class="toggle-otp-digit" data-index="0" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="toggle-otp-digit" data-index="1" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="toggle-otp-digit" data-index="2" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="toggle-otp-digit" data-index="3" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="toggle-otp-digit" data-index="4" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
-                    <input type="text" maxlength="1" class="toggle-otp-digit" data-index="5" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="toggle_otp_digits[]" maxlength="1" class="toggle-otp-digit" data-index="0" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="toggle_otp_digits[]" maxlength="1" class="toggle-otp-digit" data-index="1" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="toggle_otp_digits[]" maxlength="1" class="toggle-otp-digit" data-index="2" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="toggle_otp_digits[]" maxlength="1" class="toggle-otp-digit" data-index="3" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="toggle_otp_digits[]" maxlength="1" class="toggle-otp-digit" data-index="4" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
+                    <input type="text" name="toggle_otp_digits[]" maxlength="1" class="toggle-otp-digit" data-index="5" style="width: 48px; height: 56px; background: #2a3544; border: 2px solid #3a4554; border-radius: 10px; color: #fff; font-size: 1.4rem; font-weight: 600; text-align: center; outline: none; transition: all 0.3s;" onfocus="this.style.borderColor='#0ea5e9'" onblur="this.style.borderColor='#3a4554'">
                 </div>
                 <input type="hidden" name="otp_code" id="toggleOtpHidden">
                 
@@ -955,8 +965,8 @@ try {
         });
 
         // OTP digit input handling for toggle modal
-        const toggleOtpDigits = document.querySelectorAll('.toggle-otp-digit');
-        const toggleOtpHidden = document.getElementById('toggleOtpHidden');
+        var toggleOtpDigits = document.querySelectorAll('.toggle-otp-digit');
+        var toggleOtpHidden = document.getElementById('toggleOtpHidden');
 
         toggleOtpDigits.forEach((digit, index) => {
             digit.addEventListener('input', (e) => {
@@ -1034,8 +1044,8 @@ try {
         });
 
         // OTP digit input handling for archive modal
-        const archiveOtpDigits = document.querySelectorAll('.archive-otp-digit');
-        const archiveOtpHidden = document.getElementById('archiveOtpHidden');
+        var archiveOtpDigits = document.querySelectorAll('.archive-otp-digit');
+        var archiveOtpHidden = document.getElementById('archiveOtpHidden');
 
         archiveOtpDigits.forEach((digit, index) => {
             digit.addEventListener('input', (e) => {
@@ -1135,6 +1145,29 @@ try {
             }
         });
         
+        // Auto-show OTP modals if they should be displayed
+        <?php if ($show_toggle_otp): ?>
+        // Close any other modals first
+        closeToggleConfirm();
+        // Show the OTP modal
+        document.getElementById('toggleOtpModal').classList.add('active');
+        // Focus first OTP digit
+        setTimeout(() => {
+            document.querySelector('.toggle-otp-digit[data-index="0"]')?.focus();
+        }, 100);
+        <?php endif; ?>
+
+        <?php if ($show_archive_otp): ?>
+        // Close any other modals first
+        closeArchiveConfirm();
+        // Show the OTP modal
+        document.getElementById('archiveOtpModal').classList.add('active');
+        // Focus first OTP digit
+        setTimeout(() => {
+            document.querySelector('.archive-otp-digit[data-index="0"]')?.focus();
+        }, 100);
+        <?php endif; ?>
+
         // Initialize Lucide icons
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();

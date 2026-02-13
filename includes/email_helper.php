@@ -71,7 +71,7 @@ function sendApplicantWelcomeEmail($email, $firstName, $lastName, $jobTitle, $te
     $subject = "Welcome to SLATE Freight - Your Application Account";
     
     $loginUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') 
-                . "://" . $_SERVER['HTTP_HOST'] . "/HR1/partials/login.php";
+                . "://" . $_SERVER['HTTP_HOST'] . "/HR1/auth/login.php";
     
     $body = "
     <!DOCTYPE html>

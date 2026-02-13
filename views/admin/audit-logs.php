@@ -31,17 +31,17 @@ $where_conditions = [];
 $params = [];
 
 if ($filter_date) {
-    $where_conditions[] = "DATE(ash.changed_at) = ?";
+    $where_conditions[] = "DATE(al.created_at) = ?";
     $params[] = $filter_date;
 }
 
 if ($filter_action) {
-    $where_conditions[] = "ash.new_status = ?";
+    $where_conditions[] = "al.action = ?";
     $params[] = $filter_action;
 }
 
 if ($filter_user) {
-    $where_conditions[] = "ash.changed_by = ?";
+    $where_conditions[] = "al.user_id = ?";
     $params[] = $filter_user;
 }
 
@@ -50,16 +50,14 @@ $where_clause = !empty($where_conditions) ? 'WHERE ' . implode(' AND ', $where_c
 // Fetch audit logs
 try {
     $logs = fetchAll("
-        SELECT ash.*, 
-               ja.first_name, ja.last_name, ja.email,
-               ua.first_name as changed_by_first, ua.last_name as changed_by_last,
-               COALESCE(jp.title, 'General Application') as job_title
-        FROM application_status_history ash
-        LEFT JOIN job_applications ja ON ja.id = ash.application_id
-        LEFT JOIN user_accounts ua ON ua.id = ash.changed_by
-        LEFT JOIN job_postings jp ON jp.id = ja.job_posting_id
+        SELECT al.*, 
+               ua.first_name, ua.last_name, ua.company_email, ua.personal_email,
+               r.role_name, r.role_type
+        FROM audit_logs al
+        LEFT JOIN user_accounts ua ON ua.id = al.user_id
+        LEFT JOIN roles r ON r.id = ua.role_id
         $where_clause
-        ORDER BY ash.changed_at DESC
+        ORDER BY al.created_at DESC
         LIMIT $per_page OFFSET $offset
     ", $params);
 } catch (Exception $e) {
@@ -70,7 +68,7 @@ try {
 try {
     $total_logs = fetchSingle("
         SELECT COUNT(*) as count 
-        FROM application_status_history ash
+        FROM audit_logs al
         $where_clause
     ", $params)['count'] ?? 0;
 } catch (Exception $e) {
@@ -81,7 +79,7 @@ $total_pages = max(1, ceil($total_logs / $per_page));
 
 // Get unique actions for filter
 try {
-    $actions = fetchAll("SELECT DISTINCT new_status FROM application_status_history ORDER BY new_status");
+    $actions = fetchAll("SELECT DISTINCT action FROM audit_logs ORDER BY action");
 } catch (Exception $e) {
     $actions = [];
 }
@@ -91,7 +89,7 @@ try {
     $users = fetchAll("
         SELECT DISTINCT ua.id, ua.first_name, ua.last_name
         FROM user_accounts ua
-        INNER JOIN application_status_history ash ON ash.changed_by = ua.id
+        INNER JOIN audit_logs al ON al.user_id = ua.id
         ORDER BY ua.first_name, ua.last_name
     ");
 } catch (Exception $e) {
@@ -311,8 +309,8 @@ try {
                             <select name="action" class="filter-select">
                                 <option value="">All Actions</option>
                                 <?php foreach ($actions as $action): ?>
-                                <option value="<?php echo htmlspecialchars($action['new_status']); ?>" <?php echo $filter_action === $action['new_status'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($action['new_status']); ?>
+                                <option value="<?php echo htmlspecialchars($action['action']); ?>" <?php echo $filter_action === $action['action'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($action['action']); ?>
                                 </option>
                                 <?php endforeach; ?>
                             </select>
@@ -334,7 +332,7 @@ try {
                             <i data-lucide="search"></i>
                             Apply Filters
                         </button>
-                        <a href="audit-logs.php" class="btn btn-secondary">
+                        <a href="#" data-page="audit-logs" class="btn btn-secondary">
                             <i data-lucide="x"></i>
                             Clear Filters
                         </a>
@@ -354,55 +352,43 @@ try {
                     <thead>
                         <tr>
                             <th>Date & Time</th>
-                            <th>Applicant</th>
-                            <th>Job Position</th>
+                            <th>User</th>
+                            <th>Role</th>
                             <th>Action</th>
-                            <th>Changed By</th>
+                            <th>Module</th>
+                            <th>Details</th>
+                            <th>IP Address</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($logs as $log): ?>
                         <tr>
-                            <td><?php echo date('M d, Y g:i A', strtotime($log['changed_at'])); ?></td>
+                            <td><?php echo date('M d, Y g:i A', strtotime($log['created_at'])); ?></td>
                             <td>
-                                <?php echo htmlspecialchars($log['first_name'] . ' ' . $log['last_name']); ?>
+                                <?php echo htmlspecialchars(($log['first_name'] ?? '') . ' ' . ($log['last_name'] ?? '')); ?>
                                 <br>
-                                <small style="color: #94a3b8;"><?php echo htmlspecialchars($log['email']); ?></small>
+                                <small style="color: #94a3b8;"><?php echo htmlspecialchars($log['company_email'] ?? $log['personal_email'] ?? $log['user_email'] ?? 'N/A'); ?></small>
                             </td>
-                            <td><?php echo htmlspecialchars($log['job_title']); ?></td>
                             <td>
-                                <span class="status-badge <?php echo strtolower(str_replace(' ', '_', $log['new_status'])); ?>">
-                                    <?php echo htmlspecialchars($log['old_status']); ?> → <?php echo htmlspecialchars($log['new_status']); ?>
+                                <span class="status-badge" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6;">
+                                    <?php echo htmlspecialchars($log['role_type'] ?? 'N/A'); ?>
                                 </span>
                             </td>
-                            <td><?php echo htmlspecialchars($log['changed_by_first'] . ' ' . $log['changed_by_last']); ?></td>
+                            <td>
+                                <span class="status-badge <?php echo strtolower($log['action']); ?>">
+                                    <?php echo htmlspecialchars($log['action']); ?>
+                                </span>
+                            </td>
+                            <td><?php echo htmlspecialchars($log['module'] ?? 'N/A'); ?></td>
+                            <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <?php echo htmlspecialchars($log['detail'] ?? ''); ?>
+                            </td>
+                            <td><small style="color: #94a3b8;"><?php echo htmlspecialchars($log['ip_address'] ?? 'N/A'); ?></small></td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
 
-                <?php if ($total_pages > 1): ?>
-                <div class="pagination">
-                    <?php if ($page > 1): ?>
-                    <a href="?page=<?php echo $page - 1; ?>&date=<?php echo urlencode($filter_date); ?>&action=<?php echo urlencode($filter_action); ?>&user=<?php echo urlencode($filter_user); ?>" class="page-btn">
-                        <i data-lucide="chevron-left"></i>
-                    </a>
-                    <?php endif; ?>
-
-                    <?php for ($i = max(1, $page - 2); $i <= min($total_pages, $page + 2); $i++): ?>
-                    <a href="?page=<?php echo $i; ?>&date=<?php echo urlencode($filter_date); ?>&action=<?php echo urlencode($filter_action); ?>&user=<?php echo urlencode($filter_user); ?>" 
-                       class="page-btn <?php echo $i === $page ? 'active' : ''; ?>">
-                        <?php echo $i; ?>
-                    </a>
-                    <?php endfor; ?>
-
-                    <?php if ($page < $total_pages): ?>
-                    <a href="?page=<?php echo $page + 1; ?>&date=<?php echo urlencode($filter_date); ?>&action=<?php echo urlencode($filter_action); ?>&user=<?php echo urlencode($filter_user); ?>" class="page-btn">
-                        <i data-lucide="chevron-right"></i>
-                    </a>
-                    <?php endif; ?>
-                </div>
-                <?php endif; ?>
                 <?php endif; ?>
             </div>
 <script>

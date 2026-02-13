@@ -46,7 +46,7 @@ function checkSessionTimeout() {
         
         if ($elapsed_time > $timeout_duration) {
             destroySecureSession();
-            header('Location: /HR1/partials/login.php?timeout=1');
+            header('Location: /HR1/auth/login.php?timeout=1');
             exit();
         }
     }
@@ -144,7 +144,7 @@ function isAuthenticated() {
 /**
  * Require authentication (redirect if not logged in)
  */
-function requireAuth($redirect_url = '/HR1/partials/login.php') {
+function requireAuth($redirect_url = '/HR1/auth/login.php') {
     if (!isAuthenticated()) {
         header('Location: ' . $redirect_url);
         exit();

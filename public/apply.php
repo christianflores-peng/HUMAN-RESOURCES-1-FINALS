@@ -599,7 +599,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                 <div class="alert alert-success">
                     <strong>✓ Success!</strong> <?php echo htmlspecialchars($success_message); ?>
                     <div style="margin-top: 0.75rem;">
-                        <a href="../partials/terms.php" class="btn btn-primary" style="display: inline-flex;">Continue to Registration</a>
+                        <a href="../auth/terms.php" class="btn btn-primary" style="display: inline-flex;">Continue to Registration</a>
                     </div>
                 </div>
             <?php endif; ?>

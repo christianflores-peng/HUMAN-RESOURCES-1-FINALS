@@ -3,7 +3,7 @@ session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header('Location: partials/login.php');
+    header('Location: auth/login.php');
     exit();
 }
 
@@ -34,7 +34,7 @@ if (!$user) {
 }
 
 if (!$user) {
-    header('Location: partials/login.php');
+    header('Location: auth/login.php');
     exit();
 }
 
@@ -900,7 +900,7 @@ function h($v) { return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8'); }
                     <div class="user-avatar"><?php echo strtoupper(substr($user['full_name'] ?? $user['username'], 0, 1)); ?></div>
                     <span><?php echo h($user['full_name'] ?? $user['username']); ?></span>
                 </div>
-                <a href="logout.php">Logout</a>
+                <a href="auth/logout.php">Logout</a>
             </nav>
         </header>
 
