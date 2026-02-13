@@ -1,14 +1,14 @@
 <?php
 /**
  * Role-Based Portal Router
- * Routes users to their appropriate dashboard based on role_type
+ * Routes users to their appropriate portal based on role_type
  * 
  * Directory Structure:
- * - Admin → modals/admin/dashboard.php
- * - HR_Staff → modals/hr_staff/dashboard.php
- * - Manager → modals/manager/dashboard.php
- * - Applicant → modals/applicant/dashboard.php
- * - Employee → modals/employee/dashboard.php
+ * - Admin → modals/admin/index.php
+ * - HR_Staff → modals/hr_staff/index.php
+ * - Manager → modals/manager/index.php
+ * - Applicant → modals/applicant/index.php
+ * - Employee → modals/employee/index.php
  */
 
 require_once 'includes/session_helper.php';
@@ -25,33 +25,27 @@ $role = $_SESSION['role_type'] ?? '';
 
 switch ($role) {
     case 'Admin':
-        // Admin portal - admin/ directory
-        header('Location: modals/admin/dashboard.php');
+        header('Location: modals/admin/index.php');
         break;
         
     case 'HR_Staff':
-        // HR Staff - recruitment dashboard
-        header('Location: modals/hr_staff/dashboard.php');
+        header('Location: modals/hr_staff/index.php');
         break;
         
     case 'Manager':
-        // Manager - manager dashboard
-        header('Location: modals/manager/dashboard.php');
+        header('Location: modals/manager/index.php');
         break;
         
     case 'Applicant':
-        // Applicant portal - modals/applicant/
-        header('Location: modals/applicant/dashboard.php');
+        header('Location: modals/applicant/index.php');
         break;
         
     case 'Employee':
-        // Employee portal - modals/employee/
-        header('Location: modals/employee/dashboard.php');
+        header('Location: modals/employee/index.php');
         break;
         
     default:
-        // Fallback to general dashboard
-        header('Location: pages/dashboard.php');
+        header('Location: index.php');
         break;
 }
 exit();

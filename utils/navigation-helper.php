@@ -134,26 +134,39 @@ $is_logged_in = isset($_SESSION['user_id']);
                 </ul>
             </div>
             
-            <!-- Admin Pages -->
+            <!-- SPA Portals -->
             <div class="nav-section">
-                <h3>👨‍💼 Admin Pages</h3>
+                <h3>👨‍💼 Admin Portal</h3>
                 <ul class="nav-links">
-                    <li><a href="pages/dashboard.php">Dashboard <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="pages/applicant-management.php">Applicant Management <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="pages/recruitment.php">Recruitment <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="pages/onboarding.php">Onboarding <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="pages/performance.php">Performance <span class="status status-protected">Protected</span></a></li>
-                    <li><a href="pages/recognition.php">Recognition <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/admin/index.php">Admin Dashboard <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../modals/admin/index.php?page=accounts">User Management <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../modals/admin/index.php?page=applicant-database">Applicant Database <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../modals/admin/index.php?page=regularization-approval">Regularization <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../modals/admin/index.php?page=recognition-moderation">Recognition Moderation <span class="status status-admin">Admin</span></a></li>
                 </ul>
             </div>
             
-            <!-- API Endpoints -->
+            <!-- HR Staff Portal -->
             <div class="nav-section">
-                <h3>🔌 API Endpoints</h3>
+                <h3>📋 HR Staff Portal</h3>
                 <ul class="nav-links">
-                    <li><a href="pages/api/create_goal.php">Create Goal <span class="status status-admin">Admin</span></a></li>
-                    <li><a href="pages/api/schedule_review.php">Schedule Review <span class="status status-admin">Admin</span></a></li>
-                    <li><a href="pages/api/update_application_status.php">Update Status <span class="status status-admin">Admin</span></a></li>
+                    <li><a href="../modals/hr_staff/index.php">HR Dashboard <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/hr_staff/index.php?page=job-requisitions">Job Requisitions <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/hr_staff/index.php?page=job-postings">Job Postings <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/hr_staff/index.php?page=applicant-screening">Applicant Screening <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/hr_staff/index.php?page=recruitment-pipeline">Recruitment Pipeline <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/hr_staff/index.php?page=onboarding-tracker">Onboarding Tracker <span class="status status-protected">Protected</span></a></li>
+                </ul>
+            </div>
+            
+            <!-- Manager Portal -->
+            <div class="nav-section">
+                <h3>� Manager Portal</h3>
+                <ul class="nav-links">
+                    <li><a href="../modals/manager/index.php">Manager Dashboard <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/manager/index.php?page=job-requisitions">Job Requisitions <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/manager/index.php?page=goal-setting">Goal Setting <span class="status status-protected">Protected</span></a></li>
+                    <li><a href="../modals/manager/index.php?page=performance-reviews">Performance Reviews <span class="status status-protected">Protected</span></a></li>
                 </ul>
             </div>
             

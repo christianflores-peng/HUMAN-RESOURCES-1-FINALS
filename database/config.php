@@ -9,8 +9,8 @@
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'hr1_hr1data');  // Your existing database name
-define('DB_USER', 'root');         // Default XAMPP/Laragon username
-define('DB_PASS', '');             // Default XAMPP/Laragon password (empty)
+define('DB_USER', 'hr1_hr1slate');         // Production database username
+define('DB_PASS', 'ax#wO%GyP*KodxNA');             // Production database password
 define('DB_CHARSET', 'utf8mb4');
 
 /**
@@ -110,8 +110,8 @@ function insertRecord($sql, $params = []) {
         $stmt->execute($params);
         return $pdo->lastInsertId();
     } catch (PDOException $e) {
-        error_log("insertRecord failed: " . $e->getMessage());
-        throw new PDOException("Insert failed.");
+        error_log("insertRecord failed - SQLSTATE/Code: " . $e->getCode() . ", Message: " . $e->getMessage());
+        throw $e;
     }
 }
 

@@ -13,11 +13,14 @@ $success_message = '';
 $show_otp_modal = false;
 $pending_email = '';
 
-// Ensure username column exists in user_accounts
+// Ensure username column exists in user_accounts (check first to avoid ALTER on every load)
 try {
-    executeQuery("ALTER TABLE user_accounts ADD COLUMN username VARCHAR(50) UNIQUE AFTER employee_id");
+    $colCheck = fetchSingle("SELECT COUNT(*) as c FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_accounts' AND COLUMN_NAME = 'username'");
+    if (($colCheck['c'] ?? 0) == 0) {
+        executeQuery("ALTER TABLE user_accounts ADD COLUMN username VARCHAR(50) UNIQUE AFTER employee_id");
+    }
 } catch (Exception $e) {
-    // Column may already exist, continue
+    // Column may already exist or table not ready, continue
 }
 
 // Check if user is already logged in
@@ -94,22 +97,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
                     
                     switch ($roleType) {
                         case 'Admin':
-                            header('Location: ../modals/admin/dashboard.php');
+                            header('Location: ../modals/admin/index.php');
                             break;
                         case 'HR_Staff':
-                            header('Location: ../modals/hr_staff/dashboard.php');
+                            header('Location: ../modals/hr_staff/index.php');
                             break;
                         case 'Manager':
-                            header('Location: ../modals/manager/dashboard.php');
+                            header('Location: ../modals/manager/index.php');
                             break;
                         case 'Applicant':
-                            header('Location: ../modals/applicant/dashboard.php');
+                            header('Location: ../modals/applicant/index.php');
                             break;
                         case 'Employee':
-                            header('Location: ../modals/employee/dashboard.php');
+                            header('Location: ../modals/employee/index.php');
                             break;
                         default:
-                            header('Location: ../pages/dashboard.php');
+                            header('Location: ../index.php');
                             break;
                     }
                     exit();

@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS `application_status_history` (
     `changed_by` INT NOT NULL,
     `changed_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `notes` TEXT,
+    `remarks` TEXT,
     FOREIGN KEY (`application_id`) REFERENCES `job_applications`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`changed_by`) REFERENCES `user_accounts`(`id`) ON DELETE CASCADE,
     INDEX `idx_application_id` (`application_id`),

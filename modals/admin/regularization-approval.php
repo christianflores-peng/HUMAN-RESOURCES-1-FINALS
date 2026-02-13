@@ -86,7 +86,7 @@ try {
         $emp_ids = array_column($probationary, 'id');
         $placeholders = implode(',', array_fill(0, count($emp_ids), '?'));
         $reviews = fetchAll("
-            SELECT pr.employee_id, pr.review_type, pr.rating, pr.status, pr.reviewer_id,
+            SELECT pr.employee_id, pr.review_type, pr.rating, pr.overall_score, pr.status, pr.reviewer_id,
                 pr.created_at, ua.first_name as reviewer_first, ua.last_name as reviewer_last
             FROM performance_reviews pr
             LEFT JOIN user_accounts ua ON ua.id = pr.reviewer_id
@@ -272,7 +272,7 @@ function renderEmployeeList($employees, $review_map, $req_map, $onboard_map, $se
             <?php foreach ($reviews as $rev): ?>
             <span class="review-tag <?php echo ($rev['status'] ?? '') === 'Completed' ? 'rv-complete' : 'rv-pending'; ?>">
                 <?php echo htmlspecialchars($rev['review_type'] ?? 'Review'); ?>
-                <?php if (!empty($rev['rating'])): ?> — <?php echo $rev['rating']; ?>/5<?php endif; ?>
+                <?php if (!empty($rev['rating'])): ?> — <?php echo $rev['rating']; ?>/5<?php elseif (!empty($rev['overall_score'])): ?> — <?php echo $rev['overall_score']; ?>/5<?php endif; ?>
                 by <?php echo htmlspecialchars(($rev['reviewer_first'] ?? '') . ' ' . ($rev['reviewer_last'] ?? '')); ?>
             </span>
             <?php endforeach; ?>

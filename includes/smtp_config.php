@@ -33,7 +33,7 @@ return [
     'timeout' => 30,
     
     // Debug Mode (set to false in production)
-    'debug' => true, // Set to false after testing
+    'debug' => false, // Disabled for production
 ];
 
 /**

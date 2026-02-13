@@ -108,14 +108,18 @@ CREATE TABLE IF NOT EXISTS `user_accounts` (
     `department_id` INT,
     `job_title` VARCHAR(100),
     `hire_date` DATE,
-    `employment_status` ENUM('Active', 'Probation', 'On Leave', 'Terminated', 'Resigned') DEFAULT 'Active',
+    `username` VARCHAR(50) UNIQUE,
+    `employment_status` ENUM('Active', 'Probation', 'Regular', 'Probationary - Extended', 'On Leave', 'Terminated', 'Resigned') DEFAULT 'Active',
     `profile_picture` VARCHAR(255),
     `last_login` TIMESTAMP NULL,
     `status` ENUM('Active', 'Inactive', 'Pending') DEFAULT 'Active',
+    `regularized_at` TIMESTAMP NULL,
+    `regularized_by` INT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (`role_id`) REFERENCES `roles`(`id`),
-    FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`)
+    FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`),
+    FOREIGN KEY (`regularized_by`) REFERENCES `user_accounts`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -298,8 +302,10 @@ CREATE TABLE IF NOT EXISTS `job_applications` (
     `address` TEXT,
     `resume_path` VARCHAR(500),
     `cover_letter` TEXT,
-    `status` ENUM('New', 'Review', 'Screening', 'Interview', 'For Interview', 'Road_Test', 'Testing', 'Offer', 'Offer_Sent', 'Hired', 'Rejected', 'Withdrawn') DEFAULT 'New',
+    `status` ENUM('New', 'New Apply', 'Review', 'Screening', 'Interview', 'For Interview', 'Road_Test', 'Road Test', 'Testing', 'Offer', 'Offer_Sent', 'Offer Sent', 'Hired', 'Rejected', 'Withdrawn', 'Blacklisted') DEFAULT 'New',
+    `rejection_reason` TEXT NULL,
     `applied_date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `applied_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `interview_date` DATETIME,
     `interview_notes` TEXT,
     `hr_notes` TEXT,
@@ -348,6 +354,7 @@ CREATE TABLE IF NOT EXISTS `performance_reviews` (
     `punctuality_score` TINYINT CHECK (punctuality_score BETWEEN 1 AND 5),
     `quality_score` TINYINT CHECK (quality_score BETWEEN 1 AND 5),
     `teamwork_score` TINYINT CHECK (teamwork_score BETWEEN 1 AND 5),
+    `rating` TINYINT CHECK (rating BETWEEN 1 AND 5),
     `overall_score` DECIMAL(3,2),
     `recommendation` ENUM('Pass Probation', 'Extend Probation', 'Terminate', 'Promote', 'Maintain') NULL,
     `comments` TEXT,
@@ -359,6 +366,149 @@ CREATE TABLE IF NOT EXISTS `performance_reviews` (
     FOREIGN KEY (`reviewer_id`) REFERENCES `user_accounts`(`id`),
     FOREIGN KEY (`approved_by`) REFERENCES `user_accounts`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table: job_requisitions - Hiring Manager requests new staff (Step 1)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `job_requisitions` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `requested_by` INT NOT NULL,
+    `department_id` INT NOT NULL,
+    `job_title` VARCHAR(255) NOT NULL,
+    `positions_needed` INT DEFAULT 1,
+    `employment_type` ENUM('Full-time','Part-time','Contract','Seasonal') DEFAULT 'Full-time',
+    `urgency` ENUM('Low','Medium','High','Critical') DEFAULT 'Medium',
+    `justification` TEXT,
+    `requirements` TEXT,
+    `preferred_start_date` DATE NULL,
+    `salary_range_min` DECIMAL(10,2) NULL,
+    `salary_range_max` DECIMAL(10,2) NULL,
+    `status` ENUM('Draft','Pending','Approved','Rejected','Filled','Cancelled') DEFAULT 'Pending',
+    `approved_by` INT NULL,
+    `approved_at` DATETIME NULL,
+    `rejection_reason` TEXT NULL,
+    `linked_posting_id` INT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`requested_by`) REFERENCES `user_accounts`(`id`),
+    FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`),
+    FOREIGN KEY (`approved_by`) REFERENCES `user_accounts`(`id`) ON DELETE SET NULL,
+    INDEX `idx_status` (`status`),
+    INDEX `idx_department` (`department_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table: social_recognitions - Welcome posts & peer kudos (Step 5)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `social_recognitions` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `recipient_id` INT NOT NULL,
+    `given_by` INT NULL,
+    `recognition_type` ENUM('Welcome','Kudos','Achievement','Milestone','Shoutout') DEFAULT 'Kudos',
+    `message` TEXT NOT NULL,
+    `badge_icon` VARCHAR(50) DEFAULT 'star',
+    `is_system_generated` TINYINT(1) DEFAULT 0,
+    `is_public` TINYINT(1) DEFAULT 1,
+    `is_hidden` TINYINT(1) DEFAULT 0,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`recipient_id`) REFERENCES `user_accounts`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`given_by`) REFERENCES `user_accounts`(`id`) ON DELETE SET NULL,
+    INDEX `idx_recipient` (`recipient_id`),
+    INDEX `idx_type` (`recognition_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table: performance_goals - Probationary goal setting (Step 4)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `performance_goals` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `employee_id` INT NOT NULL,
+    `set_by` INT NOT NULL,
+    `goal_title` VARCHAR(255) NOT NULL,
+    `goal_description` TEXT,
+    `category` ENUM('Safety','Punctuality','Quality','Teamwork','Compliance','Custom') DEFAULT 'Custom',
+    `target_value` VARCHAR(255) NULL,
+    `current_value` VARCHAR(255) NULL,
+    `weight` INT DEFAULT 25,
+    `status` ENUM('Active','Completed','Failed','Cancelled') DEFAULT 'Active',
+    `due_date` DATE NULL,
+    `review_period` ENUM('3-Month','5-Month','6-Month','Annual') DEFAULT '3-Month',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`employee_id`) REFERENCES `user_accounts`(`id`),
+    FOREIGN KEY (`set_by`) REFERENCES `user_accounts`(`id`),
+    INDEX `idx_employee` (`employee_id`),
+    INDEX `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table: employee_requirements - Document submissions (Step 3)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `employee_requirements` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `document_type` VARCHAR(100) NOT NULL,
+    `file_name` VARCHAR(255) NOT NULL,
+    `file_path` VARCHAR(500) NOT NULL,
+    `file_size` INT DEFAULT 0,
+    `status` ENUM('Pending','Verified','Rejected') DEFAULT 'Pending',
+    `verified_by` INT NULL,
+    `verified_at` DATETIME NULL,
+    `rejection_reason` TEXT NULL,
+    `remarks` TEXT NULL,
+    `uploaded_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `user_accounts`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`verified_by`) REFERENCES `user_accounts`(`id`) ON DELETE SET NULL,
+    UNIQUE KEY `unique_user_doc` (`user_id`, `document_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table: otp_verifications - Login/registration OTP codes
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `otp_verifications` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `phone_number` VARCHAR(20) NULL,
+    `otp_code` VARCHAR(6) NOT NULL,
+    `otp_type` ENUM('login', 'registration', 'password_reset', 'delete_user', 'toggle_status') DEFAULT 'login',
+    `is_verified` BOOLEAN DEFAULT FALSE,
+    `expires_at` DATETIME NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `verified_at` DATETIME NULL,
+    `attempts` INT DEFAULT 0,
+    `max_attempts` INT DEFAULT 3,
+    INDEX `idx_email` (`email`),
+    INDEX `idx_otp_code` (`otp_code`),
+    INDEX `idx_expires` (`expires_at`),
+    FOREIGN KEY (`user_id`) REFERENCES `user_accounts`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Table: application_status_history - Track all status changes
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `application_status_history` (
+    `id` INT PRIMARY KEY AUTO_INCREMENT,
+    `application_id` INT NOT NULL,
+    `old_status` VARCHAR(50),
+    `new_status` VARCHAR(50) NOT NULL,
+    `changed_by` INT NOT NULL,
+    `changed_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `notes` TEXT,
+    `remarks` TEXT,
+    FOREIGN KEY (`application_id`) REFERENCES `job_applications`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`changed_by`) REFERENCES `user_accounts`(`id`) ON DELETE CASCADE,
+    INDEX `idx_application_id` (`application_id`),
+    INDEX `idx_changed_at` (`changed_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Default data inserts
+-- --------------------------------------------------------
+
+-- Default requirement document types for onboarding
+-- (These are the documents new hires need to submit)
+-- NBI Clearance, Medical Certificate, SSS, PhilHealth, Pag-IBIG, TIN, 2x2 Photo, Birth Certificate, Diploma/TOR
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;

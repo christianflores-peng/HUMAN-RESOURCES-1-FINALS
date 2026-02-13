@@ -67,7 +67,7 @@ $application = fetchSingle("
     WHERE ja.id = ?
 ", [$application_id]);
 
-if (!$application) { header('Location: recruitment-dashboard.php'); exit(); }
+if (!$application) { header('Location: dashboard.php'); exit(); }
 
 $status_history = fetchAll("SELECT ash.*, ua.first_name, ua.last_name FROM application_status_history ash LEFT JOIN user_accounts ua ON ua.id = ash.changed_by WHERE ash.application_id = ? ORDER BY ash.changed_at DESC", [$application_id]);
 $departments = fetchAll("SELECT id, department_name FROM departments ORDER BY department_name");
@@ -132,7 +132,7 @@ $success_message = isset($_GET['success']) ? ($success_messages[$_GET['success']
             <h1>Applicant Details</h1>
             <div class="header-actions">
                 <?php include '../../includes/header-notifications.php'; ?>
-                <a href="recruitment-dashboard.php" class="btn btn-secondary"><i data-lucide="arrow-left"></i>Back to Pipeline</a>
+                <a href="#" data-page="dashboard" class="btn btn-secondary"><i data-lucide="arrow-left"></i>Back to Dashboard</a>
             </div>
         </div>
 

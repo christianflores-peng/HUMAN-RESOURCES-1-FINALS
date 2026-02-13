@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 executeQuery("UPDATE job_applications SET status = 'Blacklisted', rejection_reason = ?, updated_at = NOW() WHERE id = ?",
                     [$reason ?: 'Blacklisted by Admin', $app_id]);
                 executeQuery("INSERT INTO application_status_history (application_id, old_status, new_status, changed_by, remarks, changed_at) 
-                    VALUES (?, (SELECT status FROM job_applications WHERE id = ?), 'Blacklisted', ?, ?, NOW())",
+                    VALUES (?, (SELECT status FROM job_applications WHERE id = ? LIMIT 1), 'Blacklisted', ?, ?, NOW())",
                     [$app_id, $app_id, $_SESSION['user_id'], $reason ?: 'Blacklisted by Admin']);
                 echo '<div class="alert alert-success">Applicant blacklisted successfully.</div>';
             } catch (Exception $e) {
@@ -90,11 +90,11 @@ if ($filter_dept > 0) {
     $params[] = $filter_dept;
 }
 if ($filter_date_from) {
-    $where[] = "DATE(ja.applied_at) >= ?";
+    $where[] = "DATE(ja.applied_date) >= ?";
     $params[] = $filter_date_from;
 }
 if ($filter_date_to) {
-    $where[] = "DATE(ja.applied_at) <= ?";
+    $where[] = "DATE(ja.applied_date) <= ?";
     $params[] = $filter_date_to;
 }
 
@@ -108,7 +108,7 @@ try {
         LEFT JOIN job_postings jp ON jp.id = ja.job_posting_id
         LEFT JOIN departments d ON d.id = jp.department_id
         $where_sql
-        ORDER BY ja.applied_at DESC
+        ORDER BY ja.applied_date DESC
         LIMIT 200
     ", $params);
 } catch (Exception $e) {
@@ -208,11 +208,11 @@ foreach ($status_counts as $sc) {
         <input type="text" name="search" placeholder="Search name or email..." value="<?php echo htmlspecialchars($search); ?>">
         <select name="status">
             <option value="">All Status</option>
-            <option value="New Apply" <?php echo $filter_status === 'New Apply' ? 'selected' : ''; ?>>New Apply</option>
+            <option value="New" <?php echo $filter_status === 'New' ? 'selected' : ''; ?>>New</option>
             <option value="Screening" <?php echo $filter_status === 'Screening' ? 'selected' : ''; ?>>Screening</option>
             <option value="Interview" <?php echo $filter_status === 'Interview' ? 'selected' : ''; ?>>Interview</option>
-            <option value="Road Test" <?php echo $filter_status === 'Road Test' ? 'selected' : ''; ?>>Road Test</option>
-            <option value="Offer Sent" <?php echo $filter_status === 'Offer Sent' ? 'selected' : ''; ?>>Offer Sent</option>
+            <option value="Road_Test" <?php echo $filter_status === 'Road_Test' ? 'selected' : ''; ?>>Road Test</option>
+            <option value="Offer_Sent" <?php echo $filter_status === 'Offer_Sent' ? 'selected' : ''; ?>>Offer Sent</option>
             <option value="Hired" <?php echo $filter_status === 'Hired' ? 'selected' : ''; ?>>Hired</option>
             <option value="Rejected" <?php echo $filter_status === 'Rejected' ? 'selected' : ''; ?>>Rejected</option>
             <option value="Blacklisted" <?php echo $filter_status === 'Blacklisted' ? 'selected' : ''; ?>>Blacklisted</option>
@@ -252,13 +252,13 @@ foreach ($status_counts as $sc) {
             <tbody>
                 <?php foreach ($applicants as $app): 
                     $status_class = match($app['status']) {
-                        'New Apply' => 'st-new',
-                        'Screening' => 'st-screening',
-                        'Interview' => 'st-interview',
-                        'Road Test' => 'st-default',
-                        'Offer Sent' => 'st-offer',
+                        'New', 'New Apply' => 'st-new',
+                        'Review', 'Screening' => 'st-screening',
+                        'Interview', 'For Interview' => 'st-interview',
+                        'Road_Test', 'Road Test', 'Testing' => 'st-default',
+                        'Offer', 'Offer_Sent', 'Offer Sent' => 'st-offer',
                         'Hired' => 'st-hired',
-                        'Rejected' => 'st-rejected',
+                        'Rejected', 'Withdrawn' => 'st-rejected',
                         'Blacklisted' => 'st-blacklisted',
                         default => 'st-default'
                     };
@@ -270,7 +270,7 @@ foreach ($status_counts as $sc) {
                     <td style="font-size:0.8rem;"><?php echo htmlspecialchars($app['job_title'] ?? 'N/A'); ?></td>
                     <td style="font-size:0.8rem;color:#94a3b8;"><?php echo htmlspecialchars($app['department_name'] ?? 'N/A'); ?></td>
                     <td><span class="status-badge <?php echo $status_class; ?>"><?php echo htmlspecialchars($app['status']); ?></span></td>
-                    <td style="font-size:0.8rem;color:#94a3b8;"><?php echo $app['applied_at'] ? date('M d, Y', strtotime($app['applied_at'])) : 'N/A'; ?></td>
+                    <td style="font-size:0.8rem;color:#94a3b8;"><?php echo $app['applied_date'] ? date('M d, Y', strtotime($app['applied_date'])) : 'N/A'; ?></td>
                     <td style="white-space:nowrap;">
                         <?php if ($app['status'] !== 'Blacklisted'): ?>
                         <button class="act-btn danger" onclick="openBlacklist(<?php echo $app['id']; ?>, '<?php echo htmlspecialchars(addslashes($app['first_name'] . ' ' . $app['last_name'])); ?>')" title="Blacklist">

@@ -95,12 +95,55 @@ function get_nav_items($role) {
         case 'admin':
             return [
                 [
+                    'title' => 'Main',
                     'links' => [
-                        ['page' => 'dashboard', 'icon' => 'layout-dashboard', 'label' => 'Dashboard'],
-                        ['page' => 'accounts', 'icon' => 'user-cog', 'label' => 'Manage Accounts'],
-                        ['page' => 'audit-logs', 'icon' => 'history', 'label' => 'Audit Logs'],
+                        ['page' => 'dashboard', 'icon' => 'layout-dashboard', 'label' => 'Dashboard & Analytics'],
+                    ]
+                ],
+                [
+                    'title' => 'Configuration',
+                    'links' => [
+                        ['page' => 'accounts', 'icon' => 'user-cog', 'label' => 'User Management'],
                         ['page' => 'roles-permissions', 'icon' => 'shield', 'label' => 'Roles & Permissions'],
+                        ['page' => 'approval-workflows', 'icon' => 'git-branch', 'label' => 'Approval Workflows'],
                         ['page' => 'system-settings', 'icon' => 'settings', 'label' => 'System Settings'],
+                    ]
+                ],
+                [
+                    'title' => 'Recruitment Mgt',
+                    'links' => [
+                        ['page' => 'job-postings-admin', 'icon' => 'briefcase', 'label' => 'Job Postings Override'],
+                    ]
+                ],
+                [
+                    'title' => 'Applicant Mgt',
+                    'links' => [
+                        ['page' => 'applicant-database', 'icon' => 'database', 'label' => 'Applicant Database'],
+                    ]
+                ],
+                [
+                    'title' => 'Onboarding',
+                    'links' => [
+                        ['page' => 'requirements-masterlist', 'icon' => 'clipboard-list', 'label' => 'Requirements Masterlist'],
+                    ]
+                ],
+                [
+                    'title' => 'Performance',
+                    'links' => [
+                        ['page' => 'audit-logs', 'icon' => 'history', 'label' => 'Audit Logs'],
+                        ['page' => 'regularization-approval', 'icon' => 'badge-check', 'label' => 'Regularization Approval'],
+                    ]
+                ],
+                [
+                    'title' => 'Recognition',
+                    'links' => [
+                        ['page' => 'recognition-moderation', 'icon' => 'message-square-warning', 'label' => 'Post Moderation'],
+                        ['page' => 'rewards-config', 'icon' => 'gift', 'label' => 'Rewards Configuration'],
+                    ]
+                ],
+                [
+                    'title' => 'Account',
+                    'links' => [
                         ['href' => '../../logout.php', 'icon' => 'log-out', 'label' => 'Logout'],
                     ]
                 ]

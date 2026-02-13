@@ -18,7 +18,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // Use RBAC function instead of hardcoded role check
 if (!isAdmin($_SESSION['user_id'])) {
-    header('Location: ../../pages/dashboard.php');
+    header('Location: ../../index.php');
     exit();
 }
 

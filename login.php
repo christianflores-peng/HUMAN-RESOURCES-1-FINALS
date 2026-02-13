@@ -7,22 +7,22 @@ if (isset($_SESSION['user_id']) && isset($_SESSION['role_type'])) {
     
     switch ($roleType) {
         case 'Admin':
-            header('Location: modals/admin/dashboard.php');
+            header('Location: modals/admin/index.php');
             break;
         case 'HR_Staff':
-            header('Location: modals/hr_staff/dashboard.php');
+            header('Location: modals/hr_staff/index.php');
             break;
         case 'Manager':
-            header('Location: modals/manager/dashboard.php');
+            header('Location: modals/manager/index.php');
             break;
         case 'Applicant':
-            header('Location: modals/applicant/dashboard.php');
+            header('Location: modals/applicant/index.php');
             break;
         case 'Employee':
-            header('Location: modals/employee/dashboard.php');
+            header('Location: modals/employee/index.php');
             break;
         default:
-            header('Location: pages/dashboard.php');
+            header('Location: index.php');
             break;
     }
     exit();

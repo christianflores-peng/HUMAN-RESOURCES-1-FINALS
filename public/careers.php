@@ -533,7 +533,7 @@ try {
                     <a href="../my-account.php">My Applications</a>
                     <a href="../logout.php">Logout</a>
                 <?php elseif ($is_logged_in): ?>
-                    <a href="../pages/dashboard.php">Dashboard</a>
+                    <a href="../login.php">Dashboard</a>
                     <a href="../logout.php">Logout</a>
                 <?php else: ?>
                     <a href="../partials/login.php">Login</a>

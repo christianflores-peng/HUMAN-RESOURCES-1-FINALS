@@ -576,7 +576,7 @@ $last_name = $_SESSION['last_name'] ?? '';
                 <li><a href="#about">About</a></li>
                 <li><a href="public/careers.php">Careers</a></li>
                 <?php if ($is_logged_in): ?>
-                    <li><a href="pages/dashboard.php" class="btn-primary">
+                    <li><a href="login.php" class="btn-primary">
                         <i data-lucide="layout-dashboard"></i>
                         Dashboard
                     </a></li>
@@ -600,7 +600,7 @@ $last_name = $_SESSION['last_name'] ?? '';
             <p>Manage the full employee lifecycle: job requisitions, applicant screening, interviews, road tests, onboarding, performance reviews, and social recognition — built for freight &amp; logistics teams.</p>
             <div class="cta-buttons">
                 <?php if ($is_logged_in): ?>
-                    <a href="pages/dashboard.php" class="cta-button">
+                    <a href="login.php" class="cta-button">
                         <i data-lucide="layout-dashboard"></i>
                         Access Dashboard
                     </a>
@@ -807,7 +807,7 @@ $last_name = $_SESSION['last_name'] ?? '';
                             ];
                         } else {
                             $portal_cards = [
-                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Dashboard', 'desc' => 'Access your portal', 'link' => 'pages/dashboard.php'],
+                                ['icon' => 'layout-dashboard', 'color' => '#0ea5e9', 'bg' => 'rgba(14,165,233,0.1)', 'title' => 'Dashboard', 'desc' => 'Access your portal', 'link' => 'login.php'],
                             ];
                         }
                         foreach ($portal_cards as $card):
