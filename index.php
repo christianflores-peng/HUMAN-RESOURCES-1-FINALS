@@ -758,7 +758,7 @@ $last_name = $_SESSION['last_name'] ?? '';
     </section>
 
     <!-- Quick Access Section -->
-    <section id="quick-access" style="padding: 6rem 0; background: transparent;">
+    <section style="padding: 6rem 0; background: transparent;">
         <div class="container">
             <div class="section-header">
                 <div class="section-badge"> Quick Access</div>

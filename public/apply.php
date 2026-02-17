@@ -1,4 +1,23 @@
 <?php
+// NOTE: Legacy apply flow. The canonical applicant apply flow is now:
+//   /auth/register-applicant.php?job_id=...&source=apply
+// Keep this file as a backward-compatible redirect for old links.
+
+$params = $_GET;
+if (isset($params['job_id'])) {
+    $params['job_id'] = (int)$params['job_id'];
+}
+
+// If a job_id is present, force apply mode.
+if (!empty($params['job_id'])) {
+    $params['source'] = 'apply';
+}
+
+$qs = http_build_query($params);
+$dest = '../auth/register-applicant.php' . (!empty($qs) ? ('?' . $qs) : '');
+header('Location: ' . $dest);
+exit();
+
 require_once '../database/config.php';
 require_once '../includes/email_generator.php';
 require_once '../includes/email_helper.php';

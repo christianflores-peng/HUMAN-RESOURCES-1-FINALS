@@ -156,6 +156,22 @@ try {
     .empty-state { text-align:center; padding:2rem; color:#64748b; font-size:0.85rem; }
     .override-form { display:inline-flex; gap:0.25rem; align-items:center; }
     .override-form select { padding:0.25rem 0.4rem; background:rgba(15,23,42,0.6); border:1px solid rgba(58,69,84,0.5); border-radius:4px; color:#e2e8f0; font-size:0.75rem; }
+
+    /* Custom confirmation modal */
+    .jp-modal { position:fixed; inset:0; background:rgba(0,0,0,0.65); display:none; align-items:center; justify-content:center; z-index:2000; }
+    .jp-modal.active { display:flex; }
+    .jp-modal-card { width:min(520px, 92vw); background:rgba(30,41,54,0.98); border:1px solid rgba(58,69,84,0.6); border-radius:14px; box-shadow:0 25px 70px rgba(0,0,0,0.55); overflow:hidden; }
+    .jp-modal-header { padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid rgba(58,69,84,0.5); }
+    .jp-modal-header h3 { margin:0; font-size:1rem; color:#e2e8f0; display:flex; align-items:center; gap:0.5rem; }
+    .jp-modal-body { padding:1.1rem 1.25rem; color:#cbd5e1; font-size:0.9rem; line-height:1.45; }
+    .jp-modal-footer { padding:1rem 1.25rem; display:flex; justify-content:flex-end; gap:0.6rem; border-top:1px solid rgba(58,69,84,0.5); }
+    .jp-modal-btn { border:none; border-radius:10px; padding:0.55rem 0.9rem; cursor:pointer; font-size:0.85rem; font-weight:600; display:inline-flex; align-items:center; gap:0.4rem; }
+    .jp-modal-btn.cancel { background:rgba(100,116,139,0.25); color:#e2e8f0; border:1px solid rgba(100,116,139,0.35); }
+    .jp-modal-btn.cancel:hover { background:rgba(100,116,139,0.35); }
+    .jp-modal-btn.confirm { background:rgba(239,68,68,0.15); color:#fecaca; border:1px solid rgba(239,68,68,0.35); }
+    .jp-modal-btn.confirm:hover { background:rgba(239,68,68,0.22); }
+    .jp-modal-close { background:none; border:none; color:#94a3b8; cursor:pointer; font-size:1.2rem; padding:0.25rem 0.4rem; }
+    .jp-modal-close:hover { color:#e2e8f0; }
 </style>
 
 <div class="jp-header">
@@ -256,10 +272,13 @@ try {
                     <td style="font-size:0.8rem;color:#94a3b8;"><?php echo date('M d, Y', strtotime($jp['created_at'])); ?></td>
                     <td>
                         <?php if ($jp['status'] === 'Open'): ?>
-                        <form method="POST" style="display:inline;" onsubmit="return confirm('Force close this posting?');">
+                        <form method="POST" style="display:inline;">
                             <input type="hidden" name="action" value="force_close">
                             <input type="hidden" name="posting_id" value="<?php echo $jp['id']; ?>">
-                            <button type="submit" class="act-btn danger" title="Force Close">Close</button>
+                            <button type="button" class="act-btn danger" title="Force Close"
+                                onclick="openForceCloseConfirm(this.form, <?php echo (int)$jp['id']; ?>, '<?php echo htmlspecialchars(addslashes($jp['title'])); ?>')">
+                                Close
+                            </button>
                         </form>
                         <?php elseif ($jp['status'] === 'Closed'): ?>
                         <form method="POST" style="display:inline;">
@@ -288,7 +307,70 @@ try {
     <?php endif; ?>
 </div>
 
+<!-- Force Close Confirm Modal -->
+<div class="jp-modal" id="jpForceCloseModal" aria-hidden="true">
+    <div class="jp-modal-card" role="dialog" aria-modal="true" aria-labelledby="jpForceCloseTitle">
+        <div class="jp-modal-header">
+            <h3 id="jpForceCloseTitle"><i data-lucide="alert-triangle" style="width:18px;height:18px;color:#ef4444;"></i> Confirm Force Close</h3>
+            <button class="jp-modal-close" type="button" onclick="closeForceCloseConfirm()" aria-label="Close">&times;</button>
+        </div>
+        <div class="jp-modal-body">
+            <div id="jpForceCloseText">Force close this posting?</div>
+            <div style="margin-top:0.75rem;color:#94a3b8;font-size:0.82rem;">This will set the posting status to <strong style="color:#fecaca;">Closed</strong>.</div>
+        </div>
+        <div class="jp-modal-footer">
+            <button class="jp-modal-btn cancel" type="button" onclick="closeForceCloseConfirm()">
+                <i data-lucide="x" style="width:16px;height:16px;"></i> Cancel
+            </button>
+            <button class="jp-modal-btn confirm" type="button" onclick="confirmForceClose()">
+                <i data-lucide="lock" style="width:16px;height:16px;"></i> Yes, Close
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
+let __jpForceCloseForm = null;
+
+function openForceCloseConfirm(formEl, postingId, title) {
+    __jpForceCloseForm = formEl || null;
+    const modal = document.getElementById('jpForceCloseModal');
+    const text = document.getElementById('jpForceCloseText');
+    const safeTitle = (title || '').toString().trim();
+    text.textContent = safeTitle
+        ? `Force close job posting #${postingId} (${safeTitle})?`
+        : `Force close job posting #${postingId}?`;
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function closeForceCloseConfirm() {
+    const modal = document.getElementById('jpForceCloseModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    __jpForceCloseForm = null;
+}
+
+function confirmForceClose() {
+    if (!__jpForceCloseForm) {
+        closeForceCloseConfirm();
+        return;
+    }
+    // This will go through SPA submit handler, but without relying on native confirm().
+    if (typeof __jpForceCloseForm.requestSubmit === 'function') {
+        __jpForceCloseForm.requestSubmit();
+    } else {
+        __jpForceCloseForm.submit();
+    }
+    closeForceCloseConfirm();
+}
+
+// click-outside closes
+document.getElementById('jpForceCloseModal')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'jpForceCloseModal') closeForceCloseConfirm();
+});
+
 if (typeof lucide !== 'undefined') lucide.createIcons();
 </script>
 </div>

@@ -282,10 +282,15 @@ try {
                     <?php endif; ?>
                 </div>
                 <div class="post-actions">
-                    <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this post permanently?');">
+                    <form method="POST" style="display:inline;">
                         <input type="hidden" name="action" value="delete_post">
                         <input type="hidden" name="post_id" value="<?php echo $post['id']; ?>">
-                        <button type="submit" class="act-btn danger">
+                        <button type="submit" class="act-btn danger"
+                            data-confirm-title="Delete Post"
+                            data-confirm-variant="danger"
+                            data-confirm-ok="Yes, delete"
+                            data-confirm-cancel="Cancel"
+                            data-confirm="Delete this post permanently?">
                             <i data-lucide="trash-2" style="width:12px;height:12px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Delete
                         </button>
                     </form>

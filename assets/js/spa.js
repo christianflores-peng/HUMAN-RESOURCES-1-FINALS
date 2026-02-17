@@ -7,6 +7,8 @@ const HR1SPA = {
     contentArea: null,
     isLoading: false,
     pageCache: {},
+    _confirmModalEl: null,
+    _confirmResolve: null,
 
     init() {
         this.contentArea = document.getElementById('spa-content');
@@ -92,6 +94,7 @@ const HR1SPA = {
 
         try {
             const response = await fetch(url, {
+                cache: 'no-store',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
 
@@ -170,9 +173,136 @@ const HR1SPA = {
 
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                await this.submitForm(form, e.submitter || null);
+
+                // Respect any other handlers that already prevented the event.
+                if (e.defaultPrevented) return;
+
+                const submitter = e.submitter || null;
+                const ok = await this.confirmIfNeeded(form, submitter);
+                if (!ok) return;
+
+                await this.submitForm(form, submitter);
             });
         });
+    },
+
+    ensureConfirmModal() {
+        if (this._confirmModalEl) return this._confirmModalEl;
+
+        const wrap = document.createElement('div');
+        wrap.id = 'hr1-confirm-modal';
+        wrap.style.cssText = [
+            'position:fixed',
+            'inset:0',
+            'display:none',
+            'align-items:center',
+            'justify-content:center',
+            'background:rgba(0,0,0,0.65)',
+            'z-index:4000'
+        ].join(';');
+
+        wrap.innerHTML = `
+            <div style="width:min(520px,92vw);background:rgba(30,41,54,0.98);border:1px solid rgba(58,69,84,0.6);border-radius:14px;box-shadow:0 25px 70px rgba(0,0,0,0.55);overflow:hidden;">
+                <div style="padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(58,69,84,0.5);">
+                    <div id="hr1-confirm-title" style="margin:0;font-size:1rem;color:#e2e8f0;font-weight:700;display:flex;align-items:center;gap:0.5rem;"></div>
+                    <button type="button" id="hr1-confirm-x" aria-label="Close" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.2rem;padding:0.25rem 0.4rem;">&times;</button>
+                </div>
+                <div style="padding:1.1rem 1.25rem;color:#cbd5e1;font-size:0.9rem;line-height:1.45;">
+                    <div id="hr1-confirm-message"></div>
+                </div>
+                <div style="padding:1rem 1.25rem;display:flex;justify-content:flex-end;gap:0.6rem;border-top:1px solid rgba(58,69,84,0.5);">
+                    <button type="button" id="hr1-confirm-cancel" style="border:none;border-radius:10px;padding:0.55rem 0.9rem;cursor:pointer;font-size:0.85rem;font-weight:700;background:rgba(100,116,139,0.25);color:#e2e8f0;border:1px solid rgba(100,116,139,0.35);">Cancel</button>
+                    <button type="button" id="hr1-confirm-ok" style="border:none;border-radius:10px;padding:0.55rem 0.9rem;cursor:pointer;font-size:0.85rem;font-weight:800;background:rgba(14,165,233,0.18);color:#dbeafe;border:1px solid rgba(14,165,233,0.35);">Confirm</button>
+                </div>
+            </div>
+        `;
+
+        const close = () => {
+            wrap.style.display = 'none';
+        };
+        const resolve = (val) => {
+            const fn = this._confirmResolve;
+            this._confirmResolve = null;
+            close();
+            if (typeof fn === 'function') fn(val);
+        };
+
+        wrap.addEventListener('click', (e) => {
+            if (e.target === wrap) resolve(false);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (wrap.style.display === 'flex' && e.key === 'Escape') resolve(false);
+        });
+        wrap.querySelector('#hr1-confirm-x')?.addEventListener('click', () => resolve(false));
+        wrap.querySelector('#hr1-confirm-cancel')?.addEventListener('click', () => resolve(false));
+        wrap.querySelector('#hr1-confirm-ok')?.addEventListener('click', () => resolve(true));
+
+        document.body.appendChild(wrap);
+        this._confirmModalEl = wrap;
+        return wrap;
+    },
+
+    confirmDialog({
+        title = 'Please confirm',
+        message = 'Are you sure?',
+        confirmText = 'Confirm',
+        cancelText = 'Cancel',
+        danger = false
+    } = {}) {
+        const modal = this.ensureConfirmModal();
+
+        const titleEl = modal.querySelector('#hr1-confirm-title');
+        const msgEl = modal.querySelector('#hr1-confirm-message');
+        const okBtn = modal.querySelector('#hr1-confirm-ok');
+        const cancelBtn = modal.querySelector('#hr1-confirm-cancel');
+
+        if (titleEl) {
+            const icon = danger
+                ? '<i data-lucide="alert-triangle" style="width:18px;height:18px;color:#ef4444;"></i>'
+                : '<i data-lucide="help-circle" style="width:18px;height:18px;color:#38bdf8;"></i>';
+            titleEl.innerHTML = `${icon}<span>${String(title)}</span>`;
+        }
+        if (msgEl) msgEl.textContent = String(message);
+
+        if (okBtn) {
+            okBtn.textContent = String(confirmText);
+            okBtn.style.background = danger ? 'rgba(239,68,68,0.15)' : 'rgba(14,165,233,0.18)';
+            okBtn.style.borderColor = danger ? 'rgba(239,68,68,0.35)' : 'rgba(14,165,233,0.35)';
+            okBtn.style.color = danger ? '#fecaca' : '#dbeafe';
+        }
+        if (cancelBtn) cancelBtn.textContent = String(cancelText);
+
+        if (typeof lucide !== 'undefined') {
+            try { lucide.createIcons(); } catch (e) {}
+        }
+
+        modal.style.display = 'flex';
+        return new Promise((resolve) => {
+            this._confirmResolve = resolve;
+        });
+    },
+
+    async confirmIfNeeded(form, submitter = null) {
+        const message = (submitter && (submitter.dataset.confirm || submitter.dataset.confirmMessage))
+            || form.dataset.confirm
+            || form.dataset.confirmMessage
+            || '';
+
+        if (!message) return true;
+
+        const title = (submitter && submitter.dataset.confirmTitle)
+            || form.dataset.confirmTitle
+            || 'Please confirm';
+        const confirmText = (submitter && submitter.dataset.confirmOk)
+            || form.dataset.confirmOk
+            || ((submitter && submitter.dataset.confirmVariant === 'danger') ? 'Yes, Continue' : 'Confirm');
+        const cancelText = (submitter && submitter.dataset.confirmCancel)
+            || form.dataset.confirmCancel
+            || 'Cancel';
+        const danger = ((submitter && submitter.dataset.confirmVariant === 'danger')
+            || form.dataset.confirmVariant === 'danger');
+
+        return await this.confirmDialog({ title, message, confirmText, cancelText, danger });
     },
 
     async submitForm(form, submitter = null) {
@@ -201,6 +331,7 @@ const HR1SPA = {
             let requestUrl = action;
             const fetchOptions = {
                 method: method,
+                cache: 'no-store',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             };
 
@@ -308,6 +439,9 @@ const HR1SPA = {
         }, 4000);
     }
 };
+
+// Make available to inline scripts loaded via SPA (global scope access may not be on window).
+try { window.HR1SPA = HR1SPA; } catch (e) {}
 
 // Auto-init when DOM is ready
 document.addEventListener('DOMContentLoaded', () => HR1SPA.init());

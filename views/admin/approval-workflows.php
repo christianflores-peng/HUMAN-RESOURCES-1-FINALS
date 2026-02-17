@@ -250,10 +250,17 @@ $modules = ['Job Requisition', 'Job Posting', 'Offer Letter', 'Onboarding', 'Reg
                         <input type="hidden" name="workflow_id" value="<?php echo $wf['id']; ?>">
                         <button type="submit" title="Toggle active"><?php echo $wf['is_active'] ? 'Disable' : 'Enable'; ?></button>
                     </form>
-                    <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this workflow?');">
+                    <form method="POST" style="display:inline;">
                         <input type="hidden" name="action" value="delete_workflow">
                         <input type="hidden" name="workflow_id" value="<?php echo $wf['id']; ?>">
-                        <button type="submit" class="danger" title="Delete"><i data-lucide="trash-2" style="width:14px;height:14px;"></i></button>
+                        <button type="submit" class="danger" title="Delete"
+                            data-confirm-title="Delete Workflow"
+                            data-confirm-variant="danger"
+                            data-confirm-ok="Yes, delete"
+                            data-confirm-cancel="Cancel"
+                            data-confirm="Delete this workflow?">
+                            <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                        </button>
                     </form>
                 </div>
             </div>

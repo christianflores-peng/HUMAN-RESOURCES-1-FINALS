@@ -314,7 +314,7 @@ try {
                 <div class="apply-section">
                     <h3 style="margin-bottom: 0.5rem;">Ready to join our team?</h3>
                     <p style="margin-bottom: 1rem; opacity: 0.9;">We'd love to hear from you!</p>
-                    <a href="apply.php?job_id=<?php echo $job['id']; ?>" class="btn btn-primary">
+                    <a href="../auth/terms.php?type=applicant&job_id=<?php echo $job['id']; ?>" class="btn btn-primary">
                         Apply Now
                     </a>
                 </div>
@@ -373,7 +373,7 @@ try {
                 <div style="text-align: center; padding: 2rem 0; border-top: 1px solid var(--border-color);">
                     <h3 style="color: var(--text-primary); margin-bottom: 1rem;">Interested in this position?</h3>
                     <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Submit your application and let us know why you'd be a great fit for our team.</p>
-                    <a href="apply.php?job_id=<?php echo $job['id']; ?>" class="btn btn-primary" 
+                    <a href="../auth/terms.php?type=applicant&job_id=<?php echo $job['id']; ?>" class="btn btn-primary" 
                        style="background: var(--primary-color); color: white; margin-right: 1rem;">
                         Apply Now
                     </a>

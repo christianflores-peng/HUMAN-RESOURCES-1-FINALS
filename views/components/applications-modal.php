@@ -116,27 +116,28 @@ function closeModal() {
     document.getElementById('applicationModal').style.display = 'none';
 }
 
-function deleteApplication(id) {
-    if (confirm('Are you sure you want to delete this application? This action cannot be undone.')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'applications.php';
-        
-        const actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'delete';
-        
-        const idInput = document.createElement('input');
-        idInput.type = 'hidden';
-        idInput.name = 'application_id';
-        idInput.value = id;
-        
-        form.appendChild(actionInput);
-        form.appendChild(idInput);
-        document.body.appendChild(form);
-        form.submit();
-    }
+async function deleteApplication(id) {
+    const ok = await ((window.HR1SPA && typeof HR1SPA.confirmDialog === 'function')
+        ? HR1SPA.confirmDialog({
+            title: 'Delete Application',
+            message: 'Are you sure you want to delete this application? This action cannot be undone.',
+            confirmText: 'Yes, delete',
+            cancelText: 'Cancel',
+            danger: true
+        })
+        : Promise.resolve(confirm('Are you sure you want to delete this application? This action cannot be undone.')));
+
+    if (!ok) return;
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'applications.php';
+    form.innerHTML = `
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="application_id" value="${id}">
+    `;
+    document.body.appendChild(form);
+    form.submit();
 }
 
 // Close modal when clicking outside

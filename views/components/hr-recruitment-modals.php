@@ -84,8 +84,14 @@
     }
 
     function showApplicantDetails(applicantId) {
-        // TODO: Show detailed view modal
-        console.log('View applicant:', applicantId);
+        if (!applicantId) return;
+        const params = 'id=' + encodeURIComponent(applicantId);
+        if (window.HR1SPA && typeof window.HR1SPA.loadPage === 'function') {
+            window.HR1SPA.loadPage('applicant-details', true, params);
+            return;
+        }
+        // Fallback: navigate to the current directory's applicant-details.php
+        window.location.href = 'applicant-details.php?' + params;
     }
 
     function closeModal(modalId) {

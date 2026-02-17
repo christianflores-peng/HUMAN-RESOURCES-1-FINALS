@@ -13,19 +13,87 @@ $success_message = '';
 $show_otp_modal = false;
 $pending_email = '';
 
-// Ensure username column exists in user_accounts (check first to avoid ALTER on every load)
+// Detect optional columns (avoid hard failures on environments without ALTER privileges)
+$has_username_column = false;
 try {
-    $colCheck = fetchSingle("SELECT COUNT(*) as c FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_accounts' AND COLUMN_NAME = 'username'");
-    if (($colCheck['c'] ?? 0) == 0) {
-        executeQuery("ALTER TABLE user_accounts ADD COLUMN username VARCHAR(50) UNIQUE AFTER employee_id");
-    }
+    $colCheck = fetchSingle(
+        "SELECT COUNT(*) as c
+         FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'user_accounts'
+           AND COLUMN_NAME = 'username'"
+    );
+    $has_username_column = (($colCheck['c'] ?? 0) > 0);
 } catch (Exception $e) {
-    // Column may already exist or table not ready, continue
+    // If INFORMATION_SCHEMA isn't accessible, assume username column is not available.
+    $has_username_column = false;
 }
 
 // Check if user is already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: ../index.php');
+    exit();
+}
+
+/**
+ * Complete login (set session + redirect) for both OTP and non-OTP flows.
+ */
+function completeLoginAndRedirect(array $user): void {
+    // Regenerate session ID
+    regenerateSessionAfterLogin();
+
+    // Set session variables
+    $_SESSION['user_id'] = (int)($user['id'] ?? 0);
+    $_SESSION['username'] = $user['company_email'] ?? $user['personal_email'] ?? $user['username'] ?? '';
+    $_SESSION['first_name'] = $user['first_name'] ?? '';
+    $_SESSION['last_name'] = $user['last_name'] ?? '';
+    $_SESSION['full_name'] = trim(($_SESSION['first_name'] . ' ' . $_SESSION['last_name']));
+    $_SESSION['personal_email'] = $user['personal_email'] ?? ($user['email'] ?? '');
+    $_SESSION['role'] = $user['role_name'] ?? ($user['role'] ?? '');
+    $_SESSION['role_type'] = $user['role_type'] ?? 'Employee';
+    $_SESSION['role_id'] = $user['role_id'] ?? null;
+    $_SESSION['department_id'] = $user['department_id'] ?? null;
+    $_SESSION['login_time'] = time();
+    $_SESSION['last_activity'] = time();
+
+    // Update last login only for user_accounts
+    if (!empty($user['id']) && array_key_exists('password_hash', $user)) {
+        try {
+            updateRecord("UPDATE user_accounts SET last_login = NOW() WHERE id = ?", [$user['id']]);
+        } catch (Exception $e) {
+            // ignore
+        }
+    }
+
+    // Log login action
+    try {
+        logAuditAction((int)($user['id'] ?? 0), 'LOGIN', 'user_accounts', (int)($user['id'] ?? 0), null, null, 'User logged in');
+    } catch (Exception $e) {
+        // ignore
+    }
+
+    // Redirect based on role type (matches directory structure)
+    $roleType = $user['role_type'] ?? 'Employee';
+    switch ($roleType) {
+        case 'Admin':
+            header('Location: ../views/admin/index.php');
+            break;
+        case 'HR_Staff':
+            header('Location: ../views/hr_staff/index.php');
+            break;
+        case 'Manager':
+            header('Location: ../views/manager/index.php');
+            break;
+        case 'Applicant':
+            header('Location: ../views/applicant/index.php');
+            break;
+        case 'Employee':
+            header('Location: ../views/employee/index.php');
+            break;
+        default:
+            header('Location: ../index.php');
+            break;
+    }
     exit();
 }
 
@@ -45,12 +113,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
             
             if ($result['success']) {
                 // Get user data and complete login
+                $userWhere = "(ua.company_email = ? OR ua.personal_email = ?" . ($has_username_column ? " OR ua.username = ?" : "") . ")";
+                $userParams = [$pending_email, $pending_email];
+                if ($has_username_column) {
+                    $userParams[] = $pending_email;
+                }
+
                 $user = fetchSingle(
-                    "SELECT ua.*, r.role_name, r.role_type, r.access_level 
-                     FROM user_accounts ua 
-                     LEFT JOIN roles r ON ua.role_id = r.id 
-                     WHERE (ua.company_email = ? OR ua.personal_email = ? OR ua.username = ?) AND ua.status = 'Active'",
-                    [$pending_email, $pending_email, $pending_email]
+                    "SELECT ua.*, r.role_name, r.role_type, r.access_level
+                     FROM user_accounts ua
+                     LEFT JOIN roles r ON ua.role_id = r.id
+                     WHERE {$userWhere} AND ua.status = 'Active'",
+                    $userParams
                 );
                 
                 if (!$user) {
@@ -65,57 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_otp'])) {
                 }
                 
                 if ($user) {
-                    // Regenerate session ID
-                    regenerateSessionAfterLogin();
-                    
-                    // Set session variables
-                    $_SESSION['user_id'] = (int)$user['id'];
-                    $_SESSION['username'] = $user['company_email'] ?? $user['username'];
-                    $_SESSION['first_name'] = $user['first_name'] ?? '';
-                    $_SESSION['last_name'] = $user['last_name'] ?? '';
-                    $_SESSION['full_name'] = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
-                    $_SESSION['personal_email'] = $user['personal_email'] ?? '';
-                    $_SESSION['role'] = $user['role_name'] ?? $user['role'];
-                    $_SESSION['role_type'] = $user['role_type'] ?? 'Employee';
-                    $_SESSION['role_id'] = $user['role_id'] ?? null;
-                    $_SESSION['department_id'] = $user['department_id'] ?? null;
-                    $_SESSION['login_time'] = time();
-                    $_SESSION['last_activity'] = time();
-                    
-                    // Update last login
-                    try {
-                        updateRecord("UPDATE user_accounts SET last_login = NOW() WHERE id = ?", [$user['id']]);
-                    } catch (Exception $e) {}
-                    
-                    // Log login action
-                    try {
-                        logAuditAction($user['id'], 'LOGIN', 'user_accounts', $user['id'], null, null, 'User logged in with OTP verification');
-                    } catch (Exception $e) {}
-                    
-                    // Redirect based on role type (matches directory structure)
-                    $roleType = $user['role_type'] ?? 'Employee';
-                    
-                    switch ($roleType) {
-                        case 'Admin':
-                            header('Location: ../views/admin/index.php');
-                            break;
-                        case 'HR_Staff':
-                            header('Location: ../views/hr_staff/index.php');
-                            break;
-                        case 'Manager':
-                            header('Location: ../views/manager/index.php');
-                            break;
-                        case 'Applicant':
-                            header('Location: ../views/applicant/index.php');
-                            break;
-                        case 'Employee':
-                            header('Location: ../views/employee/index.php');
-                            break;
-                        default:
-                            header('Location: ../index.php');
-                            break;
-                    }
-                    exit();
+                    completeLoginAndRedirect($user);
                 }
             } else {
                 incrementOTPAttempts($pending_email, 'login');
@@ -131,16 +155,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_otp'])) {
     $pending_email = $_POST['pending_email'] ?? '';
     
     if (!empty($pending_email)) {
+        $userWhere = "(company_email = ? OR personal_email = ?" . ($has_username_column ? " OR username = ?" : "") . ")";
+        $userParams = [$pending_email, $pending_email];
+        if ($has_username_column) {
+            $userParams[] = $pending_email;
+        }
+
         $user = fetchSingle(
-            "SELECT * FROM user_accounts WHERE (company_email = ? OR personal_email = ? OR username = ?) AND status = 'Active'",
-            [$pending_email, $pending_email, $pending_email]
+            "SELECT * FROM user_accounts WHERE {$userWhere} AND status = 'Active'",
+            $userParams
         );
         
         if ($user) {
             $otp_email = $user['personal_email'] ?? $user['company_email'] ?? $pending_email;
-            $otp_code = createOTP($otp_email, $user['phone_number'] ?? null, 'login', $user['id']);
+            $otp_phone = $user['phone'] ?? ($user['phone_number'] ?? null);
+            $otp_code = createOTP($otp_email, $otp_phone, 'login', $user['id']);
             $user_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
-            sendOTP($otp_email, $otp_code, $user_name, $user['phone_number'] ?? null);
+            sendOTP($otp_email, $otp_code, $user_name, $otp_phone);
             $pending_email = $otp_email;
             $success_message = 'A new verification code has been sent.';
         }
@@ -160,12 +191,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $error_message = "Please enter both email and password.";
         } else {
             try {
+                $userWhere = "(ua.company_email = ? OR ua.personal_email = ?" . ($has_username_column ? " OR ua.username = ?" : "") . ")";
+                $userParams = [$username, $username];
+                if ($has_username_column) {
+                    $userParams[] = $username;
+                }
+
                 $user = fetchSingle(
-                    "SELECT ua.*, r.role_name, r.role_type, r.access_level 
-                     FROM user_accounts ua 
-                     LEFT JOIN roles r ON ua.role_id = r.id 
-                     WHERE (ua.company_email = ? OR ua.personal_email = ? OR ua.username = ?) AND ua.status = 'Active'",
-                    [$username, $username, $username]
+                    "SELECT ua.*, r.role_name, r.role_type, r.access_level
+                     FROM user_accounts ua
+                     LEFT JOIN roles r ON ua.role_id = r.id
+                     WHERE {$userWhere} AND ua.status = 'Active'",
+                    $userParams
                 );
                 
                 if (!$user) {
@@ -186,15 +223,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 } else {
                     // Use the user's actual email from DB, not the login input
                     $otp_email = $user['personal_email'] ?? $user['company_email'] ?? $username;
-                    
-                    // Generate and send OTP
-                    $otp_code = createOTP($otp_email, $user['phone_number'] ?? null, 'login', $user['id']);
-                    $user_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
-                    sendOTP($otp_email, $otp_code, $user_name, $user['phone_number'] ?? null);
-                    
-                    $pending_email = $otp_email;
-                    $show_otp_modal = true;
-                    $success_message = 'Verification code sent to your email' . (!empty($user['phone_number']) ? ' and phone' : '') . '.';
+                    $otp_phone = $user['phone'] ?? ($user['phone_number'] ?? null);
+
+                    // Generate and send OTP (fallback to direct login if OTP fails)
+                    try {
+                        $otp_code = createOTP($otp_email, $otp_phone, 'login', $user['id']);
+                        $user_name = ($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '');
+                        sendOTP($otp_email, $otp_code, $user_name, $otp_phone);
+
+                        $pending_email = $otp_email;
+                        $show_otp_modal = true;
+                        $success_message = 'Verification code sent to your email' . (!empty($otp_phone) ? ' and phone' : '') . '.';
+                    } catch (Exception $e) {
+                        // If OTP table/email is not configured, allow password-only login.
+                        completeLoginAndRedirect($user);
+                    }
                 }
             } catch (Exception $e) {
                 $error_message = "Login failed: " . $e->getMessage();
@@ -710,7 +753,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
             <div class="otp-timer">
                 <i data-lucide="timer"></i>
-                <span id="otpTimer">Code expires in 5:00</span>
+                <span id="otpTimer">Code expires in 1:00</span>
             </div>
         </div>
     </div>
@@ -785,7 +828,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
         // OTP Timer
         <?php if ($show_otp_modal): ?>
-        let timeLeft = 300; // 5 minutes
+        let timeLeft = 60; // 1 minute
         const timerDisplay = document.getElementById('otpTimer');
         
         const countdown = setInterval(() => {

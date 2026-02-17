@@ -417,10 +417,17 @@ $reward_categories = ['General', 'Gift Cards', 'Company Merch', 'Time Off', 'Exp
                     <input type="hidden" name="reward_id" value="<?php echo $rw['id']; ?>">
                     <button type="submit" class="act-btn"><?php echo $rw['is_active'] ? 'Disable' : 'Enable'; ?></button>
                 </form>
-                <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this reward?');">
+                <form method="POST" style="display:inline;">
                     <input type="hidden" name="action" value="delete_reward">
                     <input type="hidden" name="reward_id" value="<?php echo $rw['id']; ?>">
-                    <button type="submit" class="act-btn danger">Delete</button>
+                    <button type="submit" class="act-btn danger"
+                        data-confirm-title="Delete Reward"
+                        data-confirm-variant="danger"
+                        data-confirm-ok="Yes, delete"
+                        data-confirm-cancel="Cancel"
+                        data-confirm="Delete this reward?">
+                        Delete
+                    </button>
                 </form>
             </div>
         </div>

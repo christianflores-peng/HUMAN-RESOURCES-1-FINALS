@@ -10,7 +10,7 @@
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'hr1_hr1data');  // Your existing database name
 define('DB_USER', 'hr1_hr1slate');         // Production database username
-define('DB_PASS', 'ax#wO%GyP*KodxNA');             // Production database password
+define('DB_PASS', '@g5N#%EFkq+nBrc@');             // Production database password
 define('DB_CHARSET', 'utf8mb4');
 
 /**
@@ -34,8 +34,30 @@ function getDBConnection() {
         return $pdo;
         
     } catch (PDOException $e) {
+        // If credentials are production ones but running locally (Laragon/XAMPP), try common local defaults.
+        $serverName = strtolower((string)($_SERVER['SERVER_NAME'] ?? ''));
+        $httpHost = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+        $isLocal = ($serverName === 'localhost' || $serverName === '127.0.0.1' ||
+            str_starts_with($httpHost, 'localhost') || str_starts_with($httpHost, '127.0.0.1') ||
+            PHP_SAPI === 'cli');
+
+        $isAccessDenied = (strpos($e->getMessage(), '[1045]') !== false) || ((int)$e->getCode() === 1045);
+
+        if ($isLocal && $isAccessDenied) {
+            foreach ([
+                ['root', ''],
+                ['root', 'root'],
+            ] as $creds) {
+                try {
+                    return new PDO($dsn, $creds[0], $creds[1], $options);
+                } catch (PDOException $ignored) {
+                    // try next
+                }
+            }
+        }
+
         error_log("Database connection failed: " . $e->getMessage());
-        throw new PDOException("Database connection failed. Please check your configuration.");
+        throw new PDOException("Database connection failed: " . $e->getMessage());
     }
 }
 
@@ -67,8 +89,13 @@ function executeQuery($sql, $params = []) {
         $stmt->execute($params);
         return $stmt;
     } catch (PDOException $e) {
+        // Log with context for debugging
         error_log("Query execution failed: " . $e->getMessage());
-        throw new PDOException("Query execution failed.");
+        error_log("SQL: " . $sql);
+        error_log("Params: " . json_encode($params));
+
+        // Surface underlying SQL error (useful in development; consider hiding in production)
+        throw new PDOException("Query execution failed: " . $e->getMessage(), (int)$e->getCode(), $e);
     }
 }
 

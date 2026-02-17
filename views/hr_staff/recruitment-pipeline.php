@@ -253,6 +253,7 @@ $stats = [
 
         .action-btn.move { background: rgba(14, 165, 233, 0.2); color: #0ea5e9; }
         .action-btn.hire { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .action-btn.view { background: rgba(100, 116, 139, 0.25); color: #cbd5e1; }
         .action-btn:hover { opacity: 0.8; }
 
         .alert {
@@ -445,6 +446,9 @@ $stats = [
                                     <span><?php echo date('M d', strtotime($applicant['applied_date'])); ?></span>
                                 </div>
                                 <div class="applicant-actions">
+                                    <button type="button" class="action-btn view" onclick="showApplicantDetails(<?php echo $applicant['id']; ?>)">
+                                        <i data-lucide="eye" style="width:14px;height:14px;"></i> Details
+                                    </button>
                                     <button class="action-btn move" onclick="moveToStatus(<?php echo $applicant['id']; ?>, 'screening')">
                                         <i data-lucide="arrow-right" style="width:14px;height:14px;"></i> Screen
                                     </button>
@@ -470,6 +474,9 @@ $stats = [
                                     <span><?php echo date('M d', strtotime($applicant['applied_date'])); ?></span>
                                 </div>
                                 <div class="applicant-actions">
+                                    <button type="button" class="action-btn view" onclick="showApplicantDetails(<?php echo $applicant['id']; ?>)">
+                                        <i data-lucide="eye" style="width:14px;height:14px;"></i> Details
+                                    </button>
                                     <button class="action-btn move" onclick="moveToStatus(<?php echo $applicant['id']; ?>, 'interview')">
                                         <i data-lucide="arrow-right" style="width:14px;height:14px;"></i> Interview
                                     </button>
@@ -495,6 +502,9 @@ $stats = [
                                     <span><?php echo date('M d', strtotime($applicant['applied_date'])); ?></span>
                                 </div>
                                 <div class="applicant-actions">
+                                    <button type="button" class="action-btn view" onclick="showApplicantDetails(<?php echo $applicant['id']; ?>)">
+                                        <i data-lucide="eye" style="width:14px;height:14px;"></i> Details
+                                    </button>
                                     <button class="action-btn move" onclick="moveToStatus(<?php echo $applicant['id']; ?>, 'road_test')">
                                         <i data-lucide="arrow-right" style="width:14px;height:14px;"></i> Road Test
                                     </button>
@@ -520,6 +530,9 @@ $stats = [
                                     <span><?php echo date('M d', strtotime($applicant['applied_date'])); ?></span>
                                 </div>
                                 <div class="applicant-actions">
+                                    <button type="button" class="action-btn view" onclick="showApplicantDetails(<?php echo $applicant['id']; ?>)">
+                                        <i data-lucide="eye" style="width:14px;height:14px;"></i> Details
+                                    </button>
                                     <button class="action-btn move" onclick="moveToStatus(<?php echo $applicant['id']; ?>, 'offer_sent')">
                                         <i data-lucide="arrow-right" style="width:14px;height:14px;"></i> Send Offer
                                     </button>
@@ -545,6 +558,9 @@ $stats = [
                                     <span><?php echo date('M d', strtotime($applicant['applied_date'])); ?></span>
                                 </div>
                                 <div class="applicant-actions">
+                                    <button type="button" class="action-btn view" onclick="showApplicantDetails(<?php echo $applicant['id']; ?>)">
+                                        <i data-lucide="eye" style="width:14px;height:14px;"></i> Details
+                                    </button>
                                     <button class="action-btn hire" onclick="showHireModal(<?php echo $applicant['id']; ?>, '<?php echo htmlspecialchars($applicant['first_name'] . ' ' . $applicant['last_name']); ?>', '<?php echo htmlspecialchars($applicant['job_title'] ?? ''); ?>')">
                                         <i data-lucide="check-circle" style="width:14px;height:14px;"></i> HIRE
                                     </button>
@@ -568,6 +584,11 @@ $stats = [
                                 <div class="applicant-meta">
                                     <span style="color: #10b981;">Onboarding</span>
                                     <span><?php echo date('M d', strtotime($applicant['applied_date'])); ?></span>
+                                </div>
+                                <div class="applicant-actions">
+                                    <button type="button" class="action-btn view" onclick="showApplicantDetails(<?php echo $applicant['id']; ?>)">
+                                        <i data-lucide="eye" style="width:14px;height:14px;"></i> Details
+                                    </button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -657,6 +678,16 @@ $stats = [
                 document.getElementById('statusNewStatus').value = newStatus;
                 document.getElementById('statusForm').submit();
             }
+        }
+
+        function showApplicantDetails(applicationId) {
+            if (!applicationId) return;
+            const params = 'id=' + encodeURIComponent(applicationId);
+            if (window.HR1SPA && typeof window.HR1SPA.loadPage === 'function') {
+                window.HR1SPA.loadPage('applicant-details', true, params);
+                return;
+            }
+            window.location.href = 'applicant-details.php?' + params;
         }
 
         function closeModal(modalId) {

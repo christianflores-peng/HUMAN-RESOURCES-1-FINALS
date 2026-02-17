@@ -129,7 +129,7 @@ $is_logged_in = isset($_SESSION['user_id']);
                 <h3>💼 Job System</h3>
                 <ul class="nav-links">
                     <li><a href="careers.php">Careers Page <span class="status status-public">Public</span></a></li>
-                    <li><a href="apply.php">Apply for Jobs <span class="status status-public">Public</span></a></li>
+                    <li><a href="careers.php">Apply for Jobs <span class="status status-public">Public</span></a></li>
                     <li><a href="job_details.php">Job Details <span class="status status-public">Public</span></a></li>
                 </ul>
             </div>

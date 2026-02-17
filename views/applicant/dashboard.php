@@ -23,14 +23,19 @@ $user_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
 // Fetch applicant's profile
 try {
     $applicant = fetchSingle("
-        SELECT ap.*, ua.personal_email, ua.phone, ua.created_at as registered_date
+        SELECT ap.*, ua.personal_email, ua.created_at as registered_date
         FROM applicant_profiles ap
         JOIN user_accounts ua ON ua.id = ap.user_id
         WHERE ap.user_id = ?
     ", [$user_id]);
 } catch (Exception $e) {
     // If applicant_profiles doesn't exist, get basic info from user_accounts
-    $applicant = fetchSingle("SELECT id, personal_email, phone, created_at as registered_date FROM user_accounts WHERE id = ?", [$user_id]);
+    try {
+        $applicant = fetchSingle("SELECT id, personal_email, created_at as registered_date FROM user_accounts WHERE id = ?", [$user_id]);
+    } catch (Exception $e) {
+        // Fallback for deployments where the email column is company_email
+        $applicant = fetchSingle("SELECT id, company_email as personal_email, created_at as registered_date FROM user_accounts WHERE id = ?", [$user_id]);
+    }
 }
 
 $user_email = $applicant['personal_email'] ?? $_SESSION['personal_email'] ?? '';
@@ -51,7 +56,25 @@ try {
         ORDER BY ja.applied_date DESC
     ", [$user_email]);
 } catch (Exception $e) {
-    $applications = [];
+    try {
+        // Fallback for deployments where the column is named applied_at instead of applied_date
+        $applications = fetchAll(" 
+            SELECT ja.*, 
+                   COALESCE(jp.title, 'General Application') as job_title, 
+                   COALESCE(jp.location, 'N/A') as location, 
+                   COALESCE(jp.employment_type, 'Full-time') as employment_type,
+                   jp.department_id, 
+                   COALESCE(d.department_name, 'Not Assigned') as department_name,
+                   ja.applied_at as applied_date
+            FROM job_applications ja
+            LEFT JOIN job_postings jp ON jp.id = ja.job_posting_id
+            LEFT JOIN departments d ON d.id = jp.department_id
+            WHERE ja.email = ?
+            ORDER BY ja.applied_at DESC
+        ", [$user_email]);
+    } catch (Exception $e) {
+        $applications = [];
+    }
 }
 
 // Get application statistics

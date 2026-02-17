@@ -15,7 +15,7 @@ $user_name = htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_na
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Portal - HR1</title>
+    <title>Admin Panel - HR1</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="../../assets/css/spa.css">
 </head>
@@ -25,7 +25,7 @@ $user_name = htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_na
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../../assets/images/slate.png" alt="SLATE Logo">
-                <h2>Admin Portal</h2>
+                <h2>Admin Panel</h2>
                 <p><?php echo $user_name; ?></p>
                 <span class="role-badge">ADMINISTRATOR</span>
             </div>
@@ -172,7 +172,7 @@ $user_name = htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_na
         </main>
     </div>
 
-    <script src="../../assets/js/spa.js"></script>
+    <script src="../../assets/js/spa.js?v=<?php echo urlencode((string)@filemtime(__DIR__ . '/../../assets/js/spa.js')); ?>"></script>
     <?php include '../../includes/logout-modal.php'; ?>
     <script>
         if (typeof lucide !== 'undefined') lucide.createIcons();

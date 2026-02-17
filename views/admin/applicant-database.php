@@ -283,10 +283,15 @@ foreach ($status_counts as $sc) {
                             <button type="submit" class="act-btn" title="Remove from blacklist" style="color:#10b981;">Unblock</button>
                         </form>
                         <?php endif; ?>
-                        <form method="POST" style="display:inline;" onsubmit="return confirm('PERMANENTLY anonymize this applicant\'s data? This cannot be undone.');">
+                        <form method="POST" style="display:inline;">
                             <input type="hidden" name="action" value="gdpr_delete">
                             <input type="hidden" name="application_id" value="<?php echo $app['id']; ?>">
-                            <button type="submit" class="act-btn warn" title="Data Privacy Delete">
+                            <button type="submit" class="act-btn warn" title="Data Privacy Delete"
+                                data-confirm-title="Data Privacy Delete"
+                                data-confirm-variant="danger"
+                                data-confirm-ok="Yes, anonymize"
+                                data-confirm-cancel="Cancel"
+                                data-confirm="PERMANENTLY anonymize this applicant's data? This cannot be undone.">
                                 <i data-lucide="shield-off" style="width:12px;height:12px;"></i>
                             </button>
                         </form>

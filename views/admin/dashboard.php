@@ -18,6 +18,30 @@ require_once '../../database/config.php';
 
 $user_id = $_SESSION['user_id'];
 
+// Detect job_applications date columns across environments (some use applied_at, others applied_date)
+$jobapps_applied_col = 'applied_date';
+$jobapps_has_updated_at = false;
+try {
+    $colCheck = fetchAll(
+        "SELECT COLUMN_NAME
+         FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'job_applications'
+           AND COLUMN_NAME IN ('applied_at','applied_date','updated_at')"
+    );
+    $cols = array_map(fn($r) => strtolower((string)($r['COLUMN_NAME'] ?? '')), $colCheck ?: []);
+    if (in_array('applied_at', $cols, true)) {
+        $jobapps_applied_col = 'applied_at';
+    } elseif (in_array('applied_date', $cols, true)) {
+        $jobapps_applied_col = 'applied_date';
+    }
+    $jobapps_has_updated_at = in_array('updated_at', $cols, true);
+} catch (Exception $e) {
+    // Fallback to defaults
+    $jobapps_applied_col = 'applied_date';
+    $jobapps_has_updated_at = false;
+}
+
 // === SYSTEM OVERVIEW STATS ===
 try {
     $total_users = fetchSingle("SELECT COUNT(*) as count FROM user_accounts")['count'] ?? 0;
@@ -29,8 +53,8 @@ try {
 
 try {
     $total_applications = fetchSingle("SELECT COUNT(*) as count FROM job_applications")['count'] ?? 0;
-    $active_postings = fetchSingle("SELECT COUNT(*) as count FROM job_postings WHERE status = 'Open'")['count'] ?? 0;
-    $total_hired = fetchSingle("SELECT COUNT(*) as count FROM job_applications WHERE status = 'Hired'")['count'] ?? 0;
+    $active_postings = fetchSingle("SELECT COUNT(*) as count FROM job_postings WHERE UPPER(status) = 'OPEN'")['count'] ?? 0;
+    $total_hired = fetchSingle("SELECT COUNT(*) as count FROM job_applications WHERE UPPER(status) = 'HIRED'")['count'] ?? 0;
 } catch (Exception $e) {
     $total_applications = 0; $active_postings = 0; $total_hired = 0;
 }
@@ -43,32 +67,38 @@ try {
 
 // === TIME-TO-HIRE ANALYTICS ===
 try {
+    $endExpr = $jobapps_has_updated_at
+        ? "COALESCE(ash_hired.changed_at, ja.updated_at, ja.{$jobapps_applied_col})"
+        : "COALESCE(ash_hired.changed_at, ja.{$jobapps_applied_col})";
     $avg_time_to_hire = fetchSingle("
         SELECT ROUND(AVG(DATEDIFF(
-            COALESCE(ash_hired.changed_at, ja.updated_at),
-            ja.applied_at
+            {$endExpr},
+            ja.{$jobapps_applied_col}
         ))) as avg_days
         FROM job_applications ja
         LEFT JOIN application_status_history ash_hired ON ash_hired.application_id = ja.id AND ash_hired.new_status = 'Hired'
-        WHERE ja.status = 'Hired' AND ja.applied_at IS NOT NULL
+        WHERE UPPER(ja.status) = 'HIRED' AND ja.{$jobapps_applied_col} IS NOT NULL
     ")['avg_days'] ?? 0;
 } catch (Exception $e) {
     $avg_time_to_hire = 0;
 }
 
 try {
+    $endExpr = $jobapps_has_updated_at
+        ? "COALESCE(ash_hired.changed_at, ja.updated_at, ja.{$jobapps_applied_col})"
+        : "COALESCE(ash_hired.changed_at, ja.{$jobapps_applied_col})";
     $time_to_hire_by_dept = fetchAll("
         SELECT d.department_name,
             ROUND(AVG(DATEDIFF(
-                COALESCE(ash_hired.changed_at, ja.updated_at),
-                ja.applied_at
+                {$endExpr},
+                ja.{$jobapps_applied_col}
             ))) as avg_days,
             COUNT(ja.id) as hire_count
         FROM job_applications ja
         LEFT JOIN application_status_history ash_hired ON ash_hired.application_id = ja.id AND ash_hired.new_status = 'Hired'
         LEFT JOIN job_postings jp ON jp.id = ja.job_posting_id
         LEFT JOIN departments d ON d.id = jp.department_id
-        WHERE ja.status = 'Hired' AND ja.applied_at IS NOT NULL AND d.department_name IS NOT NULL
+        WHERE UPPER(ja.status) = 'HIRED' AND ja.{$jobapps_applied_col} IS NOT NULL AND d.department_name IS NOT NULL
         GROUP BY d.id, d.department_name
         ORDER BY avg_days DESC
         LIMIT 6
@@ -83,7 +113,7 @@ try {
         SELECT 
             COALESCE(ja.source, 'Direct Apply') as source,
             COUNT(*) as total,
-            SUM(CASE WHEN ja.status = 'Hired' THEN 1 ELSE 0 END) as hired
+            SUM(CASE WHEN UPPER(ja.status) = 'HIRED' THEN 1 ELSE 0 END) as hired
         FROM job_applications ja
         GROUP BY COALESCE(ja.source, 'Direct Apply')
         ORDER BY total DESC

@@ -52,7 +52,7 @@ $defaults = [
     'company_address' => '',
     'session_timeout' => '30',
     'max_login_attempts' => '5',
-    'otp_expiry_minutes' => '5',
+    'otp_expiry_minutes' => '1',
     'password_min_length' => '8',
     'maintenance_mode' => '0',
     'allow_registration' => '1',
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $updates = [
                 'session_timeout' => $_POST['session_timeout'] ?? '30',
                 'max_login_attempts' => $_POST['max_login_attempts'] ?? '5',
-                'otp_expiry_minutes' => $_POST['otp_expiry_minutes'] ?? '5',
+                'otp_expiry_minutes' => $_POST['otp_expiry_minutes'] ?? '1',
                 'password_min_length' => $_POST['password_min_length'] ?? '8',
                 'maintenance_mode' => isset($_POST['maintenance_mode']) ? '1' : '0',
                 'allow_registration' => isset($_POST['allow_registration']) ? '1' : '0',

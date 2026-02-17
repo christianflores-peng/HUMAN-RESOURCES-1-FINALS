@@ -48,7 +48,7 @@ return [
  * 7. Paste it in 'smtp_password' above (remove spaces: "abcdefghijklmnop")
  * 8. Update 'smtp_username' and 'from_email' with your Gmail address
  * 9. Save this file
- * 10. Test by submitting an application in apply.php
+ * 10. Test by submitting an application via Careers → Apply Now (register-applicant.php)
  * 
  * SECURITY NOTE:
  * - Never commit this file to version control (add to .gitignore)

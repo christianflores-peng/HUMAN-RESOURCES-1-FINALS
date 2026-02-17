@@ -836,7 +836,7 @@ try {
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(58, 69, 84, 0.5);">
                 <p style="color: #94a3b8; font-size: 0.8rem;">
                     <i data-lucide="timer" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
-                    <span id="archiveOtpTimer">Code expires in 5:00</span>
+                    <span id="archiveOtpTimer">Code expires in 1:00</span>
                 </p>
             </div>
         </div>
@@ -924,7 +924,7 @@ try {
             <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(58, 69, 84, 0.5);">
                 <p style="color: #94a3b8; font-size: 0.8rem;">
                     <i data-lucide="timer" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
-                    <span id="toggleOtpTimer">Code expires in 5:00</span>
+                    <span id="toggleOtpTimer">Code expires in 1:00</span>
                 </p>
             </div>
         </div>
@@ -1002,7 +1002,7 @@ try {
         // OTP Timer for toggle modal
         <?php if ($show_toggle_otp): ?>
         (function() {
-            let timeLeft = 300;
+            let timeLeft = 60;
             const timerEl = document.getElementById('toggleOtpTimer');
             const countdown = setInterval(() => {
                 timeLeft--;
@@ -1083,7 +1083,7 @@ try {
         // OTP Timer for archive modal
         <?php if ($show_archive_otp): ?>
         (function() {
-            let timeLeft = 300;
+            let timeLeft = 60;
             const timerEl = document.getElementById('archiveOtpTimer');
             const countdown = setInterval(() => {
                 timeLeft--;

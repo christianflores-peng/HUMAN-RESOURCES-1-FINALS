@@ -279,7 +279,7 @@ function hireApplicant($application_id, $hired_by, $employee_id = null) {
             if ($employee_role) {
                 executeQuery("
                     UPDATE user_accounts 
-                    SET role_id = ?, employee_id = ?, department_id = ?, status = 'active'
+                    SET role_id = ?, employee_id = ?, department_id = ?, status = 'Active'
                     WHERE id = ?
                 ", [$employee_role['id'], $employee_id, $app['department_id'], $app['user_id']]);
             }

@@ -679,7 +679,7 @@ asort($employment_types);
                                 </div>
                                 <div>
                                     <a href="job_details.php?id=<?php echo $job['id']; ?>" class="btn btn-outline">View Details</a>
-                                    <a href="../auth/register-portal.php?terms_accepted=true&type=applicant&job_id=<?php echo $job['id']; ?>&source=apply" class="btn btn-primary">Apply Now</a>
+                                    <a href="../auth/terms.php?type=applicant&job_id=<?php echo $job['id']; ?>" class="btn btn-primary">Apply Now</a>
                                 </div>
                             </div>
                         </div>

@@ -376,7 +376,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
         </div>
 
         <div class="button-group">
-            <button class="btn btn-secondary" onclick="window.location.href='<?php echo $job_id ? '../careers.php' : 'login.php'; ?>'">Back</button>
+            <button class="btn btn-secondary" onclick="window.location.href='<?php echo $job_id ? ('../public/job_details.php?id=' . $job_id) : 'login.php'; ?>'">Back</button>
             <button class="btn btn-primary" id="proceed-btn" disabled onclick="proceedToRegistration()">Proceed to Registration</button>
         </div>
     </div>
@@ -393,7 +393,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : 'register';
             if (checkbox.checked) {
                 <?php if ($job_id && $type === 'applicant'): ?>
                 // Redirect to apply page with job_id
-                window.location.href = '../public/apply.php?job_id=<?php echo $job_id; ?>&terms_accepted=true';
+                window.location.href = 'register-applicant.php?job_id=<?php echo $job_id; ?>&source=apply&terms_accepted=true';
                 <?php else: ?>
                 // Redirect to applicant registration with terms acceptance flag
                 window.location.href = 'register-applicant.php?terms_accepted=true';

@@ -18,7 +18,20 @@ function generateOTP() {
  */
 function createOTP($email, $phone_number = null, $otp_type = 'login', $user_id = null) {
     $otp_code = generateOTP();
-    $expires_at = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+
+    // OTP expiry is fixed to 1 minute (system-wide)
+    $expiry_minutes = 1;
+    $expires_at = date('Y-m-d H:i:s', strtotime('+' . $expiry_minutes . ' minute'));
+
+    // Keep System Settings UI consistent (best-effort)
+    try {
+        executeQuery(
+            "INSERT INTO system_settings (setting_key, setting_value) VALUES ('otp_expiry_minutes', ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)",
+            [(string)$expiry_minutes]
+        );
+    } catch (Exception $e) {
+        // ignore (table may not exist yet)
+    }
     
     // Delete any existing OTPs for this email and type
     executeQuery("DELETE FROM otp_verifications WHERE email = ? AND otp_type = ?", [$email, $otp_type]);
@@ -90,7 +103,7 @@ function sendOTPEmail($email, $otp_code, $user_name = 'User') {
             </div>
             
             <p style='color: #94a3b8; margin: 25px 0 0; font-size: 14px;'>
-                This code will expire in <strong>5 minutes</strong>.<br>
+                This code will expire in <strong>1 minute</strong>.<br>
                 If you didn't request this code, please ignore this email.
             </p>
         </div>

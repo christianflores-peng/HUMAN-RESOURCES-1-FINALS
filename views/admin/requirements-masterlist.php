@@ -325,10 +325,17 @@ $categories = ['General', 'Government IDs', 'Medical', 'Employment', 'Education'
                         <input type="hidden" name="requirement_id" value="<?php echo $req['id']; ?>">
                         <button type="submit" class="act-btn"><?php echo $req['is_active'] ? 'Disable' : 'Enable'; ?></button>
                     </form>
-                    <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this requirement?');">
+                    <form method="POST" style="display:inline;">
                         <input type="hidden" name="action" value="delete_requirement">
                         <input type="hidden" name="requirement_id" value="<?php echo $req['id']; ?>">
-                        <button type="submit" class="act-btn danger">Delete</button>
+                        <button type="submit" class="act-btn danger"
+                            data-confirm-title="Delete Requirement"
+                            data-confirm-variant="danger"
+                            data-confirm-ok="Yes, delete"
+                            data-confirm-cancel="Cancel"
+                            data-confirm="Delete this requirement?">
+                            Delete
+                        </button>
                     </form>
                 </div>
             </div>
@@ -381,7 +388,14 @@ $categories = ['General', 'Government IDs', 'Medical', 'Employment', 'Education'
             <label>Reason for Bypass</label>
             <input type="text" name="bypass_reason" placeholder="e.g. Delayed submission approved by HR Head" required>
         </div>
-        <button type="submit" class="btn-primary" onclick="return confirm('Bypass this requirement?');">Confirm Bypass</button>
+        <button type="submit" class="btn-primary"
+            data-confirm-title="Bypass Requirement"
+            data-confirm-variant="danger"
+            data-confirm-ok="Yes, bypass"
+            data-confirm-cancel="Cancel"
+            data-confirm="Bypass this requirement?">
+            Confirm Bypass
+        </button>
     </form>
 </div>
 

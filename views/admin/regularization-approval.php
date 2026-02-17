@@ -280,20 +280,39 @@ function renderEmployeeList($employees, $review_map, $req_map, $onboard_map, $se
         <?php endif; ?>
         
         <div class="emp-actions">
-            <form method="POST" style="display:inline;" onsubmit="return confirm('Approve regularization for this employee?');">
+            <form method="POST" style="display:inline;">
                 <input type="hidden" name="action" value="approve_regularization">
                 <input type="hidden" name="employee_id" value="<?php echo $emp['id']; ?>">
-                <button type="submit" class="btn-approve"><i data-lucide="check" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Regularize</button>
+                <button type="submit" class="btn-approve"
+                    data-confirm-title="Approve Regularization"
+                    data-confirm-ok="Yes, regularize"
+                    data-confirm-cancel="Cancel"
+                    data-confirm="Approve regularization for this employee?">
+                    <i data-lucide="check" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Regularize
+                </button>
             </form>
-            <form method="POST" style="display:inline;" onsubmit="return confirm('Extend probation for this employee?');">
+            <form method="POST" style="display:inline;">
                 <input type="hidden" name="action" value="reject_regularization">
                 <input type="hidden" name="employee_id" value="<?php echo $emp['id']; ?>">
-                <button type="submit" class="btn-reject"><i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Extend Probation</button>
+                <button type="submit" class="btn-reject"
+                    data-confirm-title="Extend Probation"
+                    data-confirm-ok="Yes, extend"
+                    data-confirm-cancel="Cancel"
+                    data-confirm="Extend probation for this employee?">
+                    <i data-lucide="clock" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Extend Probation
+                </button>
             </form>
-            <form method="POST" style="display:inline;" onsubmit="return confirm('TERMINATE this employee? This will set their account to Inactive.');">
+            <form method="POST" style="display:inline;">
                 <input type="hidden" name="action" value="terminate">
                 <input type="hidden" name="employee_id" value="<?php echo $emp['id']; ?>">
-                <button type="submit" class="btn-terminate"><i data-lucide="user-x" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Terminate</button>
+                <button type="submit" class="btn-terminate"
+                    data-confirm-title="Terminate Employee"
+                    data-confirm-variant="danger"
+                    data-confirm-ok="Yes, terminate"
+                    data-confirm-cancel="Cancel"
+                    data-confirm="TERMINATE this employee? This will set their account to Inactive.">
+                    <i data-lucide="user-x" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.2rem;"></i>Terminate
+                </button>
             </form>
         </div>
     </div>

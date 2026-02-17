@@ -585,17 +585,25 @@ try {
             alert('Edit functionality would be implemented here for user ID: ' + userId);
         }
         
-        function deleteUser(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.innerHTML = `
-                    <input type="hidden" name="action" value="delete_user">
-                    <input type="hidden" name="user_id" value="${userId}">
-                `;
-                document.body.appendChild(form);
-                form.submit();
-            }
+        async function deleteUser(userId) {
+            const ok = await (window.HR1SPA?.confirmDialog ? HR1SPA.confirmDialog({
+                title: 'Delete User',
+                message: 'Are you sure you want to delete this user?',
+                confirmText: 'Yes, delete',
+                cancelText: 'Cancel',
+                danger: true
+            }) : Promise.resolve(confirm('Are you sure you want to delete this user?')));
+
+            if (!ok) return;
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML = `
+                <input type="hidden" name="action" value="delete_user">
+                <input type="hidden" name="user_id" value="${userId}">
+            `;
+            document.body.appendChild(form);
+            form.submit();
         }
     </script>
 </div>

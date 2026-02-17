@@ -24,7 +24,7 @@ $user_name = htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_na
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Portal - HR1</title>
+    <title>Manager Panel - HR1</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="../../assets/css/spa.css">
 </head>
@@ -34,7 +34,7 @@ $user_name = htmlspecialchars($_SESSION['first_name'] . ' ' . $_SESSION['last_na
         <aside class="sidebar">
             <div class="logo-section">
                 <img src="../../assets/images/slate.png" alt="SLATE Logo">
-                <h2>Manager Portal</h2>
+                <h2>Manager Panel</h2>
                 <p><?php echo $user_name; ?></p>
                 <span class="role-badge">MANAGER</span>
             </div>

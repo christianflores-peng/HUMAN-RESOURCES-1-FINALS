@@ -94,10 +94,19 @@
         document.getElementById('editUserModal').classList.add('active');
     }
 
-    function resetPassword() {
-        if (confirm('Are you sure you want to reset this user\'s password?')) {
-            document.getElementById('resetPasswordForm').submit();
-        }
+    async function resetPassword() {
+        const ok = await ((window.HR1SPA && typeof HR1SPA.confirmDialog === 'function')
+            ? HR1SPA.confirmDialog({
+                title: 'Reset Password',
+                message: "Are you sure you want to reset this user's password?",
+                confirmText: 'Yes, reset',
+                cancelText: 'Cancel',
+                danger: true
+            })
+            : Promise.resolve(confirm("Are you sure you want to reset this user's password?")));
+
+        if (!ok) return;
+        document.getElementById('resetPasswordForm').submit();
     }
 
     function closeModal(modalId) {

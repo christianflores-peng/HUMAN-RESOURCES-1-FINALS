@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../includes/session_helper.php';
 require_once __DIR__ . '/../../includes/rbac_helper.php';
 require_once __DIR__ . '/../../includes/spa_helper.php';
+require_once __DIR__ . '/../../includes/email_generator.php';
 startSecureSession();
 $is_ajax = is_spa_ajax();
 
@@ -54,6 +55,80 @@ if (!$is_ajax) {
 }
 
 require_once __DIR__ . '/../../database/config.php';
+
+// Ensure handbook document types can be stored across environments.
+// Some databases define employee_documents.document_type as a restrictive ENUM,
+// which causes: SQLSTATE[01000]: Warning: 1265 Data truncated for column 'document_type'
+// when inserting values like 'Handbook_All'.
+try {
+    executeQuery("ALTER TABLE employee_documents MODIFY COLUMN document_type VARCHAR(50) NOT NULL");
+} catch (Exception $e) {
+    // Ignore: schema may already be compatible or user may not have ALTER privileges.
+}
+
+// Same idea for status: some schemas use a restrictive ENUM or numeric flag.
+try {
+    executeQuery("ALTER TABLE employee_documents MODIFY COLUMN status VARCHAR(20) NOT NULL DEFAULT 'Active'");
+} catch (Exception $e) {
+    // Ignore: schema may already be compatible or user may not have ALTER privileges.
+}
+
+function handbook_status_insert_strategy() {
+    // Returns ['has_status' => bool, 'status_value' => mixed, 'use_status_column' => bool]
+    // status_value is already the correct type (int for numeric columns, string for enum/varchar).
+    try {
+        $col = fetchSingle(
+            "SELECT DATA_TYPE, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'employee_documents'
+               AND COLUMN_NAME = 'status'") ?: null;
+        if (!$col) {
+            return ['has_status' => false, 'status_value' => null, 'use_status_column' => false];
+        }
+
+        $dataType = strtolower((string)($col['DATA_TYPE'] ?? ''));
+        $columnType = (string)($col['COLUMN_TYPE'] ?? '');
+        $default = $col['COLUMN_DEFAULT'] ?? null;
+
+        // Numeric flag
+        if (in_array($dataType, ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'], true)) {
+            return ['has_status' => true, 'status_value' => 1, 'use_status_column' => true];
+        }
+
+        // ENUM
+        if ($dataType === 'enum') {
+            $opts = [];
+            if (preg_match_all("/'([^']*)'/", $columnType, $m)) {
+                $opts = $m[1] ?? [];
+            }
+            $pick = null;
+            foreach (['Active', 'active', 'Approved', 'approved', 'Enabled', 'enabled'] as $candidate) {
+                if (in_array($candidate, $opts, true)) {
+                    $pick = $candidate;
+                    break;
+                }
+            }
+            if ($pick === null) {
+                if ($default !== null && $default !== '') {
+                    $pick = (string)$default;
+                } elseif (!empty($opts)) {
+                    $pick = (string)$opts[0];
+                } else {
+                    // Last resort
+                    $pick = 'Active';
+                }
+            }
+            return ['has_status' => true, 'status_value' => $pick, 'use_status_column' => true];
+        }
+
+        // VARCHAR/TEXT/etc
+        return ['has_status' => true, 'status_value' => 'Active', 'use_status_column' => true];
+    } catch (Exception $e) {
+        // If we can't introspect, keep old behavior but allow retry without status column.
+        return ['has_status' => true, 'status_value' => 'Active', 'use_status_column' => true];
+    }
+}
 
 function handbook_public_path($stored_path) {
     $normalized = str_replace('\\', '/', (string)$stored_path);
@@ -145,11 +220,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_handbook']) &&
 
             if (move_uploaded_file($_FILES['handbook_file']['tmp_name'], $filePath)) {
                 try {
-                    insertRecord(
-                        "INSERT INTO employee_documents (user_id, document_type, document_name, file_path, uploaded_by, uploaded_at, status)
-                         VALUES (0, ?, ?, ?, ?, NOW(), 'Active')",
-                        [$documentType, $meta_name, $dbFilePath, $userId]
-                    );
+                    $statusStrategy = handbook_status_insert_strategy();
+                    if (!empty($statusStrategy['use_status_column'])) {
+                        insertRecord(
+                            "INSERT INTO employee_documents (user_id, document_type, document_name, file_path, uploaded_by, uploaded_at, status)
+                             VALUES (?, ?, ?, ?, ?, NOW(), ?)",
+                            [$userId, $documentType, $meta_name, $dbFilePath, $userId, $statusStrategy['status_value']]
+                        );
+                    } else {
+                        insertRecord(
+                            "INSERT INTO employee_documents (user_id, document_type, document_name, file_path, uploaded_by, uploaded_at)
+                             VALUES (?, ?, ?, ?, ?, NOW())",
+                            [$userId, $documentType, $meta_name, $dbFilePath, $userId]
+                        );
+                    }
                     logAuditAction($userId, 'CREATE', 'employee_documents', null, null, [
                         'document_type' => $documentType,
                         'document_name' => $handbookTitle,
@@ -159,8 +243,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_handbook']) &&
                     $message = "Handbook uploaded successfully!";
                     $messageType = "success";
                 } catch (Exception $e) {
-                    $message = "Database error: " . $e->getMessage();
-                    $messageType = "error";
+                    // Retry once without status column (some schemas have incompatible status datatype/default).
+                    try {
+                        insertRecord(
+                            "INSERT INTO employee_documents (user_id, document_type, document_name, file_path, uploaded_by, uploaded_at)
+                             VALUES (?, ?, ?, ?, ?, NOW())",
+                            [$userId, $documentType, $meta_name, $dbFilePath, $userId]
+                        );
+                        $message = "Handbook uploaded successfully!";
+                        $messageType = "success";
+                    } catch (Exception $e2) {
+                        $message = "Database error: " . $e->getMessage();
+                        $messageType = "error";
+                    }
                 }
             } else {
                 $message = "Failed to move uploaded file.";
@@ -198,7 +293,8 @@ try {
         SELECT ed.*, ua.first_name, ua.last_name
         FROM employee_documents ed
         LEFT JOIN user_accounts ua ON ed.uploaded_by = ua.id
-        WHERE ed.user_id = 0 AND ed.document_type IN ($placeholders)
+        WHERE ed.file_path LIKE 'uploads/handbooks/%'
+          AND ed.document_type IN ($placeholders)
         ORDER BY ed.uploaded_at DESC
     ", $visible_types);
 

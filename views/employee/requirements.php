@@ -15,6 +15,7 @@ if (!$is_ajax) {
 }
 
 require_once '../../database/config.php';
+require_once '../../includes/email_generator.php';
 
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['first_name'] . ' ' . $_SESSION['last_name'];
@@ -82,11 +83,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_requirement'])
                 
                 // Check if already exists and update, otherwise insert
                 $existing = fetchSingle("SELECT id FROM employee_requirements WHERE user_id = ? AND document_type = ?", [$user_id, $document_type]);
-                
+
+                $requirement_id = 0;
                 if ($existing) {
-                    executeQuery("UPDATE employee_requirements SET file_path = ?, status = 'pending', updated_at = NOW() WHERE id = ?", [$relative_path, $existing['id']]);
+                    $requirement_id = (int)$existing['id'];
+                    executeQuery("UPDATE employee_requirements SET file_path = ?, status = 'pending', updated_at = NOW() WHERE id = ?", [$relative_path, $requirement_id]);
                 } else {
-                    executeQuery("INSERT INTO employee_requirements (user_id, document_type, file_path, status) VALUES (?, ?, ?, 'pending')", [$user_id, $document_type, $relative_path]);
+                    $requirement_id = (int)insertRecord(
+                        "INSERT INTO employee_requirements (user_id, document_type, file_path, status) VALUES (?, ?, ?, 'pending')",
+                        [$user_id, $document_type, $relative_path]
+                    );
+                }
+
+                // Audit: employee submitted/updated a requirement document (visible to Admin/HR notifications)
+                try {
+                    logAuditAction(
+                        (int)$user_id,
+                        'SUBMIT',
+                        'employee_requirements',
+                        (int)$requirement_id,
+                        null,
+                        ['document_type' => $document_type, 'file_path' => $relative_path],
+                        "Employee submitted requirement: {$document_type}"
+                    );
+                } catch (Exception $e) {
+                    // ignore
                 }
                 
                 $success_message = 'Document uploaded successfully! Waiting for HR verification.';

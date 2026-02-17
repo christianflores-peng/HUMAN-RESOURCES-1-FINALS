@@ -760,7 +760,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
 
             <div class="otp-timer">
                 <i data-lucide="timer"></i>
-                <span id="otpTimer">Code expires in 5:00</span>
+                <span id="otpTimer">Code expires in 1:00</span>
             </div>
         </div>
     </div>
@@ -884,7 +884,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register_employee']))
         }
 
         <?php if ($show_otp_modal): ?>
-        let timeLeft = 300;
+        let timeLeft = 60;
         const timerDisplay = document.getElementById('otpTimer');
         
         const countdown = setInterval(() => {

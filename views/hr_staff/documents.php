@@ -313,11 +313,21 @@ $doc_type_labels = [
         });
     }
 
-    function approveDocument() {
+    async function approveDocument() {
         if (!selectedDocId) { alert('Please select a document first.'); return; }
-        if (confirm('Approve this document as verified and authentic?')) {
-            docAction('approve', '');
-        }
+
+        const ok = await ((typeof HR1SPA !== 'undefined' && typeof HR1SPA.confirmDialog === 'function')
+            ? HR1SPA.confirmDialog({
+                title: 'Approve Document',
+                message: 'Approve this document as verified and authentic?',
+                confirmText: 'Yes, approve',
+                cancelText: 'Cancel',
+                danger: false
+            })
+            : Promise.resolve(confirm('Approve this document as verified and authentic?')));
+
+        if (!ok) return;
+        docAction('approve', '');
     }
 
     function rejectDocument() {

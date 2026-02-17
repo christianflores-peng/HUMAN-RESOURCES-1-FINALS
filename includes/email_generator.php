@@ -424,8 +424,11 @@ function logAuditAction($userId, $action, $module, $recordId = null, $oldValues 
     try {
         $userEmail = null;
         if ($userId) {
-            $user = fetchSingle("SELECT company_email FROM user_accounts WHERE id = ?", [$userId]);
+            $user = fetchSingle("SELECT company_email, personal_email FROM user_accounts WHERE id = ?", [$userId]);
             $userEmail = $user['company_email'] ?? null;
+            if (!$userEmail) {
+                $userEmail = $user['personal_email'] ?? null;
+            }
             
             // Fallback to users table
             if (!$userEmail) {

@@ -427,7 +427,12 @@ try {
                                 <input type="hidden" name="toggle_status" value="1">
                                 <input type="hidden" name="posting_id" value="<?php echo $posting['id']; ?>">
                                 <input type="hidden" name="new_status" value="Closed">
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Close this posting?')">
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                    data-confirm-title="Close Posting"
+                                    data-confirm-variant="danger"
+                                    data-confirm-ok="Yes, close"
+                                    data-confirm-cancel="Cancel"
+                                    data-confirm="Close this posting?">
                                     <i data-lucide="x-circle" style="width:14px;height:14px;"></i> Close
                                 </button>
                             </form>
@@ -436,7 +441,11 @@ try {
                                 <input type="hidden" name="toggle_status" value="1">
                                 <input type="hidden" name="posting_id" value="<?php echo $posting['id']; ?>">
                                 <input type="hidden" name="new_status" value="Open">
-                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Reopen this posting?')">
+                                <button type="submit" class="btn btn-sm btn-success"
+                                    data-confirm-title="Reopen Posting"
+                                    data-confirm-ok="Yes, reopen"
+                                    data-confirm-cancel="Cancel"
+                                    data-confirm="Reopen this posting?">
                                     <i data-lucide="check-circle" style="width:14px;height:14px;"></i> Reopen
                                 </button>
                             </form>

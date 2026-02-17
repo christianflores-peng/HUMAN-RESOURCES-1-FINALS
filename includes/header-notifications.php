@@ -37,19 +37,21 @@ if ($_header_is_applicant) {
         if (in_array($_header_role, ['Admin', 'HR_Staff'])) {
             // Admin/HR see all recent system activity
             $_header_recent = fetchAll("
-                SELECT id, user_email, action, module, detail, created_at 
+                SELECT id, user_id, user_email, action, module, detail, created_at 
                 FROM audit_logs 
+                WHERE UPPER(action) NOT IN ('LOGIN','LOGOUT')
                 ORDER BY created_at DESC 
                 LIMIT 10
             ");
             $_header_unread = fetchAll("
                 SELECT id FROM audit_logs 
                 WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+                  AND UPPER(action) NOT IN ('LOGIN','LOGOUT')
             ");
         } else {
             // Manager/Employee see only their own activity
             $_header_recent = fetchAll("
-                SELECT id, user_email, action, module, detail, created_at 
+                SELECT id, user_id, user_email, action, module, detail, created_at 
                 FROM audit_logs 
                 WHERE user_id = ?
                 ORDER BY created_at DESC 
@@ -188,6 +190,12 @@ if ($_header_is_applicant) {
         transition: background 0.2s;
         cursor: pointer;
     }
+
+    /* Allow notification items to be anchors (clickable) */
+    a.notification-item {
+        text-decoration: none;
+        color: inherit;
+    }
     
     .notification-item:hover {
         background: rgba(14, 165, 233, 0.05);
@@ -286,8 +294,8 @@ if ($_header_is_applicant) {
     <div class="notification-dropdown" id="notificationDropdown">
         <div class="notification-dropdown-header">
             <h4>Notifications</h4>
-            <?php if ($_header_unread_count > 0): ?>
-            <a href="notifications.php?mark_all_read=1">Mark all read</a>
+            <?php if ($_header_is_applicant && $_header_unread_count > 0): ?>
+            <a href="index.php?page=notifications&mark_all_read=1" data-page="notifications" data-params="mark_all_read=1">Mark all read</a>
             <?php endif; ?>
         </div>
         
@@ -301,7 +309,49 @@ if ($_header_is_applicant) {
             <?php foreach ($_header_recent as $notif): 
                 // Get message text - applicant_notifications uses 'message', audit_logs uses 'detail'
                 $_notif_msg = $notif['message'] ?? $notif['detail'] ?? ($notif['action'] ?? 'Activity') . ' on ' . ($notif['module'] ?? 'system');
+
+                // For audit-log based notifications, prefix the actor for clarity
+                if (!$_header_is_applicant) {
+                    $_actor = trim((string)($notif['user_email'] ?? ''));
+                    if ($_actor !== '' && strcasecmp($_actor, 'System') !== 0) {
+                        $_notif_msg = $_actor . ' - ' . $_notif_msg;
+                    }
+                }
                 $_notif_is_read = isset($notif['is_read']) ? $notif['is_read'] : 1;
+
+                // Build click-through links
+                $_notif_href = '#';
+                $_notif_data_page = '';
+                $_notif_data_params = '';
+
+                if ($_header_is_applicant) {
+                    // Clicking a dropdown item should mark it read then land on Notifications page
+                    $_notif_id = (int)($notif['id'] ?? 0);
+                    $_notif_data_page = 'notifications';
+                    $_notif_data_params = ($_notif_id > 0 && !$_notif_is_read) ? ('mark_read=' . $_notif_id) : '';
+
+                    // Non-JS / non-SPA fallback
+                    $_notif_href = 'index.php?page=notifications' . (!empty($_notif_data_params) ? ('&' . $_notif_data_params) : '');
+                } elseif ($_header_role === 'Admin') {
+                    // Admin: link to Audit Logs (SPA-aware)
+                    $_notif_data_page = 'audit-logs';
+
+                    $_act_upper = strtoupper(trim((string)($notif['action'] ?? '')));
+                    $_uid = (int)($notif['user_id'] ?? 0);
+
+                    if ($_act_upper !== '') {
+                        $_notif_data_params = 'action=' . rawurlencode($_act_upper);
+                        if ($_uid > 0) {
+                            $_notif_data_params .= '&user=' . $_uid;
+                        }
+                    }
+
+                    // Non-JS / non-SPA fallback
+                    $_notif_href = 'index.php?page=audit-logs' . (!empty($_notif_data_params) ? ('&' . $_notif_data_params) : '');
+                } else {
+                    // Other roles: just go back to their dashboard
+                    $_notif_href = 'dashboard.php';
+                }
                 
                 $icon_class = 'status';
                 $icon_name = 'info';
@@ -332,7 +382,11 @@ if ($_header_is_applicant) {
                 elseif ($time_ago < 86400) $time_str = floor($time_ago / 3600) . 'h ago';
                 else $time_str = date('M d', strtotime($notif['created_at']));
             ?>
-            <div class="notification-item <?php echo $_notif_is_read ? '' : 'unread'; ?>">
+            <a class="notification-item <?php echo $_notif_is_read ? '' : 'unread'; ?>" 
+               href="<?php echo htmlspecialchars($_notif_href); ?>"
+               <?php if (!empty($_notif_data_page)): ?>data-page="<?php echo htmlspecialchars($_notif_data_page); ?>"<?php endif; ?>
+               <?php if (!empty($_notif_data_params)): ?>data-params="<?php echo htmlspecialchars($_notif_data_params); ?>"<?php endif; ?>
+            >
                 <div class="notification-icon <?php echo $icon_class; ?>">
                     <i data-lucide="<?php echo $icon_name; ?>"></i>
                 </div>
@@ -340,7 +394,7 @@ if ($_header_is_applicant) {
                     <p><?php echo htmlspecialchars($_notif_msg); ?></p>
                     <span class="time"><?php echo $time_str; ?></span>
                 </div>
-            </div>
+            </a>
             <?php endforeach; ?>
             <?php endif; ?>
         </div>
@@ -348,6 +402,12 @@ if ($_header_is_applicant) {
         <?php if ($_header_is_applicant): ?>
         <div class="notification-dropdown-footer">
             <a href="notifications.php"><i data-lucide="eye" style="width: 1rem; height: 1rem;"></i>View All Notifications</a>
+        </div>
+        <?php elseif ($_header_role === 'Admin'): ?>
+        <div class="notification-dropdown-footer">
+            <a href="index.php?page=audit-logs&action=LOGIN" data-page="audit-logs" data-params="action=LOGIN">
+                <i data-lucide="history" style="width: 1rem; height: 1rem;"></i>View Login Activity
+            </a>
         </div>
         <?php else: ?>
         <div class="notification-dropdown-footer">
@@ -377,6 +437,19 @@ if ($_header_is_applicant) {
     // Prevent dropdown from closing when clicking inside
     document.getElementById('notificationDropdown').addEventListener('click', function(e) {
         e.stopPropagation();
+    });
+
+    // SPA-aware click handling for notification items (Admin audit logs, etc.)
+    document.querySelectorAll('#notificationDropdown [data-page]').forEach((el) => {
+        el.addEventListener('click', function(e) {
+            if (typeof HR1SPA !== 'undefined' && HR1SPA && typeof HR1SPA.loadPage === 'function') {
+                e.preventDefault();
+                const page = el.getAttribute('data-page');
+                const params = el.getAttribute('data-params') || '';
+                HR1SPA.loadPage(page, true, params);
+                document.getElementById('notificationDropdown').classList.remove('active');
+            }
+        });
     });
     
     // Initialize Lucide icons

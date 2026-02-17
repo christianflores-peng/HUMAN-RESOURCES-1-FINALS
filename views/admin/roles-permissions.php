@@ -224,10 +224,15 @@ $modules = ['dashboard', 'users', 'job_postings', 'applications', 'interviews', 
                                 <td><span class="user-count"><?php echo $role['user_count']; ?></span></td>
                                 <td style="color: #94a3b8; font-size: 0.85rem; max-width: 250px;"><?php echo htmlspecialchars($role['description'] ?? ''); ?></td>
                                 <td>
-                                    <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this role?');">
+                                    <form method="POST" style="display: inline;">
                                         <input type="hidden" name="action" value="delete_role">
                                         <input type="hidden" name="role_id" value="<?php echo $role['id']; ?>">
-                                        <button type="submit" class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">
+                                        <button type="submit" class="btn btn-danger" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;"
+                                            data-confirm-title="Delete Role"
+                                            data-confirm-variant="danger"
+                                            data-confirm-ok="Yes, delete"
+                                            data-confirm-cancel="Cancel"
+                                            data-confirm="Delete this role?">
                                             <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
                                         </button>
                                     </form>

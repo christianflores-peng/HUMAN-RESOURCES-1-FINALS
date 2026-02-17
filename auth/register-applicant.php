@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/session_helper.php';
 require_once '../database/config.php';
-require_once '../includes/otp_helper.php';
+require_once '../includes/email_generator.php';
 
 // Start secure session
 startSecureSession();
@@ -14,151 +14,15 @@ if (isset($_SESSION['user_id'])) {
 
 $error_message = '';
 $success_message = '';
-$show_otp_modal = false;
-$pending_email = '';
-$pending_phone = '';
 $job_id = intval($_GET['job_id'] ?? 0);
 $source = trim($_GET['source'] ?? '');
-if ($job_id > 0 && $source === 'apply') {
+$is_apply_flow = ($job_id > 0 && $source === 'apply');
+if ($is_apply_flow) {
     $_SESSION['apply_job_id'] = $job_id;
 }
 
-// Handle OTP verification for registration
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_registration_otp'])) {
-    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-        $error_message = 'Invalid security token. Please try again.';
-    } else {
-        $otp_code = trim($_POST['otp_code'] ?? '');
-        $pending_email = $_POST['pending_email'] ?? '';
-        $job_id = intval($_POST['job_id'] ?? 0);
-        $source = trim($_POST['source'] ?? '');
-        if ($job_id > 0 && $source === 'apply') {
-            $_SESSION['apply_job_id'] = $job_id;
-        }
-        
-        if (empty($otp_code)) {
-            $error_message = 'Please enter the verification code.';
-            $show_otp_modal = true;
-            $pending_phone = $_SESSION['pending_registration']['phone'] ?? '';
-        } else {
-            $result = verifyOTP($pending_email, $otp_code, 'registration');
-            
-            if ($result['success']) {
-                // OTP verified, complete registration with documents
-                require_once '../includes/email_helper.php';
-                
-                $first_name = $_SESSION['pending_registration']['first_name'];
-                $last_name = $_SESSION['pending_registration']['last_name'];
-                $email = $_SESSION['pending_registration']['email'];
-                $phone = $_SESSION['pending_registration']['phone'];
-                $password_hash = $_SESSION['pending_registration']['password_hash'];
-                $cover_letter = $_SESSION['pending_registration']['cover_letter'] ?? '';
-                $resume_temp_path = $_SESSION['pending_registration']['resume_temp_path'] ?? '';
-                
-                try {
-                    // Get Applicant role ID
-                    $applicant_role = fetchSingle("SELECT id FROM roles WHERE role_type = 'Applicant' LIMIT 1");
-                    
-                    if (!$applicant_role) {
-                        throw new Exception("Applicant role not found in system");
-                    }
-                    
-                    $role_id = $applicant_role['id'];
-                    
-                    // Start database transaction
-                    $pdo = getDBConnection();
-                    $pdo->beginTransaction();
-                    
-                    try {
-                        // Insert into user_accounts table
-                        $user_id = insertRecord(
-                            "INSERT INTO user_accounts (first_name, last_name, personal_email, phone, password_hash, role_id, status, created_at) 
-                             VALUES (?, ?, ?, ?, ?, ?, 'Active', NOW())",
-                            [$first_name, $last_name, $email, $phone, $password_hash, $role_id]
-                        );
-                        
-                        // Move temp file to final location with user_id
-                        $resume_path = '';
-                        if (!empty($resume_temp_path) && file_exists($resume_temp_path)) {
-                            $file_ext = pathinfo($resume_temp_path, PATHINFO_EXTENSION);
-                            $resume_path = 'resume_' . $user_id . '_' . time() . '.' . $file_ext;
-                            $final_path = '../uploads/resumes/' . $resume_path;
-                            rename($resume_temp_path, $final_path);
-                        }
-                        
-                        // Insert into applicant_profiles table
-                        $profile_id = insertRecord(
-                            "INSERT INTO applicant_profiles (user_id, resume_path, cover_letter, created_at) 
-                             VALUES (?, ?, ?, NOW())",
-                            [$user_id, $resume_path, $cover_letter]
-                        );
-                        
-                        // Create a general job application entry
-                        $application_id = insertRecord(
-                            "INSERT INTO job_applications 
-                            (job_posting_id, first_name, last_name, email, phone, resume_path, cover_letter, status, applied_date) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, 'new', NOW())",
-                            [$_SESSION['apply_job_id'] ?? null, $first_name, $last_name, $email, $phone, 'uploads/resumes/' . $resume_path, $cover_letter]
-                        );
-                        
-                        // Commit transaction
-                        $pdo->commit();
-                        
-                        // Clear session data
-                        unset($_SESSION['pending_registration']);
-                        $apply_job_id = $_SESSION['apply_job_id'] ?? 0;
-                        unset($_SESSION['apply_job_id']);
-
-                        $success_message = 'Registration successful! You can now login with your email and password.';
-                        if ($apply_job_id > 0) {
-                            header('refresh:2;url=../public/job_details.php?id=' . $apply_job_id);
-                        } else {
-                            header('refresh:2;url=login.php');
-                        }
-                        
-                    } catch (Exception $e) {
-                        $pdo->rollBack();
-                        
-                        // Clean up temp file
-                        if (!empty($resume_temp_path) && file_exists($resume_temp_path)) {
-                            unlink($resume_temp_path);
-                        }
-                        
-                        throw $e;
-                    }
-                    
-                } catch (Exception $e) {
-                    $error_message = 'Registration failed: ' . $e->getMessage();
-                }
-            } else {
-                incrementOTPAttempts($pending_email, 'registration');
-                $error_message = $result['message'];
-                $show_otp_modal = true;
-                $pending_phone = $_SESSION['pending_registration']['phone'] ?? '';
-            }
-        }
-    }
-}
-
-// Handle resend OTP for registration
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_registration_otp'])) {
-    $pending_email = $_POST['pending_email'] ?? '';
-    $pending_data = $_SESSION['pending_registration'] ?? null;
-    $job_id = intval($_POST['job_id'] ?? 0);
-    $source = trim($_POST['source'] ?? '');
-    if ($job_id > 0 && $source === 'apply') {
-        $_SESSION['apply_job_id'] = $job_id;
-    }
-    
-    if ($pending_data && !empty($pending_email)) {
-        $otp_code = createOTP($pending_email, $pending_data['phone'] ?? null, 'registration');
-        $user_name = $pending_data['first_name'] . ' ' . $pending_data['last_name'];
-        sendOTP($pending_email, $otp_code, $user_name, $pending_data['phone'] ?? null);
-        $success_message = 'A new verification code has been sent.';
-        $pending_phone = $pending_data['phone'] ?? '';
-    }
-    $show_otp_modal = true;
-}
+// If coming from a specific job application flow, resume should be required
+$resume_required = $is_apply_flow;
 
 // Handle registration form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
@@ -174,12 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         $cover_letter = trim($_POST['cover_letter'] ?? '');
         $job_id = intval($_POST['job_id'] ?? 0);
         $source = trim($_POST['source'] ?? '');
-        if ($job_id > 0 && $source === 'apply') {
+        // Recompute apply-flow flags for POST (GET flags may not match form submission)
+        $is_apply_flow = ($job_id > 0 && $source === 'apply');
+        $resume_required = $is_apply_flow;
+        if ($is_apply_flow) {
             $_SESSION['apply_job_id'] = $job_id;
         }
     
         // Validation
-        if (empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($phone) || empty($password)) {
             $error_message = 'Please fill in all required fields.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $error_message = 'Please enter a valid email address.';
@@ -188,11 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         } elseif ($password !== $confirm_password) {
             $error_message = 'Passwords do not match.';
         } else {
+            // Require resume if coming from Apply flow
+            if ($resume_required && (!isset($_FILES['resume']) || ($_FILES['resume']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK)) {
+                $error_message = 'Please upload your resume to continue with your job application.';
+            }
+
             // Handle resume upload
             $resume_temp_path = '';
+            $upload_dir = '../uploads/resumes/';
             
-            if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = '../uploads/resumes/';
+            if (empty($error_message) && isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
                 if (!is_dir($upload_dir)) {
                     mkdir($upload_dir, 0755, true);
                 }
@@ -240,26 +112,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                             unlink($resume_temp_path);
                         }
                     } else {
-                        // Store data temporarily and send OTP
-                        $_SESSION['pending_registration'] = [
-                            'first_name' => $first_name,
-                            'last_name' => $last_name,
-                            'email' => $email,
-                            'phone' => $phone,
-                            'password_hash' => password_hash($password, PASSWORD_DEFAULT),
-                            'cover_letter' => $cover_letter,
-                            'resume_temp_path' => $resume_temp_path
-                        ];
-                        
-                        // Generate and send OTP
-                        $otp_code = createOTP($email, $phone, 'registration');
-                        $user_name = $first_name . ' ' . $last_name;
-                        sendOTP($email, $otp_code, $user_name, $phone);
-                        
-                        $pending_email = $email;
-                        $pending_phone = $phone;
-                        $show_otp_modal = true;
-                        $success_message = 'Verification code sent to your email' . (!empty($phone) ? ' and phone' : '') . '.';
+                        // Complete registration immediately (OTP removed)
+                        $password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+                        // Get Applicant role ID
+                        $applicant_role = fetchSingle("SELECT id FROM roles WHERE role_type = 'Applicant' LIMIT 1");
+                        if (!$applicant_role) {
+                            throw new Exception('Applicant role not found in system');
+                        }
+                        $role_id = $applicant_role['id'];
+
+                        // Start database transaction
+                        $pdo = getDBConnection();
+                        $pdo->beginTransaction();
+
+                        $final_resume_path = '';
+                        try {
+                            // IMPORTANT: use the same $pdo connection for all statements inside the transaction.
+                            // Using insertRecord()/fetchSingle() here would open a new connection and bypass this transaction.
+
+                            // Insert into user_accounts table
+                            $stmt = $pdo->prepare(
+                                "INSERT INTO user_accounts (first_name, last_name, personal_email, phone, password_hash, role_id, status, created_at)
+                                 VALUES (?, ?, ?, ?, ?, ?, 'Active', NOW())"
+                            );
+                            $stmt->execute([$first_name, $last_name, $email, $phone, $password_hash, $role_id]);
+                            $user_id = (int)$pdo->lastInsertId();
+
+                            // Move temp file to final location with user_id (if uploaded)
+                            $resume_path = null;
+                            if (!empty($resume_temp_path) && file_exists($resume_temp_path)) {
+                                if (!is_dir($upload_dir)) {
+                                    mkdir($upload_dir, 0755, true);
+                                }
+                                $file_ext = strtolower(pathinfo($resume_temp_path, PATHINFO_EXTENSION));
+                                $resume_path = 'resume_' . $user_id . '_' . time() . '.' . $file_ext;
+                                $final_resume_path = $upload_dir . $resume_path;
+
+                                if (!rename($resume_temp_path, $final_resume_path)) {
+                                    throw new Exception('Failed to save resume file. Please try again.');
+                                }
+                            }
+
+                            // Insert into applicant_profiles table
+                            $stmt = $pdo->prepare(
+                                "INSERT INTO applicant_profiles (user_id, resume_path, cover_letter, created_at)
+                                 VALUES (?, ?, ?, NOW())"
+                            );
+                            $stmt->execute([$user_id, $resume_path, $cover_letter]);
+
+                            // Create a general job application entry
+                            $apply_job_id = $_SESSION['apply_job_id'] ?? ($job_id > 0 ? $job_id : null);
+                            $resume_db_path = $resume_path ? ('uploads/resumes/' . $resume_path) : null;
+                            $stmt = $pdo->prepare(
+                                "INSERT INTO job_applications
+                                (job_posting_id, first_name, last_name, email, phone, resume_path, cover_letter, status, applied_date)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, 'new', NOW())"
+                            );
+                            $stmt->execute([$apply_job_id, $first_name, $last_name, $email, $phone, $resume_db_path, $cover_letter]);
+                            $application_id = (int)$pdo->lastInsertId();
+
+                            // Audit: applicant submitted an application (visible to Admin/HR notifications)
+                            try {
+                                logAuditAction(
+                                    (int)$user_id,
+                                    'SUBMIT',
+                                    'job_applications',
+                                    (int)($application_id ?: 0),
+                                    null,
+                                    ['job_posting_id' => $apply_job_id],
+                                    "Applicant submitted application" . ($apply_job_id ? " for job #{$apply_job_id}" : '')
+                                );
+                            } catch (Exception $e) {
+                                // ignore
+                            }
+
+                            $pdo->commit();
+
+                            // Clear session data
+                            $apply_job_id_redirect = intval($_SESSION['apply_job_id'] ?? 0);
+                            unset($_SESSION['apply_job_id']);
+
+                            $success_message = 'Registration successful! You can now login with your email and password.';
+                            // Always go to login after registration
+                            header('refresh:2;url=login.php');
+                        } catch (Exception $e) {
+                            $pdo->rollBack();
+
+                            // Clean up files
+                            if (!empty($resume_temp_path) && file_exists($resume_temp_path)) {
+                                unlink($resume_temp_path);
+                            }
+                            if (!empty($final_resume_path) && file_exists($final_resume_path)) {
+                                unlink($final_resume_path);
+                            }
+
+                            throw $e;
+                        }
                     }
                 } catch (Exception $e) {
                     $error_message = 'Registration failed: ' . $e->getMessage();
@@ -466,7 +415,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 
         .form-label {
             display: block;
-            color: #ffffff
+            color: #ffffff;
             font-weight: 400;
             margin-bottom: 0.25rem;
             font-size: 0.7rem;
@@ -778,7 +727,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                             <div class="form-group">
                                 <label class="form-label">Upload Resume</label>
                                 <div class="file-upload" onclick="document.getElementById('resume').click()">
-                                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
+                                    <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" <?php echo $resume_required ? 'required' : ''; ?> onchange="updateFileName(this)">
                                     <div class="file-upload-label" id="file-label">
                                         <i data-lucide="upload" style="width: 2rem; height: 2rem; color: #0ea5e9;"></i>
                                         <p style="margin-top: 0.5rem;">Click to upload</p>
@@ -799,7 +748,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 </div>
 
                 <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='register-portal.php?terms_accepted=true'">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='<?php echo ($resume_required && $job_id > 0) ? ('../public/job_details.php?id=' . $job_id) : 'register-portal.php?terms_accepted=true'; ?>'">
                         <i data-lucide="arrow-left"></i>
                         Previous
                     </button>
@@ -855,208 +804,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 }
             });
         });
-    </script>
 
-    <!-- OTP Verification Modal for Registration -->
-    <div id="otpModal" class="otp-modal <?php echo $show_otp_modal ? 'active' : ''; ?>">
-        <div class="otp-modal-content">
-            <div class="otp-header">
-                <img src="../assets/images/slate.png" alt="SLATE Logo" class="otp-logo">
-                <h2>Verify Your Account</h2>
-                <p>Enter the 6-digit code sent to <strong style="color:#0ea5e9;"><?php echo htmlspecialchars(maskEmail($pending_email)); ?></strong></p>
-            </div>
-
-            <?php if (!empty($error_message) && $show_otp_modal): ?>
-            <div class="alert alert-error"><?php echo htmlspecialchars($error_message); ?></div>
-            <?php endif; ?>
-
-            <?php if (!empty($success_message) && $show_otp_modal): ?>
-            <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
-            <?php endif; ?>
-
-            <form method="POST" action="" class="otp-form">
-                <?php echo getCSRFTokenField(); ?>
-                <input type="hidden" name="verify_registration_otp" value="1">
-                <input type="hidden" name="pending_email" value="<?php echo htmlspecialchars($pending_email); ?>">
-                <?php if ($job_id > 0 && $source === 'apply'): ?>
-                <input type="hidden" name="job_id" value="<?php echo $job_id; ?>">
-                <input type="hidden" name="source" value="apply">
-                <?php endif; ?>
-                
-                <div class="otp-inputs">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="0" autofocus>
-                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
-                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
-                </div>
-                <input type="hidden" name="otp_code" id="otp_code_hidden">
-                
-                <button type="submit" class="otp-submit-btn">Verify & Continue</button>
-            </form>
-
-            <div class="otp-footer">
-                <p>Didn't receive the code?</p>
-                <form method="POST" action="" style="display: inline;">
-                    <?php echo getCSRFTokenField(); ?>
-                    <input type="hidden" name="resend_registration_otp" value="1">
-                    <input type="hidden" name="pending_email" value="<?php echo htmlspecialchars($pending_email); ?>">
-                    <?php if ($job_id > 0 && $source === 'apply'): ?>
-                    <input type="hidden" name="job_id" value="<?php echo $job_id; ?>">
-                    <input type="hidden" name="source" value="apply">
-                    <?php endif; ?>
-                    <button type="submit" class="resend-btn">Resend Code</button>
-                </form>
-                <button type="button" class="back-btn" onclick="closeOtpModal()">Back to Registration</button>
-            </div>
-
-            <div class="otp-timer">
-                <i data-lucide="timer"></i>
-                <span id="otpTimer">Code expires in 5:00</span>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .otp-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 25, 41, 0.95);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
-        }
-        .otp-modal.active { display: flex; }
-        .otp-modal-content {
-            background: #1e2936;
-            border-radius: 20px;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 420px;
-            text-align: center;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(58, 69, 84, 0.5);
-        }
-        .otp-header { margin-bottom: 2rem; }
-        .otp-logo { width: 80px; height: auto; margin-bottom: 1rem; }
-        .otp-header h2 { color: #ffffff; font-size: 1.5rem; margin-bottom: 0.5rem; }
-        .otp-header p { color: #94a3b8; font-size: 0.9rem; }
-        .otp-inputs { display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem; }
-        .otp-digit {
-            width: 50px; height: 60px;
-            background: #2a3544;
-            border: 2px solid #3a4554;
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        .otp-digit:focus {
-            outline: none;
-            border-color: #0ea5e9;
-            background: #2f3a4a;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
-        }
-        .otp-submit-btn {
-            width: 100%; padding: 1rem;
-            background: #0ea5e9;
-            border: none; border-radius: 8px;
-            color: white; font-size: 1rem; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease;
-        }
-        .otp-submit-btn:hover { background: #0284c7; }
-        .otp-footer { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(58, 69, 84, 0.5); }
-        .otp-footer p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.75rem; }
-        .resend-btn, .back-btn {
-            background: none; border: none;
-            color: #0ea5e9; font-size: 0.9rem;
-            cursor: pointer; padding: 0.5rem 1rem;
-            transition: color 0.3s;
-        }
-        .resend-btn:hover, .back-btn:hover { color: #38bdf8; }
-        .back-btn { color: #94a3b8; display: block; margin: 0.5rem auto 0; }
-        .otp-timer {
-            margin-top: 1rem;
-            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-            color: #f59e0b; font-size: 0.85rem;
-        }
-        .otp-timer i { width: 1.1rem; height: 1.1rem; }
-    </style>
-
-    <script>
-        // OTP Input handling
-        const otpDigits = document.querySelectorAll('.otp-digit');
-        const otpHidden = document.getElementById('otp_code_hidden');
-
-        if (otpDigits.length > 0) {
-            otpDigits.forEach((digit, index) => {
-                digit.addEventListener('input', (e) => {
-                    const value = e.target.value;
-                    if (value.length === 1 && index < otpDigits.length - 1) {
-                        otpDigits[index + 1].focus();
-                    }
-                    updateHiddenOTP();
-                });
-
-                digit.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && !digit.value && index > 0) {
-                        otpDigits[index - 1].focus();
-                    }
-                });
-
-                digit.addEventListener('paste', (e) => {
-                    e.preventDefault();
-                    const pastedData = e.clipboardData.getData('text').slice(0, 6);
-                    pastedData.split('').forEach((char, i) => {
-                        if (otpDigits[i]) otpDigits[i].value = char;
-                    });
-                    updateHiddenOTP();
-                    if (pastedData.length === 6) otpDigits[5].focus();
-                });
-            });
-        }
-
-        function updateHiddenOTP() {
-            let otp = '';
-            otpDigits.forEach(digit => otp += digit.value);
-            if (otpHidden) otpHidden.value = otp;
-        }
-
-        function closeOtpModal() {
-            document.getElementById('otpModal').classList.remove('active');
-            otpDigits.forEach(digit => digit.value = '');
-            if (otpHidden) otpHidden.value = '';
-        }
-
-        <?php if ($show_otp_modal): ?>
-        let timeLeft = 300;
-        const timerDisplay = document.getElementById('otpTimer');
-        
-        const countdown = setInterval(() => {
-            timeLeft--;
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.textContent = `Code expires in ${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                timerDisplay.textContent = 'Code expired. Please resend.';
-                timerDisplay.style.color = '#ef4444';
-            }
-        }, 1000);
-
-        document.querySelector('.otp-digit[data-index="0"]')?.focus();
-        <?php endif; ?>
-        
-        // Initialize Lucide icons
+        // Initialize Lucide icons on page load
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
